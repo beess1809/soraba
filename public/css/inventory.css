@@ -1,193 +1,205 @@
 :root {
-    --primary: #00afa0;
-    --hover: #85d7cf;
+  --primary: #7ca3d6;
+  --hover: #7ca3d6b3;
 }
 .brand-link {
-    border-bottom: 1px solid #dee2e6;
-    padding-bottom: 2rem;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 2rem;
 }
 .bg-inventory {
-    background-color: var(--primary);
-    color: #fff;
+  background-color: var(--primary);
+  color: #fff;
 }
 
 .sidebar-light-inventory .nav-sidebar > .nav-item > .nav-link.active {
-    background-color: var(--primary);
-    color: #fff;
+  background-color: var(--primary);
+  color: #fff;
 }
 
 .brand-link.text-sm .brand-image,
 .text-sm .brand-link .brand-image {
-    height: 33px;
+  height: 33px;
 }
 
 .hr1 {
-    background-color: var(--primary);
-    height: 5px;
-    margin-top: 2rem;
+  background-color: var(--primary);
+  height: 5px;
+  margin-top: 2rem;
 }
 
 .hr2 {
-    background-color: var(--primary);
-    height: 2px;
-    margin-bottom: 2rem;
-    margin-top: 2px;
+  background-color: var(--primary);
+  height: 2px;
+  margin-bottom: 2rem;
+  margin-top: 2px;
 }
 .bg-login {
-    align-items: center;
-    background-color: #ffffff;
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    height: 100vh;
-    -ms-flex-pack: center;
-    justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  height: 100vh;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.login-box {
+  z-index: 1;
 }
 .bg-login-logo {
-    margin-bottom: 1px;
-    margin-left: 1px;
-    left: 0;
-    bottom: 0;
-    width: 491px;
-    height: 489px;
-    position: fixed;
-    opacity: 0.2;
+  z-index: -1;
+  margin-bottom: 1px;
+  margin-left: 1px;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 453px;
+  position: fixed;
+  opacity: 1;
 }
 
 .btn-inventory {
-    color: #fff;
-    background-color: var(--primary);
-    border-color: var(--primary);
-    box-shadow: none;
+  color: #fff;
+  background-color: var(--primary);
+  border-color: var(--primary);
+  box-shadow: none;
 }
 .btn-inventory:hover {
-    color: #fff;
-    background-color: var(--hover);
-    border-color: var(--hover);
-    box-shadow: none;
+  color: #fff;
+  background-color: var(--hover);
+  border-color: var(--hover);
+  box-shadow: none;
 }
 
 .bg-inventory .navbar-nav .nav-link {
-    color: #ffffff;
+  color: #ffffff;
 }
 
 .nav-center {
-    position: relative;
-    left: 15%;
-    padding-top: 0.5rem;
-    margin-left: 4.5rem;
-    -webkit-transform: translateX(-50%);
-    -ms-transform: translateX(-50%);
-    transform: translateX(-50%);
+  position: relative;
+  left: 15%;
+  padding-top: 0.5rem;
+  margin-left: 4.5rem;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
 }
 
 .navbar-toggler {
-    padding: 0.25rem 0.75rem;
-    font-size: 1.25rem;
-    line-height: 1;
-    background-color: #fff0;
-    border: 1px solid #fff;
-    border-radius: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 1.25rem;
+  line-height: 1;
+  background-color: #fff0;
+  border: 1px solid #fff;
+  border-radius: 0.25rem;
 }
 
 .link-pos {
-    margin-right: 2rem;
+  margin-right: 2rem;
 }
 
 .active-link a {
-    background-color: white;
-    border-radius: 0.5rem;
-    color: var(--primary) !important;
+  background-color: white;
+  border-radius: 0.5rem;
+  color: var(--primary) !important;
 }
 
 .nav-tabs .nav-link {
-    color: grey;
+  color: grey;
 }
 
 .nav-tabs .nav-link.active,
 .nav-tabs .nav-item.show .nav-link {
-    color: white;
-    background-color: var(--primary);
-    /* border-color: 2px solid var(--navy) var(--navy) ; */
-    border-color: var(--primary);
+  color: white;
+  background-color: var(--primary);
+  /* border-color: 2px solid var(--navy) var(--navy) ; */
+  border-color: var(--primary);
 }
 
 .nav-tabs .nav-link:hover {
-    color: white;
-    background-color: var(--hover);
-    /* border-color: 2px solid var(--navy) var(--navy) ; */
-    border-color: var(--hover);
+  color: white;
+  background-color: var(--hover);
+  /* border-color: 2px solid var(--navy) var(--navy) ; */
+  border-color: var(--hover);
 }
 
 .nav-tabs {
-    border-bottom: white;
-    background-color: white;
-    border-color: white;
+  border-bottom: white;
+  background-color: white;
+  border-color: white;
 }
 
 .center {
-    width: 150px;
-    margin: 40px auto;
+  width: 150px;
+  margin: 40px auto;
 }
 
 .order {
-    background-color: #85d7cf8c;
-    padding: unset;
-    overflow-y: hidden;
-    overflow-x: hidden;
-    height: 86.8vh;
+  background-color: #7ba4dd4d;
+  padding: unset;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  height: 86.8vh;
 }
 
 .order-title {
-    background: #00afa073;
+  background: #7ca3d680;
 }
 
 .order-title span {
-    opacity: 1;
+  opacity: 1;
 }
 
 .detail-pesanan {
-    height: 42vh;
-    overflow: hidden;
+  height: 42vh;
+  overflow: hidden;
 }
 
 .footer-pesanan {
-    position: absolute;
-    bottom: 3%;
-    width: 100%;
-    padding-left: 2rem;
-    padding-right: 2rem;
+  position: absolute;
+  bottom: 3%;
+  width: 100%;
+  padding-left: 2rem;
+  padding-right: 2rem;
 }
 
 .customer {
-    padding: 2rem;
-    overflow-y: hidden;
-    overflow-x: hidden;
+  padding: 2rem;
+  overflow-y: hidden;
+  overflow-x: hidden;
 }
 .detail-transaction {
-    background-color: #85d7cf8c;
-    height: 86.8vh;
-    padding: 1rem;
-    overflow-y: scroll;
-    overflow-x: hidden;
+  background-color: #7ba4dd4d;
+  height: 86.8vh;
+  padding: 1rem;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 .logo-detail-transaction {
-    margin-bottom: -7%;
-    margin-left: 15%;
-    left: 0;
-    bottom: 0;
-    width: 491px;
-    height: 489px;
-    position: fixed;
-    opacity: 0.5;
+  margin-bottom: -7%;
+  margin-left: 15%;
+  left: 0;
+  bottom: 0;
+  width: 491px;
+  height: 489px;
+  position: fixed;
+  opacity: 0.5;
 }
 
 .label-bordered {
-    display: inline-block;
-    padding: 0.5rem;
-    border: 1px solid #ced4da;
-    border-radius: 10px;
-    width: 100%;
+  display: inline-block;
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 10px;
+  width: 100%;
+}
+
+.btn-soraba {
+  color: #fff;
+  background-color: #7aa4dd;
+  border-color: #7aa4dd;
+  box-shadow: none;
 }

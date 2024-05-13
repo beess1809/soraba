@@ -279,7 +279,7 @@ class PosController extends Controller
                         <input type="text" name="quant[2]" class="form-control input-number-' . $value->id . '" value="0"
                             min="0" max="' . $value->qty . '" style="background-color: #F2F2F280;border: 0px;text-align:center">
                         <span class="input-group-btn">
-                            <button type="button" class="btn btn-xs btn-success btn-number-' . $value->id . '" onclick="plusItem(' . $value->id . ')" data-type="plus" data-field="quant[2]">
+                            <button type="button" class="btn btn-xs btn-soraba btn-number-' . $value->id . '" onclick="plusItem(' . $value->id . ')" data-type="plus" data-field="quant[2]">
                                 <i class="fas fa-plus"></i>
                             </button>
                         </span>
@@ -577,6 +577,7 @@ class PosController extends Controller
     {
         $id = base64_decode($id);
         $data['transaction'] = Transaction::find($id);
+        $data['title'] =  'invoice '.$data['transaction']->invoice_no;
         return view('pos.invoice', $data);
     }
 

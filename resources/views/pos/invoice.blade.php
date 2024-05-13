@@ -54,8 +54,8 @@
                                     </th>
                                     <td valign="top">:</td>
                                     <td width="" style="text-align:justify">
-                                        Jl. Pantai Indah Kapuk Ruko Emerald Park No. 8-9, RT.6/RW.2, Kamal Muara, Kec.
-                                        Penjaringan, Kota Jkt Utara, Jakarta 14470
+                                        Office 88 Kasablanka Tower A, 18th floor Jl. Casablanca Raya Kav 88 Jakarta 12870,
+                                        Indonesia
                                     </td>
                                 </tr>
                                 <tr>
@@ -64,7 +64,7 @@
                                     </th>
                                     <td>:</td>
                                     <td class="justy">
-                                        021 29031691
+                                        +62 859-1065-30391
                                     </td>
                                 </tr>
                             </table>

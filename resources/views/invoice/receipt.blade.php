@@ -51,9 +51,18 @@
 <html>
 
 <head>
-    <title>Healthy Fit</title>
+    <title>receipt {{ $transaction->invoice_no }}</title>
     <style>
         /* Gaya untuk struk pembelian */
+
+        @font-face {
+            font-family: "source_sans_proregular";
+            src: local("Source Sans Pro"), url("fonts/sourcesans/sourcesanspro-regular-webfont.ttf") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+
+        }
+
         @media print {
             @page {
                 size: 100%;
@@ -70,22 +79,22 @@
         }
 
         body {
-            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            /* font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; */
             font-size: 13.5pt;
             width: 90mm;
             /* Lebar kertas thermal */
             margin: 0;
             padding: 0;
+            color: #717180;
+            font-family: Arial, sans-serif;
         }
 
         .lucida {
-            font-size: 13.5pt !important;
-
+            font-size: 12pt !important;
         }
 
         .lucida-content {
             font-size: 15pt !important;
-
         }
 
         .struk-container {
@@ -100,6 +109,17 @@
             font-size: 10px;
         }
 
+        .struk-header,
+        .struk-body,
+        .struk-footer {
+            margin: 10px 30px 0 30px;
+        }
+
+        .struk-header {
+            font-weight: 600;
+        }
+
+
         /* .item {
             display: flex;
             justify-content: space-between;
@@ -109,93 +129,89 @@
 
 <body>
     <div class="struk-container">
-        <div class="struk-header" style="text-align:center">
+        <div class="struk-header">
             <table class="lucida">
                 <tr>
-                    <td><img src="{{ asset('img/logo black.png') }}" alt="logo" width="100"></td>
-                    <td style="text-align: left">
-                        Jl PIK Ruko Emerald Park No. 8-9,
-                        Kamal Muara, Penjaringan,
-                        <br> DKI Jakarta 14470 | <span>021 29031691
-                            customer@healthyfit.com</span>
+                    <td>
+                        <img src="{{ asset('img/logo.png') }}" alt="logo" width="140" height="50">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: left; font-size:12px">
+                        Office 88 Kasablanka Tower A, 18<sup>th</sup>Floor<br>
+                        Jl. Casablanca Raya Kav 88<br> Jakarta 12870,
+                        Indonesia. <br> <span>+62 859-1065-30391, support@natha.co.id </span>
                     </td>
                 </tr>
             </table>
             <hr>
         </div>
-        <p style="margin-bottom: 0px">
-            {{ date('d / m / y', strtotime($transaction->date)) . ' - ' . date('H:i:s', strtotime($transaction->created_at)) }}
+
+        <p style="margin: 0 30px;font-size:12px; font-weight:600">
+            {{ date('d / m / y', strtotime($transaction->date)) . ' - ' . date('H:i', strtotime($transaction->created_at)) }}
             | {{ $transaction->created_by }} | {{ substr($transaction->invoice_no, 4, 4) }}
         </p>
 
-        <p style="margin-top: 0px">Customer : {{ substr($transaction->customer_name, 0, 20) }} |
-            {{ $transaction->customer_phone }}</p>
+        <p style="margin: 0 30px;font-size:12px; font-weight:600">Customer :
+            {{ substr($transaction->customer_name, 0, 20) }} |
+            {{ $transaction->customer_phone }}
+        </p>
 
-        <hr>
-        <!-- <div class="item"> -->
-        <table class="lucida-content">
-            @php
-                $total = 0;
-                $diskon = 0;
-            @endphp
-            @foreach ($transaction->details as $key => $item)
+        <div class="struk-body">
+            <hr>
+            <table class="lucida-content">
                 @php
-                    $price = $item->price + ($item->price * 11) / 100;
-                    $subtotal = $price * $item->qty;
-                    $diskon += $item->discount;
-                    $total = $total + $subtotal;
+                    $total = 0;
+                    $diskon = 0;
                 @endphp
+                @foreach ($transaction->details as $key => $item)
+                    @php
+                        $price = $item->price + ($item->price * 11) / 100;
+                        $subtotal = $price * $item->qty;
+                        $diskon += $item->discount;
+                        $total = $total + $subtotal;
+                    @endphp
+                    <tr>
+                        <td colspan="3" style="font-size:13px; font-weight:600">
+                            {{ strtoupper($item->item_name) }}
+                        </td>
+                    </tr>
+                    <tr style="font-size:12px; font-weight:500">
+                        <td>Rp.
+                            {{ number_format($item->price + $item->ppn / $item->qty, 0, ',', '.') }}</td>
+                        <td>x {{ $item->qty }}</td>
+                        <td style="text-align: right">Rp.
+                            {{ number_format($item->total + $item->discount, 0, ',', '.') }}
+                        </td>
+                    </tr>
+                    @if ($item->discount > 0.0)
+                        <tr style="font-size:12px; font-weight:500">
+                            <td colspan="2" style="text-align: right">Hemat</td>
+                            <td style="text-align: right">Rp. {{ format_rupiah($item->discount) }}</td>
+                        </tr>
+                    @endif
+                @endforeach
                 <tr>
                     <td colspan="3">
-                        {{ strtoupper($item->item_name) }}
+                        <hr>
                     </td>
                 </tr>
-                <tr>
-                    <td>Rp.
-                        {{ number_format($item->price + $item->ppn / $item->qty, 0, ',', '.') }}</td>
-                    <td>x {{ $item->qty }}</td>
-                    <td style="text-align: right">Rp. {{ number_format($item->total + $item->discount, 0, ',', '.') }}
-                    </td>
-                </tr>
-                @if ($item->discount > 0.0)
+                @if ($transaction->discount > 0)
                     <tr>
-                        <td colspan="2" style="text-align: right">Hemat</td>
-                        <td style="text-align: right">Rp. {{ format_rupiah($item->discount) }}</td>
+                        <td style="text-align: right" colspan="2">DISCOUNT</td>
+                        <td style="text-align: right">Rp. {{ number_format($transaction->discount, 0, ',', '.') }}</td>
                     </tr>
                 @endif
-            @endforeach
-            <tr>
-                <td colspan="3">
-                    <hr>
-                </td>
-            </tr>
-            @if ($transaction->discount > 0)
-                <tr>
-                    <td style="text-align: right" colspan="2">DISCOUNT</td>
-                    <td style="text-align: right">Rp. {{ number_format($transaction->discount, 0, ',', '.') }}</td>
+                <tr style="font-size:12px; font-weight:600">
+                    <td style="text-align: right" colspan="2">{{ $transaction->paymentType->name }}</td>
+                    <td style="text-align: right">Rp. {{ number_format($transaction->grand_total, 0, ',', '.') }}</td>
                 </tr>
-            @endif
-            <tr>
-                <td style="text-align: right" colspan="2">{{ $transaction->paymentType->name }}</td>
-                <td style="text-align: right">Rp. {{ number_format($transaction->grand_total, 0, ',', '.') }}</td>
-            </tr>
-            <tr>
-                <td colspan="3">
-                    <hr>
-                </td>
-            </tr>
-        </table>
-        <!-- </div> -->
 
-        <div class="struk-footer" style="text-align:center">
-            <p>DPP : Rp. {{ number_format($transaction->sub_total, 0, ',', '.') }} | PPN Rp.
-                {{ number_format($transaction->pajak, 0, ',', '.') }}</p>
-            <p>NPWP : 010612273051000
-                <br>
-                Barang yang sudah dibeli tidak dapat dikembalikan atau ditukar
-            </p>
+            </table>
             <hr>
-            <p>TERIMA KASIH <br>Semoga Lekas Sehat</p>
+        </div>
+        <div class="struk-footer" style="font-size:12px; font-weight:500">
+            <p>TERIMA KASIH</p>
         </div>
     </div>
 

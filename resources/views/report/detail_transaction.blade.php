@@ -68,14 +68,14 @@
         }
 
         header .hr {
-            background-color: #00AFA0;
+            background-color: #7ca3d6;
             height: 5px;
             width: 704px;
             margin-top: 90px;
         }
 
         header .hr2 {
-            background-color: #00AFA0;
+            background-color: #7ca3d6;
             height: 2px;
             width: 704px;
             margin-top: 2px;
@@ -194,12 +194,12 @@
             <table>
                 <tr>
                     <th valign="top">
-                        Apotek
+                        Office
                     </th>
                     <td valign="top">:</td>
                     <td width="170px" style="text-align:justify">
-                        Jl. Pantai Indah Kapuk Ruko Emerald Park No. 8-9, RT.6/RW.2, Kamal Muara, Kec. Penjaringan, Kota
-                        Jkt Utara, Jakarta 14470
+                        Office 88 Kasablanka Tower A, 18th floor Jl. Casablanca Raya Kav 88 Jakarta 12870,
+                        Indonesia
                     </td>
                 </tr>
                 <tr>
@@ -208,7 +208,7 @@
                     </th>
                     <td>:</td>
                     <td class="justy">
-                        021 29031691
+                        +62 859-1065-30391
                     </td>
                 </tr>
             </table>
@@ -263,7 +263,7 @@
             </div>
             <div class="signature">
                 <div class="pharm-signature">
-                    <p>Pharmacy</p><br><br><br>
+                    <p>Pegawai</p><br><br><br>
                     <p>(...........................)</p>
                 </div>
             </div>

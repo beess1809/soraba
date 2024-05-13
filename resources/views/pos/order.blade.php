@@ -26,24 +26,24 @@
                                     aria-controls="umum" aria-selected="false"><i class="fas fa-notes-medical">
                                         &nbsp;</i>Umum</a>
                             </li>
-                            <li class="nav-item">
+                            {{-- <li class="nav-item">
                                 <a class="nav-link" id="racikan-tab" data-toggle="pill" href="#racikan" role="tab"
                                     aria-controls="racikan" aria-selected="false"><i class="fas fa-pills">
                                         &nbsp;</i>
                                     Racikan</a>
-                            </li>
+                            </li> --}}
                         </ul>
                     </div>
-                    
+
                 </div>
 
                 <div class="tab-content" id="tabContent" style="padding-top: 1rem;">
                     <div class="tab-pane fade show active" id="umum" role="tabpanel" aria-labelledby="umum">
                         @include('pos.tab.umum')
                     </div>
-                    <div class="tab-pane fade show" id="racikan" role="tabpanel" aria-labelledby="racikan">
+                    {{-- <div class="tab-pane fade show" id="racikan" role="tabpanel" aria-labelledby="racikan">
                         @include('pos.tab.racikan')
-                    </div>
+                    </div> --}}
                 </div>
             </div>
             <!-- /.col-md-6 -->
@@ -57,7 +57,7 @@
                     @csrf
                     <div class="p-3">
                         <h4>Pesanan</h4>
-                        <div id="detail" class="detail-pesanan"  style="overflow-y: scroll;height: 250px">
+                        <div id="detail" class="detail-pesanan" style="overflow-y: scroll;height: 250px">
 
                         </div>
                     </div>
@@ -370,36 +370,36 @@
 
             // if(cat_id) {
 
-                $.ajax({
-                    url: '{{ route('items.getItemByCategory') }}',
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    dataType: 'json',
-                    data: {
-                        cat_id
-                    },
-                    success: (data) => {
-                        // console.log(data);
-                        $('#card-item').html('')
-    
-                        for (let i = 0; i < data.length; i++) {
-                            $('#card-item').append(data[i])
-                        }
-                        // var str_data = '<option value="">Select City</option>';
-                        // str_data += data.map((project) => {
-                        //     return '<option value="' + project.city_id + '">' + project.city_name +
-                        //         '</option>';
-                        // });
-                        // $('#city').html(str_data);
-                        // Swal.close();
-                    },
-                    error: (xhr) => {
-                        console.log(xhr);
-                        // Swal.close();
+            $.ajax({
+                url: '{{ route('items.getItemByCategory') }}',
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                dataType: 'json',
+                data: {
+                    cat_id
+                },
+                success: (data) => {
+                    // console.log(data);
+                    $('#card-item').html('')
+
+                    for (let i = 0; i < data.length; i++) {
+                        $('#card-item').append(data[i])
                     }
-                });
+                    // var str_data = '<option value="">Select City</option>';
+                    // str_data += data.map((project) => {
+                    //     return '<option value="' + project.city_id + '">' + project.city_name +
+                    //         '</option>';
+                    // });
+                    // $('#city').html(str_data);
+                    // Swal.close();
+                },
+                error: (xhr) => {
+                    console.log(xhr);
+                    // Swal.close();
+                }
+            });
             // }
         });
     </script>

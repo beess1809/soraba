@@ -167,18 +167,16 @@ class ReportController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('A1', 'No');
-        $sheet->setCellValue('B1', 'No Invoice');
-        $sheet->setCellValue('C1', 'Nama Pelanggan');
-        $sheet->setCellValue('D1', 'Tanggal Pemesanan');
-        $sheet->setCellValue('E1', 'Tipe Pembayaran');
-        $sheet->setCellValue('F1', 'Tanggal Pembayaran');
-        $sheet->setCellValue('G1', 'Subtotal Item');
-        $sheet->setCellValue('H1', 'Biaya Embalase');
-        $sheet->setCellValue('I1', 'Subtotal');
-        $sheet->setCellValue('J1', 'Pajak');
-        $sheet->setCellValue('K1', 'Total');
-        $sheet->setCellValue('L1', 'Diskon');
-        $sheet->setCellValue('M1', 'Grand Total');
+        $sheet->setCellValue('B1', 'No Invoice')->getColumnDimension('B')->setWidth(30);
+        $sheet->setCellValue('C1', 'Nama Pelanggan')->getColumnDimension('C')->setWidth(25);
+        $sheet->setCellValue('D1', 'Tanggal Pemesanan')->getColumnDimension('D')->setWidth(20);
+        $sheet->setCellValue('E1', 'Tipe Pembayaran')->getColumnDimension('E')->setWidth(15);
+        $sheet->setCellValue('F1', 'Tanggal Pembayaran')->getColumnDimension('F')->setWidth(20);
+        $sheet->setCellValue('G1', 'Subtotal Item')->getColumnDimension('G')->setWidth(15);
+        $sheet->setCellValue('H1', 'Subtotal')->getColumnDimension('H')->setWidth(15);
+        $sheet->setCellValue('I1', 'Total')->getColumnDimension('I')->setWidth(15);
+        $sheet->setCellValue('J1', 'Diskon')->getColumnDimension('J')->setWidth(15);
+        $sheet->setCellValue('K1', 'Grand Total')->getColumnDimension('K')->setWidth(15);
         $no = 2;
         foreach ($data as $key => $item) {
 
@@ -190,18 +188,17 @@ class ReportController extends Controller
             $sheet->setCellValue('F' . $no, sqlindo_datetime_to_datetime($item->updated_at));
             $sheet->setCellValue('G' . $no, $item->sub_total);
             $sheet->getStyle('G' . $no)->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->setCellValue('H' . $no, $item->cost);
+      
+           
+            $sheet->setCellValue('H' . $no, $item->sub_total);
             $sheet->getStyle('H' . $no)->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->setCellValue('I' . $no, $item->sub_total);
+           
+            $sheet->setCellValue('I' . $no, $item->total);
             $sheet->getStyle('I' . $no)->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->setCellValue('J' . $no, $item->pajak);
+            $sheet->setCellValue('J' . $no, $item->discount);
             $sheet->getStyle('J' . $no)->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->setCellValue('K' . $no, $item->total);
+            $sheet->setCellValue('K' . $no, $item->grand_total);
             $sheet->getStyle('K' . $no)->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->setCellValue('L' . $no, $item->discount);
-            $sheet->getStyle('L' . $no)->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->setCellValue('M' . $no, $item->grand_total);
-            $sheet->getStyle('M' . $no)->getNumberFormat()->setFormatCode('#,##0');
 
             $no++;
         }
@@ -306,14 +303,14 @@ class ReportController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('A1', 'No');
-        $sheet->setCellValue('B1', 'No Invoice');
-        $sheet->setCellValue('C1', 'Nama Item');
-        $sheet->setCellValue('D1', 'Kuantitas');
-        $sheet->setCellValue('E1', 'Harga Jual');
-        $sheet->setCellValue('F1', 'Subtotal');
-        $sheet->setCellValue('G1', 'Pajak');
-        $sheet->setCellValue('H1', 'Diskon');
-        $sheet->setCellValue('I1', 'Total');
+        $sheet->setCellValue('B1', 'No Invoice')->getColumnDimension('B')->setWidth(30);
+        $sheet->setCellValue('C1', 'Nama Item')->getColumnDimension('C')->setWidth(35);
+        $sheet->setCellValue('D1', 'Kuantitas')->getColumnDimension('D')->setWidth(15);
+        $sheet->setCellValue('E1', 'Harga Jual')->getColumnDimension('E')->setWidth(15);
+        $sheet->setCellValue('F1', 'Subtotal')->getColumnDimension('F')->setWidth(15);
+        $sheet->setCellValue('G1', 'Pajak')->getColumnDimension('G')->setWidth(15);
+        $sheet->setCellValue('H1', 'Diskon')->getColumnDimension('H')->setWidth(15);
+        $sheet->setCellValue('I1', 'Total')->getColumnDimension('I')->setWidth(15);
         $no = 2;
         foreach ($details as $key => $item) {
             $sheet->setCellValue('A' . $no, $no);

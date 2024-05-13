@@ -4,9 +4,9 @@
             <!-- <label>Filter </label> -->
             <select name="category" id="category" class="form-control form-control-sm select2">
                 <option value="">Select All</option>
-            @foreach (App\Models\Master\Category::all() as $category)
-                <option value="{{ $category->id }}">{{ $category->name }}</option>
-            @endforeach    
+                @foreach (App\Models\Master\Category::all() as $category)
+                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                @endforeach
             </select>
         </div>
     </div>
@@ -27,12 +27,13 @@
     </div>
     <div class="col-lg-4 col-sm-4">
         <!-- <div class="float-right"> -->
-            <div class="input-group input-group-sm">
-                <input type="text" id="cari" class="form-control">
-                <span class="input-group-append">
-                    <button type="button" id="btn-cari" class="btn btn-inventory btn-flat"><i class="fas fa-search"></i>Cari</button>
-                </span>
-            </div>
+        <div class="input-group input-group-sm">
+            <input type="text" id="cari" class="form-control">
+            <span class="input-group-append">
+                <button type="button" id="btn-cari" class="btn btn-inventory btn-flat"><i
+                        class="fas fa-search"></i>Cari</button>
+            </span>
+        </div>
         <!-- </div> -->
     </div>
 </div>

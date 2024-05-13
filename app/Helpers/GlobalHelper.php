@@ -161,6 +161,9 @@ if (!function_exists('getNumber')) {
         $lastNumber = "INV/" . sprintf('%04d', $no + 1) . "/" . getRomawi($month) . "/NATHA/HF-PIK/" . $year;
 
         return $lastNumber;
+
+        // INV/001/03/2024/NJM
+        //001 no urut, 01 nama bulan, 2024 nama tahun, NJM nama copmany
     }
 }
 

@@ -48,10 +48,8 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                    <button class="btn btn-secondary" id="export"><i class="fas fa-file"></i> Download
-                        Transaksi</button>
-                    <button class="btn btn-info" id="print"><i class="fas fa-file"></i> Print
-                        Transaksi</button>
+                    <button class="btn btn-secondary" id="export"><i class="fas fa-file"></i> Download Transaksi</button>
+                    <button class="btn btn-info" id="print"><i class="fas fa-file"></i> Print Transaksi</button>
                     <div id="pdfContainer"></div>
                 </div>
                 <div class="card-body">
