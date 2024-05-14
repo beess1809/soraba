@@ -134,6 +134,7 @@
                 '<a href="{{ route('items.create') }}" class="btn btn-sm bg-inventory" title="Add Item"><i class="fas fa-plus"></i> Add Item</a>' +
                 '&nbsp <a href="{{ route('items.formUpload') }}" class="btn btn-sm btn-success modal-create-upload" title="Add Item"><i class="fas fa-file-excel"></i> Upload Items</a>' +
                 '&nbsp <a href="{{ route('items.formUpdateUpload') }}" class="btn btn-sm btn-primary modal-create-upload" title="Update Bulk Item"><i class="fas fa-file-excel"></i> Update Bulk Items</a>' +
+                '&nbsp <a href="{{ route('items.createBundling') }}" class="btn btn-sm btn-secondary" title="Add Bundling"><i class="fas fa-plus"></i> Add Bundling</a>' +
                 '</div>';
             $("div.toolbar").html(toolbar);
 
@@ -143,3 +144,16 @@
         });
     </script>
 @endpush
+
+{{-- stok A = 50
+stok B = 50
+stok C = 50
+
+bundling
+A = 25
+B = 25
+C = 25
+per item
+A = 25
+B = 25
+C = 25 --}}

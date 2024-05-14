@@ -60,10 +60,10 @@ class PosController extends Controller
             $model->grand_total = str_replace('.', '', $request->total);
             $model->cost = str_replace('.', '', $request->total_cost);
 
-            $sub = round(reverse_tax($model->total));
+            // $sub = round(reverse_tax($model->total));
 
-            $model->pajak = $model->total - $sub;
-            $model->sub_total = $sub;
+            // $model->pajak = $model->total - $sub;
+            $model->sub_total = $model->total;
             $model->created_by = Auth::user()->id;
             $model->save();
 
@@ -73,13 +73,13 @@ class PosController extends Controller
                 $dtl->transaction_id = $model->id;
                 $dtl->item_id = json_encode($request->item_id[$value]);
                 $dtl->qty_item = json_encode($request->item_qty[$value]);
-                $dtl->item_pajak = json_encode($request->item_pajak[$value]);
+                // $dtl->item_pajak = json_encode($request->item_pajak[$value]);
                 $dtl->item_price = json_encode($request->item_price[$value]);
                 $dtl->item_discount = json_encode($request->item_discount[$value]);
                 $dtl->qty = $request->qty[$key];
                 $dtl->item_name = strtoupper($request->item_name[$key]);
                 $dtl->total = $request->price[$key];
-                $dtl->ppn = $request->pajak[$key];
+                // $dtl->ppn = $request->pajak[$key];
                 $dtl->discount = $request->discount[$key];
                 $dtl->cost = $request->cost[$key];
                 $dtl->price = $request->sub_price[$key];
@@ -349,15 +349,15 @@ class PosController extends Controller
                         ->header('Content-Type', 'json');
                 }
                 $discount = is_null($item->discount) ? 0 : (($item->sale_price * $request->qty_item[$key])) * $item->discount / 100;
-                $sebelum_pajak = round(reverse_tax($item->sale_price * $request->qty_item[$key]));
+                // $sebelum_pajak = round(reverse_tax($item->sale_price * $request->qty_item[$key]));
                 $subprice = $item->sale_price * $request->qty_item[$key];
 
-                $item_price = reverse_tax($item->sale_price);
-                $item_pajak = $item->sale_price - $item_price;
+                $item_price = $item->sale_price;
+                // $item_pajak = $item->sale_price - $item_price;
 
                 $string .= '<input type="hidden" name="item_id[' . $time . '][' . $key . ']" value="' . $item->id . '">';
                 $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' . $request->qty_item[$key] . '">';
-                $string .= '<input type="hidden" name="item_pajak[' . $time . '][' . $key . ']" value="' . $item_pajak . '">';
+                // $string .= '<input type="hidden" name="item_pajak[' . $time . '][' . $key . ']" value="' . $item_pajak . '">';
                 $string .= '<input type="hidden" name="item_price[' . $time . '][' . $key . ']" value="' . $item_price . '">';
                 $string .= '<input type="hidden" name="item_discount[' . $time . '][' . $key . ']" value="' . $discount . '">';
 
@@ -367,7 +367,7 @@ class PosController extends Controller
             // $price = $harga / $request->qty;
             $sub = $harga;
             // $totPajak = round(pajak($sub + $cost));
-            $totPajak = round(reverse_tax($sub));
+            $totPajak = 0;
 
             $harga = $sub  - $disc + $request->cost;
             $price = ($sub + $request->cost) / $request->qty;
@@ -413,8 +413,8 @@ class PosController extends Controller
             // $harga -=  $disc;
         } else {
             $item = Item::find($request->item_id);
-            $sub = round(reverse_tax($item->sale_price));
-            $pajak = $item->sale_price - $sub;
+            $sub = $item->sale_price;
+            // $pajak = $item->sale_price - $sub;
             $harga = $item->sale_price * $request->qty;
 
             $discount = is_null($item->discount) ? 0 : ($harga) * $item->discount / 100;
@@ -430,7 +430,6 @@ class PosController extends Controller
                 <input type="hidden" name="item_name[]" value="' . $item->name . '">
                 <input type="hidden" name="index[]" value="' . $time . '">
                     <input type="hidden" name="item_id[' . $time . '][0]" value="' . $item->id . '">
-                    <input type="hidden" name="item_pajak[' . $time . '][0]" value="' . $pajak . '">
                     <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
                     <input type="hidden" name="item_qty[' . $time . '][0]" value="' . $request->qty . '">
                     <input type="hidden" name="item_price[' . $time . '][0]" value="' . $sub . '">
@@ -447,7 +446,6 @@ class PosController extends Controller
                                 <strong class="float-right" style="margin-right: 2rem">
                                 Rp. ' . number_format($harga  - $discount, '0', ',', '.') . '
                                     <input type="hidden" name="price[]" id="price_' . $time . '" value="' . $harga - $discount . '">
-                                    <input type="hidden" name="pajak[]" id="pajak_' . $time . '" value="' . $pajak . '">
                                     <input type="hidden" name="cost[]" id="cost_' . $time . '"  value="' . $cost . '">
                                     <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $sub . '">
                                     <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ')">

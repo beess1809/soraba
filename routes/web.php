@@ -78,6 +78,10 @@ Route::middleware('auth:employee')->group(function () {
         Route::get('/formatUpdateExcel', [ItemController::class, 'formatUpdateExcel'])->name('formatUpdateExcel');
         Route::post('/updateuploadExcel', [ItemController::class, 'updateuploadExcel'])->name('updateuploadExcel');
         Route::post('/datatable', [ItemController::class, 'datatable'])->name('datatable');
+        
+        Route::get('/create-bundling', [ItemController::class, 'createBundling'])->name('createBundling');
+        Route::post('/storeBundling', [ItemController::class, 'storeBundling'])->name('storeBundling');
+        Route::get('/add-bundling', [ItemController::class, 'addBundling'])->name('addBundling');
         Route::resource('', ItemController::class, ['parameters' => ['' => 'id']]);
     });
 
