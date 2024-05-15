@@ -95,7 +95,7 @@
                                         <td>{{ $item->item_name }}</td>
                                         <td>x{{ $item->qty }}</td>
                                         <td style="text-align: center">
-                                            {{ number_format($item->price, 0, ',', '.') }}
+                                            {{ number_format($item->price + $item->ppn, 0, ',', '.') }}
                                         </td>
                                         <td style="text-align: center">
                                             {{ number_format($item->discount, 0, ',', '.') }}

@@ -333,7 +333,7 @@ class PosController extends Controller
             $totPajak = 0;
             $string = '';
             $disc = 0;
-            $cost = $request->cost;
+            $cost = str_replace('.', '', $request->cost);
             foreach ($request->item_id as $key => $value) {
 
                 $item = Item::find($value);
@@ -369,47 +369,47 @@ class PosController extends Controller
             // $totPajak = round(pajak($sub + $cost));
             $totPajak = 0;
 
-            $harga = $sub  - $disc + $request->cost;
+            $harga = $request->qty * $cost;//$sub  - $disc + $request->cost;
             $price = ($sub + $request->cost) / $request->qty;
 
             $html = '<div class="row item-detail" id="detail-' . $time . '">
-        <div class="col-2">
-            <img src="' . asset('img/no-pict.png') . '" width="100%" height="84px" class="rounded">
-        </div>
-        <div class="col-10">
-            <dl>
-                <dd style="margin-bottom: 0px">' . strtoupper($request->item_name) . '</dd>
-                <input type="hidden" name="index[]" value="' . $time . '">
-                <input type="hidden" name="item_name[]" value="' . $request->item_name . '">
-                ' . $string . '
-                <input type="hidden" name="type[]" value="' . $request->tipe . '">
-                <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
-                <input type="hidden" name="qty[]" value="' . $request->qty . '">
-
-                <dd style="margin-bottom: 0px">
-                    <div class="row">
-                        <div class="col-5">
-                            <textarea class="form-control" rows="1" name="notes[]" placeholder="Catatan" style="min-width: 100%"></textarea>
-
+                        <div class="col-2">
+                            <img src="' . asset('img/no-pict.png') . '" width="100%" height="84px" class="rounded">
                         </div>
-                        <div class="col-7">
-                            <strong class="float-right" style="margin-right: 2rem">
-                            Rp. ' . number_format($harga, '0', ',', '.') . '
-                                <input type="hidden" name="price[]" id="price_' . $time . '" value="' . $harga . '">
-                                    <input type="hidden" name="pajak[]" id="pajak_' . $time . '" value="' . $totPajak . '">
-                                    <input type="hidden" name="discount[]" value="' . $disc . '">
-                                    <input type="hidden" name="cost[]" id="cost_' . $time . '" value="' . str_replace('.', '', $request->cost) . '">
-                                    <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $price . '">
-                                <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ')">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                            </strong>
+                        <div class="col-10">
+                            <dl>
+                                <dd style="margin-bottom: 0px">' . strtoupper($request->item_name) . '</dd>
+                                <input type="hidden" name="index[]" value="' . $time . '">
+                                <input type="hidden" name="item_name[]" value="' . $request->item_name . '">
+                                ' . $string . '
+                                <input type="hidden" name="type[]" value="' . $request->tipe . '">
+                                <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
+                                <input type="hidden" name="qty[]" value="' . $request->qty . '">
+
+                                <dd style="margin-bottom: 0px">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <textarea class="form-control" rows="1" name="notes[]" placeholder="Catatan" style="min-width: 100%"></textarea>
+
+                                        </div>
+                                        <div class="col-7">
+                                            <strong class="float-right" style="margin-right: 2rem">
+                                            Rp. ' . number_format($harga, '0', ',', '.') . '
+                                                <input type="hidden" name="price[]" id="price_' . $time . '" value="' . str_replace('.', '', $harga) . '">
+                                                    <input type="hidden" name="pajak[]" id="pajak_' . $time . '" value="' . $totPajak . '">
+                                                    <input type="hidden" name="discount[]" value="' . $disc . '">
+                                                    <input type="hidden" name="cost[]" id="cost_' . $time . '" value="' . str_replace('.', '', $request->cost) . '">
+                                                    <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $harga . '">
+                                                <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ')">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </dd>
+                            </dl>
                         </div>
-                    </div>
-                </dd>
-            </dl>
-        </div>
-    </div>';
+                    </div>';
             // $harga -=  $disc;
         } else {
             $item = Item::find($request->item_id);

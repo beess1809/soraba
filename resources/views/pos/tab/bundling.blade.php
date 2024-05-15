@@ -1,5 +1,5 @@
     <div class="form-group">
-        <label for="item" class="col-sm-12 col-form-label">Nama Obat <span class="text-red">*</span></label>
+        <label for="item" class="col-sm-12 col-form-label">Nama Bundle <span class="text-red">*</span></label>
         <div class="col-sm-6">
             <input type="text" name="__item_name" id="__item_name" class="form-control" placeholder="">
         </div>
@@ -9,7 +9,7 @@
             <label for="item" class="col-sm-12 col-form-label">Pilih Item <span class="text-red">*</span></label>
             <div class="col-sm-12">
                 <select class=" form-control select-item item-formula" name="__item_id[]" id="__item_ids">
-                    <option value="">Pilih Item Untuk diracik</option>
+                    <option value="">Pilih Item Untuk di bundle</option>
                 </select>
                 @error('item')
                     <small class="text-red">
@@ -33,9 +33,9 @@
         </div>
         <div class="form-group  col-4">
             <label for="item" class="col-sm-12 col-form-label"> <span class="text-white">*</span></label>
-            <button type="button" class="btn" id="add-obat"> 
+            <button type="button" class="btn" id="add-obat">
                 <i class="fas fa-plus" style="color: var(--primary)"></i>
-                &nbsp;<span style="color: var(--primary)"> Tambah Item Racikan</span>
+                &nbsp;<span style="color: var(--primary)"> Tambah Item Bundling</span>
             </button>
         </div>
     </div>
@@ -43,8 +43,7 @@
 
     </div>
     <div class="form-group col-6">
-        <label for="item" class="col-sm-12 col-form-label">Jumlah Obat Racikan <span
-                class="text-red">*</span></label>
+        <label for="item" class="col-sm-12 col-form-label">Jumlah Paket <span class="text-red">*</span></label>
         <div class="col-sm-12">
             <input type="number" name="__qty" id="__qty" class="form-control" placeholder="">
             @error('qty')
@@ -56,15 +55,16 @@
     </div>
 
     <div class="form-group col-6">
-        <label for="item" class="col-sm-12 col-form-label">Embalase <span class="text-red">*</span></label>
+        <label for="item" class="col-sm-12 col-form-label">Harga Bundle <span class="text-red">*</span></label>
         <div class="col-sm-12">
-            <select name="cost" id="cost" class="form-control select2">
+            <input type="text" class="form-control number" name="cost" id="cost" value="{{ old('cost') }}">
+            {{-- <select name="cost" id="cost" class="form-control select2">
                 <option value="">Pilih Harga</option>
                 @foreach (App\Models\Master\Parameter::whereIn('code', ['em1', 'em2'])->get() as $item)
                     <option value="{{ $item->value }}">
                         {{ $item->name . '(Rp. ' . number_format($item->value, 0, ',', '.') . ' )' }}</option>
                 @endforeach
-            </select>
+            </select> --}}
         </div>
     </div>
     {{-- <div class="form-group">
@@ -120,7 +120,7 @@
                     '<div class="col-sm-12">' +
                     '<select class=" form-control select-item item-formula" name="__item_id[]" id="__item_ids_' +
                     norow + '">' +
-                    '<option value="">Pilih Item Untuk Diracik</option>' +
+                    '<option value="">Pilih Item Untuk di bundle</option>' +
                     '</select>' +
                     '</div>' +
                     '</div>' +

@@ -26,12 +26,11 @@
                                     aria-controls="umum" aria-selected="false"><i class="fas fa-notes-medical">
                                         &nbsp;</i>Umum</a>
                             </li>
-                            {{-- <li class="nav-item">
-                                <a class="nav-link" id="racikan-tab" data-toggle="pill" href="#racikan" role="tab"
-                                    aria-controls="racikan" aria-selected="false"><i class="fas fa-pills">
-                                        &nbsp;</i>
-                                    Racikan</a>
-                            </li> --}}
+                            <li class="nav-item">
+                                <a class="nav-link" id="bundling-tab" data-toggle="pill" href="#bundling" role="tab"
+                                    aria-controls="bundling" aria-selected="false"><i class="fas fa-pills">
+                                        &nbsp;</i>Bundling</a>
+                            </li>
                         </ul>
                     </div>
 
@@ -41,9 +40,9 @@
                     <div class="tab-pane fade show active" id="umum" role="tabpanel" aria-labelledby="umum">
                         @include('pos.tab.umum')
                     </div>
-                    {{-- <div class="tab-pane fade show" id="racikan" role="tabpanel" aria-labelledby="racikan">
-                        @include('pos.tab.racikan')
-                    </div> --}}
+                    <div class="tab-pane fade show" id="bundling" role="tabpanel" aria-labelledby="bundling">
+                        @include('pos.tab.bundling')
+                    </div>
                 </div>
             </div>
             <!-- /.col-md-6 -->
