@@ -153,12 +153,12 @@ if (!function_exists('getNumber')) {
             $no = explode("/", $lastTrx);
             $no = $no[1];
         } else {
-            $lastTrx =  "INV/0000/" . $month . "/NATHA/HF-PIK/" . $year;
+            $lastTrx =  "#INV/0000/" . $month . "/".$year."/NJM";
             $no = "0000";
         }
 
 
-        $lastNumber = "INV/" . sprintf('%04d', $no + 1) . "/" . getRomawi($month) . "/NATHA/HF-PIK/" . $year;
+        $lastNumber = "#INV/" . sprintf('%04d', $no + 1) . "/" . getRomawi($month) . "/".$year."/NJM" ;
 
         return $lastNumber;
 

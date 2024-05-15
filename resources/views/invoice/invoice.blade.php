@@ -350,8 +350,8 @@
                         <tr>
                             <td>No.</td>
                             <td>:</td>
-                            {{-- <td><i>{{ $transaction->invoice_no }}</i></td> --}}
-                            <td>#INV/018/03?2024/NJM</td>
+                            <td><i>{{ $transaction->invoice_no }}</i></td>
+                            {{-- <td>#INV/018/03/2024/NJM</td> --}}
                         </tr>
                         <tr>
                             <td>Tgl</td>

@@ -149,7 +149,7 @@
 
         <p style="margin: 0 30px;font-size:12px; font-weight:600">
             {{ date('d / m / y', strtotime($transaction->date)) . ' - ' . date('H:i', strtotime($transaction->created_at)) }}
-            | {{ $transaction->created_by }} | {{ substr($transaction->invoice_no, 4, 4) }}
+            | {{ $transaction->created_by }} | {{ $transaction->invoice_no }}
         </p>
 
         <p style="margin: 0 30px;font-size:12px; font-weight:600">Customer :
