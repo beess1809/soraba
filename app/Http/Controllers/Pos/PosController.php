@@ -399,7 +399,7 @@ class PosController extends Controller
                                                     <input type="hidden" name="pajak[]" id="pajak_' . $time . '" value="' . $totPajak . '">
                                                     <input type="hidden" name="discount[]" value="' . $disc . '">
                                                     <input type="hidden" name="cost[]" id="cost_' . $time . '" value="' . str_replace('.', '', $request->cost) . '">
-                                                    <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $harga . '">
+                                                    <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $cost . '">
                                                 <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ')">
                                                     <i class="fas fa-minus"></i>
                                                 </button>
