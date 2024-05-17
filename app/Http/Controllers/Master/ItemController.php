@@ -164,7 +164,8 @@ class ItemController extends Controller
         if (empty($term)) {
             $datas = Item::all();
         } else {
-            $datas = Item::where('name', 'like', '%' . $term . '%')->get();
+            $datas = Item::find($term);
+            // $datas = Item::where('name', 'like', '%' . $term . '%')->get();
         }
         $res = [];
         foreach ($datas as $data) {
@@ -662,49 +663,4 @@ class ItemController extends Controller
         $res = ['res' => 'success'];
         return $res;
     }
-
-    public function createBundling()
-    {
-        $data['model'] = new Item();
-        $data['item'] = Item::all();
-        return view('item.formBundling', $data);
-    }
-
-    public function storeBundling(Request $request)
-    {
-        $item = [];
-        $request->validate([
-            'name' => 'required',
-            'price' => 'required',
-        ]);
-
-        $model = new Bundling();
-
-        foreach($request->item as $key => $value) {
-            $item[] = [
-                'item' => $request->item[$key],
-                'qty' => $request->qty[$key]
-            ];
-        }
-
-        $model->name = $request->name;
-        $model->price = $request->price;
-        $model->item_id = json_encode($item);
-// dd($model);
-        if ($model->save()) {
-            return redirect()->route('items.index')->with('alert.success', 'Bundling Has Been Added');
-        } else {
-            return redirect()->route('items.create')->with('alert.failed', 'Something Wrong');
-        }
-
-    }
-
-    public function addBundling()
-    {
-        $indexBundling = time();
-        $model = new Item();
-        $item = Item::all();
-        return view('item.bundling', ['model' => $model, 'item' => $item, 'indexBundling' => $indexBundling]);
-    }
-
 }

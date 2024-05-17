@@ -2,7 +2,7 @@
         <div class="row">
             <div class="form-group col-md-4 my-md-1">
                 <div class="col-sm-12">
-                    <select class="form-control form-control-sm select2bs42" name="item[]" id="item{{ $indexBundling }}">
+                    <select class="form-control selectbs42" name="item[]" id="item{{ $indexBundling }}">
                         <option value="">-Pilih Item-</option>
                         @foreach ($item as $i)
                             <option value="{{ $i->id }}">{{ $i->name }}</option>
@@ -34,4 +34,5 @@
             $('#{{ $indexBundling }}').remove();
             Swal.close();
         });
+        $('.selectbs42').select2();
     </script>

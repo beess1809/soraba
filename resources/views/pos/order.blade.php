@@ -105,18 +105,23 @@
 @push('scripts')
     <script>
         function pesan(id, type) {
-
             if (type == 1) {
                 var qty = $(".input-number-" + id).val()
                 var item_id = id
             } else if (type == 2) {
                 var qty = $('#__qty').val();
-                var item_name = $('#__item_name').val();
+                var item_name = $('#bundling_id option:selected').text();
 
                 var item_id = $('.item-formula').map((_, i) => i.value).get()
                 var qty_item = $('.qty-formula').map((_, q) => q.value).get()
                 var cost = $('#cost').val()
             }
+
+            console.log(type);
+            console.log(item_name);
+            console.log(item_id);
+            console.log(qty_item);
+            console.log(cost);
 
             $.ajax({
                 url: "{{ route('pos.add-to-cart') }}",

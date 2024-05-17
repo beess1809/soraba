@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\MenuController;
 use App\Http\Controllers\Auth\PermissionController;
 use App\Http\Controllers\Auth\RoleController;
 use App\Http\Controllers\Auth\UserController;
+use App\Http\Controllers\Master\BundlingController;
 use App\Http\Controllers\Master\ItemController;
 use App\Http\Controllers\Master\WarehouseController;
 use App\Http\Controllers\Master\UomController;
@@ -83,6 +84,14 @@ Route::middleware('auth:employee')->group(function () {
         Route::post('/storeBundling', [ItemController::class, 'storeBundling'])->name('storeBundling');
         Route::get('/add-bundling', [ItemController::class, 'addBundling'])->name('addBundling');
         Route::resource('', ItemController::class, ['parameters' => ['' => 'id']]);
+    });
+
+    Route::name('bundling.')->prefix('bundling')->group(function () {
+        Route::get('/data', [BundlingController::class, 'data'])->name('data');
+        Route::post('/datatable', [BundlingController::class, 'datatable'])->name('datatable');
+        Route::post('/getItemByBundling', [BundlingController::class, 'getItemByBundling'])->name('getItemByBundling');
+        Route::get('/add-bundling', [BundlingController::class, 'addBundling'])->name('addBundling');
+        Route::resource('', BundlingController::class, ['parameters' => ['' => 'id']]);
     });
 
     Route::name('master.')->prefix('master')->group(function () {

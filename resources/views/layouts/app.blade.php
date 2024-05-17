@@ -44,6 +44,8 @@
     <link rel="stylesheet" href="{{ asset('css/inventory.css') }}">
     <!-- overlayScrollbars -->
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
+    <!-- jQuery -->
+    <script src="{{ asset('adminlte/plugins/jquery/jquery.min.js') }}"></script>
     <style>
         /* .text-sm .select2-search__field {
             line-height: 27px !important;
@@ -389,8 +391,7 @@
     <script>
         const loginUrl = "{{ route('login') }}";
     </script>
-    <!-- jQuery -->
-    <script src="{{ asset('adminlte/plugins/jquery/jquery.min.js') }}"></script>
+
     <!-- Bootstrap 4 -->
     <script src="{{ asset('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('adminlte/plugins/inputmask/jquery.inputmask.min.js') }}"></script>
