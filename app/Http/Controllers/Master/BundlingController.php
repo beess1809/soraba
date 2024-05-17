@@ -225,13 +225,14 @@ class BundlingController extends Controller
                 $data['html'] .=    '   <div class="form-group col-6">';
                 $data['html'] .=    '       <label for="item" class="col-sm-12 col-form-label">Item <span class="text-red">*</span></label>';
                 $data['html'] .=    '       <div class="col-sm-12">';
-                $data['html'] .=    '           <select class="form-control select-item item-formula" name="__item_id" id="__item_ids_'.$model->id.$i->item.'" disabled>';
+                $data['html'] .=    '           <select class="form-control select-item" name="__item_id" id="__item_ids_'.$model->id.$i->item.'" disabled>';
                 $data['html'] .=    '               <option value="">Pilih Item</option>';
                 foreach($items as $it) {
                     $selected = $i->item==$it->id ? 'selected' : '';
                     $data['html'] .=    '               <option value="'.$it->id.'" '.$selected.'>'.$it->name.'</option>';
                 }
                 $data['html'] .=    '           </select>';
+                $data['html'] .=    '<input type="hidden" class="item-formula" value="'.$i->item.'">';
                 $data['html'] .=    '       </div>';
                 $data['html'] .= '      </div>';
                 $data['html'] .= '      <div class="form-group col-2">';
