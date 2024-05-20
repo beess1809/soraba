@@ -69,7 +69,8 @@
     <div class="form-group col-6">
         <label for="item" class="col-sm-12 col-form-label">Harga Bundle <span class="text-red">*</span></label>
         <div class="col-sm-12">
-            <input type="text" class="form-control number" name="cost" id="cost" value="{{ old('cost') }}">
+            <input type="text" class="form-control number" name="cost" id="cost" value="{{ old('cost') }}"
+                readonly>
             {{-- <select name="cost" id="cost" class="form-control select2">
                 <option value="">Pilih Harga</option>
                 @foreach (App\Models\Master\Parameter::whereIn('code', ['em1', 'em2'])->get() as $item)

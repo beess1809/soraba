@@ -68,7 +68,7 @@ class ItemController extends Controller
         $model->qty = str_replace('.', '', $request->qty);
         $model->uom_id = $request->uom;
         $model->sale_price = str_replace('.', '', $request->sale_price);
-        $model->discount = $request->discount;
+        $model->discount = str_replace('.', '', $request->discount);
         $model->expired_discount = $request->expired_date;
 
         if ($model->save()) {
@@ -134,7 +134,7 @@ class ItemController extends Controller
         $model->qty = str_replace('.', '', $request->qty);
         $model->uom_id = $request->uom;
         $model->sale_price = str_replace('.', '', $request->sale_price);
-        $model->discount = $request->discount;
+        $model->discount = str_replace('.', '', $request->discount);
         $model->expired_discount = $request->expired_date;
 
         if ($model->save()) {
@@ -205,7 +205,7 @@ class ItemController extends Controller
                 return  format_rupiah($model->sale_price);
             })
             ->editColumn('discount', function ($model) {
-                return  $model->discount . '%';
+                return  format_rupiah($model->discount);
             })
             ->editColumn('expired_date', function ($model) {
                 if ($model->expired_discount) {
@@ -361,90 +361,16 @@ class ItemController extends Controller
         } else {
             $model = Item::all();
         }
-        // return res::json($model);
-
-        //     if (!is_null($param)) {
-        //         $items = Item::where('name', 'like', '%' . $param . '%')->get();
-        //     } else {
-        //         $items = Item::all();
-        //     }
-
-        //     foreach ($items as $key => $value) {
-        //         $stock = ($value->qty == 0) ? '<small class="text-red">Out of Stock !</small>' : '<small>In Stock</small>';
-        //         $pajak = pajak($value->sale_price);
-        //         $harga = $value->sale_price + $pajak;
-
-        //         if (!is_null($value->discount)) {
-        //             $total = '<dd style="color:grey"><strong><s>Rp. ' . number_format($harga, 0, ',', '.') . '</s></strong></dd>';
-        //             $harga = $harga - ($harga * $value->discount / 100);
-        //             $discount = '<span><strong>Rp. ' . number_format($harga, 0, ',', '.') . '</strong></span>';
-        //         } else {
-        //             $total = '<dd style=""><strong>Rp. ' . number_format($harga, 0, ',', '.') . '</strong></dd>';
-        //             $discount = '';
-        //         }
-
-        //         $html = '<div class="col-4">
-        //         <div class="card">
-        //     <div class="card-body" style="background-color: #F2F2F280">
-        //         <div class="row">
-        //             <div class="col-md-4">
-        //                 <img src="' . asset('img/no-pict.png') . '" alt="" width="100%" height="100px" class="rounded">
-        //             </div>
-        //             <div class="col-md-8">
-        //                 <dl>
-        //                     <dd>' . $value->name . '</dd>
-        //                     <dd><small>' . $value->composition . '</small></dd>
-
-        //                 </dl>
-        //             </div>
-        //         </div>
-        //         <br>
-        //         <div class="row">
-        //             <div class="col-md-6">
-        //                 <dl>
-        //                     ' . $total . '
-        //                     <dd style="margin-bottom: 0px"><span>' . $value->qty . '</span></dd>
-        //                     <dd style="margin-bottom: 0px">' . $stock . '</dd>
-        //                 </dl>
-        //             </div>
-        //             <div class="col-md-6">
-        //                 ' . $discount . '
-        //                 <div class="input-group" style="margin-top: 0.5rem">
-        //                     <span class="input-group-btn">
-        //                         <button type="button" class="btn btn-xs btn-number-' . $value->id . '" onclick="minusItem(' . $value->id . ')" data-type="minus" data-field="quant[2]">
-        //                             <img src="' . asset('img/icon/icon-minus.svg') . '" alt="">
-        //                         </button>
-        //                     </span>
-        //                     <input type="text" name="quant[2]" class="form-control input-number-' . $value->id . '" value="0"
-        //                         min="0" max="' . $value->qty . '" style="background-color: #F2F2F280;border: 0px;text-align:center">
-        //                     <span class="input-group-btn">
-        //                         <button type="button" class="btn btn-xs btn-number-' . $value->id . '" onclick="plusItem(' . $value->id . ')" data-type="plus" data-field="quant[2]">
-        //                             <img src="' . asset('img/icon/icon-plus.svg') . '" alt="">
-        //                         </button>
-        //                     </span>
-        //                 </div>
-        //             </div>
-        //         </div>
-        //         <button class="btn btn-block btn-inventory" onclick="pesan(' . $value->id . ',1)">Tambahkan ke Pesanan</button>
-        //     </div>
-        // </div>
-        // </div>';
-
-        //         $htmls[$key] = $html;
-        //     }
-
-
-        //     return $htmls;
-
+        
         if ($model->count() > 0) {
             foreach ($model as $key => $value) {
                 $stock = ($value->qty == 0) ? '<small class="text-red">Out of Stock !</small>' : '<small>In Stock</small>';
-                $pajak = pajak($value->sale_price);
+                $pajak = 0; //pajak($value->sale_price);
                 $harga = $value->sale_price + $pajak;
 
                 if (!is_null($value->discount)) {
                     $total = '<dd style="color:grey"><strong><s>Rp. ' . number_format($harga, 0, ',', '.') . '</s></strong></dd>';
-                    $harga = $harga - ($harga * $value->discount / 100);
+                    $harga = $harga - $value->discount;
                     $discount = '<span><strong>Rp. ' . number_format($harga, 0, ',', '.') . '</strong></span>';
                 } else {
                     $total = '<dd style=""><strong>Rp. ' . number_format($harga, 0, ',', '.') . '</strong></dd>';

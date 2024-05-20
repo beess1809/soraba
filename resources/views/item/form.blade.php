@@ -193,11 +193,11 @@
 
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label for="discount" class="col-sm-12 col-form-label">Discount (%)</label>
+                                <label for="discount" class="col-sm-12 col-form-label">Discount (Rp)</label>
                                 <div class="col-sm-12">
                                     <input type="text" name="discount" id="discount"
                                         class="form-control form-control-sm number" placeholder="Discount"
-                                        value="{{ $model->exists ? $model->discount : old('discount') }}">
+                                        value="{{ $model->exists ? format_rupiah($model->discount) : old('discount') }}">
                                     @error('discount')
                                         <small class="text-red">
                                             <strong>{{ $message }}</strong>
@@ -210,7 +210,7 @@
                                 <div class="col-sm-12">
                                     <input type="date" name="expired_date" id="expired_date"
                                         class="form-control form-control-sm" placeholder="Expired Date"
-                                        value="{{ $model->exists ? $model->expired_date : old('expired_date') }}">
+                                        value="{{ $model->exists ? $model->expired_discount : old('expired_date') }}">
                                     @error('expired_date')
                                         <small class="text-red">
                                             <strong>{{ $message }}</strong>

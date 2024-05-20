@@ -67,16 +67,3 @@
 @push('scripts')
     <script></script>
 @endpush
-
-{{-- stok A = 50
-stok B = 50
-stok C = 50
-
-bundling
-A = 25
-B = 25
-C = 25
-per item
-A = 25
-B = 25
-C = 25 --}}

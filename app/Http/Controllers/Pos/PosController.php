@@ -238,7 +238,7 @@ class PosController extends Controller
 
             if (!is_null($value->discount)) {
                 $total = '<dd style="color:grey"><strong><s>Rp. ' . number_format($harga, 0, ',', '.') . '</s></strong></dd>';
-                $harga = $harga - ($harga * $value->discount / 100);
+                $harga = $harga - $value->discount;
                 $discount = '<span><strong>Rp. ' . number_format($harga, 0, ',', '.') . '</strong></span>';
             } else {
                 $total = '<dd style=""><strong>Rp. ' . number_format($harga, 0, ',', '.') . '</strong></dd>';
@@ -338,7 +338,7 @@ class PosController extends Controller
             foreach ($request->item_id as $key => $value) {
 
                 $item = Item::find($value);
-                if ($item->qty < $request->qty_item[$key]) {
+                if ($item->qty < ($request->qty_item[$key] * $request->qty)) {
                     $data = [
                         'message' => 'Sisa stok ' . $item->name . ' adalah ' . $item->qty,
                     ];
@@ -349,7 +349,7 @@ class PosController extends Controller
                     return (new Response($content, $status))
                         ->header('Content-Type', 'json');
                 }
-                $discount = is_null($item->discount) ? 0 : (($item->sale_price * $request->qty_item[$key])) * $item->discount / 100;
+                $discount = is_null($item->discount) ? 0 : 0;// (($item->sale_price * $request->qty_item[$key])) * $item->discount / 100;
                 // $sebelum_pajak = round(reverse_tax($item->sale_price * $request->qty_item[$key]));
                 $subprice = $item->sale_price * $request->qty_item[$key];
 
@@ -365,6 +365,7 @@ class PosController extends Controller
                 $harga += $subprice;
                 $disc += $discount;
             }
+
             // $price = $harga / $request->qty;
             $sub = $harga;
             // $totPajak = round(pajak($sub + $cost));
@@ -382,7 +383,7 @@ class PosController extends Controller
                                 <dd style="margin-bottom: 0px">' . strtoupper($request->item_name) . '</dd>
                                 <input type="hidden" name="index[]" value="' . $time . '">
                                 <input type="hidden" name="item_name[]" value="' . $request->item_name . '">
-                                ' . $string . '`
+                                ' . $string . '
                                 <input type="hidden" name="type[]" value="' . $request->tipe . '">
                                 <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
                                 <input type="hidden" name="qty[]" value="' . $request->qty . '">
@@ -418,7 +419,7 @@ class PosController extends Controller
             // $pajak = $item->sale_price - $sub;
             $harga = $item->sale_price * $request->qty;
 
-            $discount = is_null($item->discount) ? 0 : ($harga) * $item->discount / 100;
+            $discount = is_null($item->discount) ? 0 : $item->discount * $request->qty;
             $cost = 0;
 
             $html = '<div class="row item-detail" id="detail-' . $time . '">

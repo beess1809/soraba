@@ -7,7 +7,7 @@
             <th>Quantity</th>
             <th>Uom</th>
             <th>Sell Price</th>
-            <th>Discount (%)</th>
+            <th>Discount (Rp)</th>
             <th>Discount Expired Date</th>
             <th>Vendor</th>
             <th>Warehouse</th>

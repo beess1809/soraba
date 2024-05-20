@@ -186,7 +186,7 @@
                     </tr>
                     @if ($item->discount > 0.0)
                         <tr style="font-size:12px; font-weight:500">
-                            <td colspan="2" style="text-align: right">Hemat</td>
+                            <td colspan="2" style="text-align: right">Discount</td>
                             <td style="text-align: right">Rp. {{ format_rupiah($item->discount) }}</td>
                         </tr>
                     @endif
