@@ -88,7 +88,7 @@ class PosController extends Controller
                 foreach ($request->item_id[$value] as $k => $val) {
                     $item = Item::find($val);
 
-                    if ($item->qty < ($request->item_qty[$value][$k] * $request->qty[$key])) {
+                    if ($item->qty < ($request->item_qty[$value][$k])) {
                         $data = [
                             'message' => 'Sisa stok ' . $item->name . ' adalah ' . $item->qty,
                         ];
@@ -100,7 +100,7 @@ class PosController extends Controller
                             ->header('Content-Type', 'json');
                     }
 
-                    $item->qty = $item->qty - ($request->item_qty[$value][$k] * $request->qty[$key]) ;
+                    $item->qty = $item->qty - ($request->item_qty[$value][$k]) ;
                     $item->save();
                 }
 
@@ -357,7 +357,7 @@ class PosController extends Controller
                 // $item_pajak = $item->sale_price - $item_price;
 
                 $string .= '<input type="hidden" name="item_id[' . $time . '][' . $key . ']" value="' . $item->id . '">';
-                $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' . $request->qty_item[$key] . '">';
+                $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' . $request->qty_item[$key] * $request->qty. '">';
                 // $string .= '<input type="hidden" name="item_pajak[' . $time . '][' . $key . ']" value="' . $item_pajak . '">';
                 $string .= '<input type="hidden" name="item_price[' . $time . '][' . $key . ']" value="' . $item_price . '">';
                 $string .= '<input type="hidden" name="item_discount[' . $time . '][' . $key . ']" value="' . $discount . '">';
