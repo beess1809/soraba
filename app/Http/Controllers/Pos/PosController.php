@@ -88,7 +88,7 @@ class PosController extends Controller
                 foreach ($request->item_id[$value] as $k => $val) {
                     $item = Item::find($val);
 
-                    if ($item->qty < $request->item_qty[$value][$k]) {
+                    if ($item->qty < ($request->item_qty[$value][$k] * $request->qty[$key])) {
                         $data = [
                             'message' => 'Sisa stok ' . $item->name . ' adalah ' . $item->qty,
                         ];
@@ -99,7 +99,8 @@ class PosController extends Controller
                         return (new Response($content, $status))
                             ->header('Content-Type', 'json');
                     }
-                    $item->qty = $item->qty - $request->item_qty[$value][$k];
+
+                    $item->qty = $item->qty - ($request->item_qty[$value][$k] * $request->qty[$key]) ;
                     $item->save();
                 }
 
@@ -381,7 +382,7 @@ class PosController extends Controller
                                 <dd style="margin-bottom: 0px">' . strtoupper($request->item_name) . '</dd>
                                 <input type="hidden" name="index[]" value="' . $time . '">
                                 <input type="hidden" name="item_name[]" value="' . $request->item_name . '">
-                                ' . $string . '
+                                ' . $string . '`
                                 <input type="hidden" name="type[]" value="' . $request->tipe . '">
                                 <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
                                 <input type="hidden" name="qty[]" value="' . $request->qty . '">
