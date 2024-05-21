@@ -12,6 +12,7 @@ use App\Http\Controllers\Transaction\InvoiceController;
 use App\Http\Controllers\Master\VendorController;
 use App\Http\Controllers\Master\CategoryController;
 use App\Http\Controllers\Pos\PosController;
+use App\Http\Controllers\Pos\PosOnlineController;
 use App\Http\Controllers\Transaction\ReportController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -38,9 +39,22 @@ Route::post('/login/employee', [App\Http\Controllers\Auth\LoginController::class
 Route::get('/tes', [App\Http\Controllers\HomeController::class, 'tes']);
 Route::get('/print', [InvoiceController::class, 'print'])->name('print');
 
+
+Route::name('pos-online.')->prefix('pos-online')->group(function () {
+    Route::get('/items/data', [ItemController::class, 'data'])->name('items.data');
+    Route::post('/datatable', [PosOnlineController::class, 'datatable'])->name('datatable');
+    Route::post('/add-to-cart', [PosOnlineController::class, 'addToCart'])->name('add-to-cart');
+    Route::put('/batal/{id}', [PosOnlineController::class, 'batal',])->name('batal');
+    Route::get('/invoice/{id}', [PosOnlineController::class, 'invoice',])->name('invoice');
+    Route::get('/struk/{id}', [PosOnlineController::class, 'struk',])->name('struk');
+    Route::post('/cari', [PosOnlineController::class, 'cari'])->name('cari');
+    Route::resource('', PosOnlineController::class, ['parameter' => ['' => 'id']]);
+    Route::post('/getItemByCategory', [ItemController::class, 'getItemByCategory'])->name('getItemByCategory');
+    Route::post('/getItemByBundling', [BundlingController::class, 'getItemByBundling'])->name('getItemByBundling');
+});
+
 Route::middleware('auth:employee')->group(function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
 
     Route::name('auth.')->prefix('auth')->group(function () {
         Route::name('user.')->prefix('user')->group(function () {

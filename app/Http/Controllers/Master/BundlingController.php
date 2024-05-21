@@ -221,8 +221,8 @@ class BundlingController extends Controller
             
             foreach($item_c as $i) {
                 $data['html'] .=  '<div class=""with-item>';
-                $data['html'] .=    '<div class="row col-12">';
-                $data['html'] .=    '   <div class="form-group col-6">';
+                $data['html'] .=    '<div class="row ">';
+                $data['html'] .=    '   <div class="form-group col-lg-6 col-md-5 col-8">';
                 $data['html'] .=    '       <label for="item" class="col-sm-12 col-form-label">Item <span class="text-red">*</span></label>';
                 $data['html'] .=    '       <div class="col-sm-12">';
                 $data['html'] .=    '           <select class="form-control select-item" name="__item_id" id="__item_ids_'.$model->id.$i->item.'" disabled>';
@@ -232,10 +232,10 @@ class BundlingController extends Controller
                     $data['html'] .=    '               <option value="'.$it->id.'" '.$selected.'>'.$it->name.'</option>';
                 }
                 $data['html'] .=    '           </select>';
-                $data['html'] .=    '<input type="hidden" class="item-formula" value="'.$i->item.'">';
+                $data['html'] .=    '           <input type="hidden" class="item-formula" value="'.$i->item.'">';
                 $data['html'] .=    '       </div>';
                 $data['html'] .= '      </div>';
-                $data['html'] .= '      <div class="form-group col-2">';
+                $data['html'] .= '      <div class="form-group col-lg-3 col-md-3 col-4">';
                 $data['html'] .= '          <label for="qty" class="col-sm-12 col-form-label">Item Quantity <span class="text-red">*</span></label>';
                 $data['html'] .= '          <div class="col-sm-12">';
                 $data['html'] .= '              <input type="number" class="form-control qty-formula" name="__qty_item" id="__qty_item_'.$model->id.$i->item.'" value="'.$i->qty.'" readonly>';
