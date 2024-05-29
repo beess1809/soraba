@@ -57,27 +57,25 @@
                         <th>Category</th>
                         <th>Name</th>
                         <th>Quantity</th>
-                        <th>Vendor</th>
                         <th>Warehouse</th>
                     </tr>
                 </thead>
                 <tbody style="background: white">
-                @php
-                    $key = 0;
-                @endphp
-                @foreach ($items->get() as $item)
-                    <tr style="text-align: center">
-                        <td>{{ $key + 1 }}</td>
-                        <td>{{ $item->category->name }}</td>
-                        <td>{{ $item->name }}</td>
-                        <td>{{ $item->qty }}</td>
-                        <td>{{ $item->vendor->name }}</td>
-                        <td>{{ $item->warehouse->name }}</td>
-                    </tr>
                     @php
-                        $key++;
+                        $key = 0;
                     @endphp
-                @endforeach
+                    @foreach ($items->get() as $item)
+                        <tr style="text-align: center">
+                            <td>{{ $key + 1 }}</td>
+                            <td>{{ $item->category->name }}</td>
+                            <td>{{ $item->name }}</td>
+                            <td>{{ $item->qty }}</td>
+                            <td>{{ $item->warehouse->name }}</td>
+                        </tr>
+                        @php
+                            $key++;
+                        @endphp
+                    @endforeach
                 </tbody>
             </table>
         </div>

@@ -11,6 +11,7 @@ use App\Http\Controllers\Master\UomController;
 use App\Http\Controllers\Transaction\InvoiceController;
 use App\Http\Controllers\Master\VendorController;
 use App\Http\Controllers\Master\CategoryController;
+use App\Http\Controllers\Pos\FlashSaleController;
 use App\Http\Controllers\Pos\PosController;
 use App\Http\Controllers\Pos\PesananOnlineController;
 use App\Http\Controllers\Transaction\ReportController;
@@ -92,7 +93,7 @@ Route::middleware('auth:employee')->group(function () {
         Route::get('/formatUpdateExcel', [ItemController::class, 'formatUpdateExcel'])->name('formatUpdateExcel');
         Route::post('/updateuploadExcel', [ItemController::class, 'updateuploadExcel'])->name('updateuploadExcel');
         Route::post('/datatable', [ItemController::class, 'datatable'])->name('datatable');
-        
+
         Route::get('/create-bundling', [ItemController::class, 'createBundling'])->name('createBundling');
         Route::post('/storeBundling', [ItemController::class, 'storeBundling'])->name('storeBundling');
         Route::get('/add-bundling', [ItemController::class, 'addBundling'])->name('addBundling');
@@ -105,6 +106,18 @@ Route::middleware('auth:employee')->group(function () {
         Route::post('/getItemByBundling', [BundlingController::class, 'getItemByBundling'])->name('getItemByBundling');
         Route::get('/add-bundling', [BundlingController::class, 'addBundling'])->name('addBundling');
         Route::resource('', BundlingController::class, ['parameters' => ['' => 'id']]);
+    });
+
+    Route::name('flash-sale.')->prefix('flash-sale')->group(function () {
+        Route::post('/datatable', [FlashSaleController::class, 'datatable'])->name('datatable');
+        Route::get('/add-bundling', [FlashSaleController::class, 'addBundling'])->name('addBundling');
+        Route::get('/create-bundling', [FlashSaleController::class, 'createBundling'])->name('createBundling');
+        Route::get('/edit-bundling/{id}', [FlashSaleController::class, 'editBundling'])->name('editBundling');
+        Route::post('/store-bundling', [FlashSaleController::class, 'storeBundling'])->name('storeBundling');
+        Route::put('/update-bundling/{id}', [FlashSaleController::class, 'updateBundling'])->name('updateBundling');
+        Route::post('/datatable-bundling', [FlashSaleController::class, 'datatableBundling'])->name('datatableBundling');
+        Route::delete('/destroy-bundling/{id}', [FlashSaleController::class, 'destroyBundling'])->name('destroyBundling');
+        Route::resource('', FlashSaleController::class, ['parameters' => ['' => 'id']]);
     });
 
     Route::name('master.')->prefix('master')->group(function () {

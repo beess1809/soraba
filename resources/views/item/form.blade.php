@@ -157,19 +157,12 @@
                         </div>
                         <div class="row">
                             <div class="form-group col-md-6">
-                                <label for="vendor_id" class="col-sm-12 col-form-label">Vendor</label>
+                                <label for="sale_price" class="col-sm-12 col-form-label">Sell Price</label>
                                 <div class="col-sm-12">
-                                    <select class="select2 form-control" name="vendor_id" id="vendor_id">
-                                        @if ($model->exists)
-                                            <option value="{{ $model->vendor_id }}">{{ $model->vendor->name }}</option>
-                                        @else
-                                            <option value="">Select Vendor</option>
-                                        @endif
-                                        @foreach (App\Models\Master\Vendor::all() as $item)
-                                            <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('vendor_id')
+                                    <input type="text" name="sale_price" id="sale_price"
+                                        class="form-control form-control-sm number" placeholder="Sell Price"
+                                        value="{{ $model->exists ? format_rupiah($model->sale_price) : old('sale_price') }}">
+                                    @error('sale_price')
                                         <small class="text-red">
                                             <strong>{{ $message }}</strong>
                                         </small>
@@ -177,12 +170,13 @@
                                 </div>
                             </div>
                             <div class="form-group col-md-6">
-                                <label for="sale_price" class="col-sm-12 col-form-label">Sell Price</label>
+                                <label for="flash_sale_price" class="col-sm-12 col-form-label">Flash Sale Price
+                                    (Rp)</label>
                                 <div class="col-sm-12">
-                                    <input type="text" name="sale_price" id="sale_price"
-                                        class="form-control form-control-sm number" placeholder="Sell Price"
-                                        value="{{ $model->exists ? format_rupiah($model->sale_price) : old('sale_price') }}">
-                                    @error('sale_price')
+                                    <input type="text" name="flash_sale_price" id="flash_sale_price"
+                                        class="form-control form-control-sm number" placeholder="Flash Sale Price"
+                                        value="{{ $model->exists ? format_rupiah($model->flash_sale_price) : old('flash_sale_price') }}">
+                                    @error('flash_sale_price')
                                         <small class="text-red">
                                             <strong>{{ $message }}</strong>
                                         </small>

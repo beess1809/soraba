@@ -8,19 +8,21 @@
                 <div class="col-sm-6">
                     <h1 class="m-0">
                         @if ($model->exists)
-                            <i class="nav-icon fas fa-eidt"></i> Edit Bundling
+                            <i class="nav-icon fas fa-eidt"></i> Edit Bundling Flash Sale
                         @else
-                            <i class="nav-icon fas fa-plus"></i> Add Bundling
+                            <i class="nav-icon fas fa-plus"></i> Add Bundling Flash Sale
                         @endif
                     </h1>
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><i class="nav-icon fas fa-boxes"></i> Bundling</li>
+                        <li class="breadcrumb-item"><i class="nav-icon fas fa-boxes"></i> Bundling Flash Sale</li>
                         @if ($model->exists)
-                            <li class="breadcrumb-item active"><i class="nav-icon fas fa-edit"></i> Edit Bundling</li>
+                            <li class="breadcrumb-item active"><i class="nav-icon fas fa-edit"></i> Edit Bundling Flash Sale
+                            </li>
                         @else
-                            <li class="breadcrumb-item active"><i class="nav-icon fas fa-plus"></i> Add Bundling</li>
+                            <li class="breadcrumb-item active"><i class="nav-icon fas fa-plus"></i> Add Bundling Flash Sale
+                            </li>
                         @endif
                     </ol>
                 </div><!-- /.col -->
@@ -39,14 +41,14 @@
             <div class="card ">
                 <div class="card-body">
                     <form class="form-horizontal"
-                        action="{{ $model->exists ? route('bundling.update', base64_encode($model->id)) : route('bundling.store') }}"
+                        action="{{ $model->exists ? route('flash-sale.updateBundling', base64_encode($model->id)) : route('flash-sale.storeBundling') }}"
                         method="POST">
                         {{ csrf_field() }}
                         @if ($model->exists)
                             <input type="hidden" name="_method" value="PUT">
                         @endif
                         <div class="row">
-                            <div class="form-group col-md-12">
+                            <div class="form-group col-md-6">
                                 <label for="name" class="col-sm-12 col-form-label">Bundling Name <span
                                         class="text-red">*</span></label>
                                 <div class="col-sm-12">
@@ -70,19 +72,6 @@
                                         class="form-control form-control-sm number" placeholder="Harga"
                                         value="{{ $model->exists ? format_rupiah($model->price) : old('price') }}">
                                     @error('price')
-                                        <small class="text-red">
-                                            <strong>{{ $message }}</strong>
-                                        </small>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="flash_sale_price" class="col-sm-12 col-form-label">Flash Sell Price</label>
-                                <div class="col-sm-12">
-                                    <input type="text" name="flash_sale_price" id="flash_sale_price"
-                                        class="form-control form-control-sm number" placeholder="Harga Flash Sale"
-                                        value="{{ $model->exists ? format_rupiah($model->flash_sale_price) : old('flash_sale_price') }}">
-                                    @error('flash_sale_price')
                                         <small class="text-red">
                                             <strong>{{ $message }}</strong>
                                         </small>
@@ -241,89 +230,6 @@
         })
         --}}
 
-
-        $('#save-uom').click(function(event) {
-            event.preventDefault();
-
-            var form = $('#modal-body-uom form'),
-                url = form.attr('action')
-
-            form.find('.help-block').remove();
-            form.find('.form-group').removeClass('has-error');
-
-            $.ajax({
-                url: '{{ route('master.uom.store') }}',
-                method: 'post',
-                data: {
-                    '_token': $('meta[name="csrf-token"]').attr('content'),
-                    'name': $('#nameUom').val(),
-                    'code': $('#codeUom').val()
-                },
-                success: function(response) {
-                    form.trigger('reset');
-                    $('#modal-uom').modal('hide');
-                    // $('#datatable').DataTable().ajax.reload();
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success!',
-                        text: 'Data has been saved!',
-                        timer: 2000,
-                        confirmButtonColor: '#3085d6',
-                    });
-                    selectUom()
-
-                },
-                error: function(xhr) {
-                    var res = xhr.responseJSON;
-                    if (res.message != '') {
-
-                    }
-                    console.log(res.errors)
-                    if ($.isEmptyObject(res.errors) == false) {
-                        $.each(res.errors, function(key, value) {
-                            $('#' + key)
-                                .closest('.form-control')
-                                .addClass('is-invalid')
-                            $('<span class="invalid-feedback" role="alert"><strong>' + value +
-                                '</strong></span>').insertAfter($('#' + key))
-                        });
-                    }
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Something went wrong!',
-                        text: 'Check your values',
-                        confirmButtonColor: '#3085d6',
-                    });
-
-                }
-            })
-        });
-
-        $(document).ready(function() {
-            selectUom()
-        })
-
-        function selectUom(params) {
-            $('#uom').select2({
-                ajax: {
-                    url: '{{ route('master.uom.data') }}',
-                    dataType: 'json',
-                    data: function(params) {
-                        return {
-                            q: $.trim(params.term)
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data
-                        };
-                    },
-                    cache: true
-                }
-            });
-        }
         $('.selectbs42').select2();
     </script>
 @endpush

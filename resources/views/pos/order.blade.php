@@ -19,17 +19,29 @@
                 <!-- /.content-header -->
 
                 <div class="row col-12">
-                    <div class="col-sm-6">
+                    <div class="col-12">
                         <ul class="nav nav-tabs" id="tab" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link active" id="umum-tab" data-toggle="pill" href="#umum" role="tab"
                                     aria-controls="umum" aria-selected="false"><i class="fas fa-notes-medical">
-                                        &nbsp;</i>Umum</a>
+                                        &nbsp;</i>Reguler</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" id="bundling-tab" data-toggle="pill" href="#bundling" role="tab"
                                     aria-controls="bundling" aria-selected="false"><i class="fas fa-pills">
-                                        &nbsp;</i>Bundling</a>
+                                        &nbsp;</i>Paket</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="flash-sale-umum-tab" data-toggle="pill" href="#flash-sale-umum"
+                                    role="tab" aria-controls="flash-sale-umum" aria-selected="false"><i
+                                        class="fas fa-stopwatch"></i>&nbsp;Flash
+                                    Sale Reguler</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="flash-sale-bundling-tab" data-toggle="pill"
+                                    href="#flash-sale-bundling" role="tab" aria-controls="flash-sale-bundling"
+                                    aria-selected="false"><i class="fas fa-stopwatch-20"></i>
+                                    &nbsp;Flash Sale Paket</a>
                             </li>
                         </ul>
                     </div>
@@ -42,6 +54,13 @@
                     </div>
                     <div class="tab-pane fade show" id="bundling" role="tabpanel" aria-labelledby="bundling">
                         @include('pos.tab.bundling')
+                    </div>
+                    <div class="tab-pane fade show" id="flash-sale-umum" role="tabpanel" aria-labelledby="flash-sale-umum">
+                        @include('pos.tab.flash-sale-umum')
+                    </div>
+                    <div class="tab-pane fade show" id="flash-sale-bundling" role="tabpanel"
+                        aria-labelledby="flash-sale-bundling">
+                        @include('pos.tab.flash-sale-bundling')
                     </div>
                 </div>
             </div>
