@@ -1,4 +1,4 @@
-@extends('pos-online.layout')
+@extends('pesanan-online.layout')
 
 @section('content')
     <div class="container-inventory">
@@ -10,13 +10,12 @@
                 <div class="content-header">
                     <div class="">
                         <div class="row mb-2">
-                            <div class="col-sm-6">
+                            {{-- <div class="col-sm-6">
                                 <h1 class="m-0"> Buat Pesanan</small></h1>
-                            </div><!-- /.col -->
-                        </div><!-- /.row -->
-                    </div><!-- /.container-fluid -->
+                            </div> --}}
+                        </div>
+                    </div>
                 </div>
-                <!-- /.content-header -->
 
                 <div class="row col-12">
                     <div class="col-sm-6">
@@ -38,10 +37,10 @@
 
                 <div class="tab-content" id="tabContent" style="padding-top: 1rem;">
                     <div class="tab-pane fade show active" id="umum" role="tabpanel" aria-labelledby="umum">
-                        @include('pos-online.tab.umum')
+                        @include('pesanan-online.tab.umum')
                     </div>
                     <div class="tab-pane fade show" id="bundling" role="tabpanel" aria-labelledby="bundling">
-                        @include('pos-online.tab.bundling')
+                        @include('pesanan-online.tab.bundling')
                     </div>
                 </div>
             </div>
@@ -52,7 +51,7 @@
                 {{-- <br> --}}
                 {{-- <strong>tes</strong> --}}
                 {{-- </div> --}}
-                <form action="{{ route('pos-online.store') }}" method="post" id="form-pesan">
+                <form action="{{ route('pesanan-online.store') }}" method="post" id="form-pesan">
                     @csrf
                     <div class="p-3">
                         <h4>Pesanan</h4>
@@ -109,40 +108,41 @@
                 var qty = $(".input-number-" + id).val()
                 var item_id = id
             } else if (type == 2) {
-                var qty = $('#__qty').val();
-                var item_name = $('#bundling_id option:selected').text();
+                // var qty = $('#__qty').val();
+                var qty = $(".input-number-" + id).val();
+                var item_id = id
+                // var item_name = $('#bundling_id option:selected').text();
 
-                var item_id = $('.item-formula').map((_, i) => i.value).get()
-                var qty_item = $('.qty-formula').map((_, q) => q.value).get()
-                var cost = $('#cost').val()
+                // var item_id = $('.item-formula').map((_, i) => i.value).get()
+                // var qty_item = $('.qty-formula').map((_, q) => q.value).get()
+                // var cost = $('#cost').val()
             }
 
             var cart_amount = $('.cart-amount').text();
             console.log(cart_amount)
 
-            console.log(type);
-            console.log(item_name);
-            console.log(item_id);
-            console.log(qty_item);
-            console.log(cost);
+            console.log('type: ' + type);
+            console.log('item : ' + id);
+            console.log('qty : ' + qty);
+            // console.log('item id : ' + item_id);
+            // console.log('qty item : ' + qty_item);
 
             $.ajax({
-                url: "{{ route('pos-online.add-to-cart') }}",
+                url: "{{ route('pesanan-online.add-to-cart') }}",
                 method: 'post',
                 data: {
                     '_token': $('meta[name="csrf-token"]').attr('content'),
-                    'item_id': id,
                     'qty': qty,
                     'tipe': type,
-                    'item_name': item_name,
+                    'item_name': item_id,
                     'item_id': item_id,
-                    'qty_item': qty_item,
-                    'cost': cost,
+                    // 'qty_item': qty_item,
+                    // 'cost': cost,
                 },
                 success: function(response) {
-                    cart_amount++;
-                    $('.cart-amount').text(cart_amount);
                     if (response.success) {
+                        cart_amount++;
+                        $('.cart-amount').text(cart_amount);
 
                         $('#__item_name').val('')
                         $('#__qty_item_1').val('')
@@ -176,7 +176,9 @@
                             position: 'top-end',
                             showConfirmButton: false,
                         });
+                        $(".input-number-" + id).val(0)
                     } else {
+                        $(".input-number-" + id).val(0)
                         Swal.fire({
                             icon: 'warning',
                             title: 'Perhatian',
@@ -315,7 +317,7 @@
         $("#btn-cari").click(function() {
             var cari = $('#cari').val();
             $.ajax({
-                url: "{{ route('pos-online.cari') }}",
+                url: "{{ route('pesanan-online.cari') }}",
                 method: 'post',
                 data: {
                     '_token': $('meta[name="csrf-token"]').attr('content'),
@@ -382,7 +384,7 @@
             // if(cat_id) {
 
             $.ajax({
-                url: '{{ route('pos-online.getItemByCategory') }}',
+                url: '{{ route('pesanan-online.getItemByCategory') }}',
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

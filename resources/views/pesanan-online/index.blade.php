@@ -1,4 +1,4 @@
-@extends('pos-online.layout')
+@extends('pesanan-online.layout')
 
 @section('content')
     <div class="container-inventory">
@@ -49,7 +49,7 @@
                 serverSide: true,
                 cache: false,
                 ajax: {
-                    url: "{{ route('pos-online.datatable') }}",
+                    url: "{{ route('pesanan-online.datatable') }}",
                     type: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
