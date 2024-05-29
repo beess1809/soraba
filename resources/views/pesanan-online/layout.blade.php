@@ -46,13 +46,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <nav class="main-header navbar navbar-expand-md bg-inventory" style="font-size: 14pt">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <button class="navbar-toggler order-1" type="button" data-toggle="collapse"
+                    {{-- <button class="navbar-toggler order-1" type="button" data-toggle="collapse"
                         data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
-                        aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon">
+                        aria-label="Toggle navigation"> --}}
+                    {{-- <span class="navbar-toggler-icon">
                             <i class="fas fa-bars"></i>
-                        </span>
-                    </button>
+                        </span> --}}
+                    <img src="{{ asset('img/logo-white.png') }}" alt="Logo" class="login-box-msg">
+                    {{-- </button> --}}
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
@@ -63,32 +64,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     </a>
                 </li>
             </ul>
-            {{-- <div class="shopping-cart-menu">
-                <a href="#pesanan" style="color: #fff">
-                    <i class="fas fa-shopping-cart"></i> Pesanan
-                </a>
-            </div> --}}
-
-            {{-- <img src="{{ asset('img/logo-white.png') }}" alt="Logo" class="login-box-msg"> --}}
-
-            <div class="collapse navbar-collapse order-3" id="navbarCollapse">
-                @php
-                    $segments = Request::segments();
-                    $url = '/' . implode('/', $segments);
-                @endphp
-                <!-- Left navbar links -->
-
-                {{-- <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <img src="{{ asset('img/logo-white.png') }}" alt="Logo" class="login-box-msg">
-                    </li>
-                </ul> --}}
-            </div>
-
-
-
         </nav>
-
         <!-- /.navbar -->
 
         <!-- Content Wrapper. Contains page content -->

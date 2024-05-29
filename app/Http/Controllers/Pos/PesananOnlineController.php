@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Pos;
 
 use App\Http\Controllers\Controller;
+use App\Models\Master\Bundling;
 use App\Models\Transaction\Transaction;
 use App\Models\Master\Item;
 use App\Models\Master\Parameter;
@@ -19,7 +20,7 @@ use PDF;
 
 use function PHPUnit\Framework\isNull;
 
-class PosOnlineController extends Controller
+class PesananOnlineController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -28,8 +29,9 @@ class PosOnlineController extends Controller
      */
     public function index()
     {
-        $card = $this->cardItem(null);
-        return view('pos-online.order', ['cards' => $card]);
+        $data['cards'] = $this->cardItem(null);
+        $data['bundlings'] = $this->cardBundling(null);
+        return view('pesanan-online.order', $data);
     }
 
     /**
@@ -40,7 +42,7 @@ class PosOnlineController extends Controller
     public function create()
     {
         $card = $this->cardItem(null);
-        return view('pos-online.order', ['cards' => $card]);
+        return view('pesanan-online.order', ['cards' => $card]);
     }
 
     /**
@@ -51,6 +53,7 @@ class PosOnlineController extends Controller
      */
     public function store(Request $request)
     {
+        
         DB::beginTransaction();
         try {
             $model = new Transaction();
@@ -65,7 +68,7 @@ class PosOnlineController extends Controller
 
             // $model->pajak = $model->total - $sub;
             $model->sub_total = $model->total;
-            $model->created_by = Auth::user()->id;
+            // $model->created_by = Auth::user()->id;
             $model->save();
 
             $index = $request->index;
@@ -94,6 +97,7 @@ class PosOnlineController extends Controller
                             'message' => 'Sisa stok ' . $item->name . ' adalah ' . $item->qty,
                         ];
 
+                        
                         $content = returnJson(false, $data);
                         $status = 200;
 
@@ -103,22 +107,24 @@ class PosOnlineController extends Controller
 
                     $item->qty = $item->qty - ($request->item_qty[$value][$k]) ;
                     $item->save();
+               
                 }
-
                 $dtl->save();
             }
 
-            DB::commit();
             $data = [
-                'url' => route('pos.show', ['id' => base64_encode($model->id)]),
+                'url' => route('pesanan-online.show', ['id' => base64_encode($model->id)]),
             ];
 
             $content = returnJson(true, $data);
             $status = 200;
+            DB::commit();
 
             return (new Response($content, $status))
                 ->header('Content-Type', 'json');
+
         } catch (Exception $e) {
+
             DB::rollBack();
 
             $data = [
@@ -146,7 +152,7 @@ class PosOnlineController extends Controller
 
         $model = Transaction::find($id);
 
-        return view('pos.show', ['model' => $model]);
+        return view('pesanan-online.show', ['model' => $model]);
     }
 
     /**
@@ -169,12 +175,17 @@ class PosOnlineController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $messages = [
-            'required' => 'Anda belum memilih Tipe Pembayaran',
-        ];
         $request->validate([
+            'name' => 'required',
+            'usia' => 'required',
+            'no_telp' => 'required',
             'tipe_pembayaran' => 'required'
-        ], $messages);
+        ], [
+            'name.required' => 'Nama Pembeli Wajib Diisi',
+            'usia.required' => 'Usia Pembeli wajib Diisi',
+            'no_telp.required' => 'No. Telp Pembeli wajib Diisi',
+            'tipe_pembayaran.required' => 'Anda belum memilih Tipe Pembayaran',
+        ]);
 
         DB::beginTransaction();
         try {
@@ -246,49 +257,113 @@ class PosOnlineController extends Controller
                 $discount = '';
             }
 
-            $html = '<div class="col-12 col-md-6 col-lg-4 item">
-            <div class="card m-0">
-        <div class="card-body item-body" style="background-color: #F2F2F280">
-            <div class="row">
-                <div class="col-lg-4 col-md-4 col-3">
-                    <img src="' . asset('img/no-pict.png') . '" alt=""class="rounded">
-                </div>
-              
-                <div class="col-lg-8 col-md-8 col-6">
-                    <dl>
-                        <dd>'.$value->name.'</dd>
-                        ' . $total . '
-                        <dd style="margin-bottom: 0px"><span>' . format_rupiah($value->qty) . '</span></dd>
-                        <dd style="margin-bottom: 0px">' . $stock . '</dd>
-                    </dl>
-                </div>
-                <div class="col-lg-6 col-md-6 col-3">
-                    ' . $discount . '
-                    <div class="input-group" style="margin-top: 0.5rem">
-                        <span class="input-group-btn">
-                            <button type="button" class="btn btn-xs btn-danger btn-number-' . $value->id . '" onclick="minusItem(' . $value->id . ')" data-type="minus" data-field="quant[2]">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </span>
-                        <input type="text" name="quant[2]" class="form-control input-number-' . $value->id . '" value="0"
-                            min="0" max="' . $value->qty . '" style="background-color: #F2F2F280;border: 0px;text-align:center">
-                        <span class="input-group-btn">
-                            <button type="button" class="btn btn-xs btn-soraba btn-number-' . $value->id . '" onclick="plusItem(' . $value->id . ')" data-type="plus" data-field="quant[2]">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <button class="btn btn-block btn-inventory" onclick="pesan(' . $value->id . ',1)">Tambahkan ke Pesanan</button>
-        </div>
-    </div>
-    </div>';
+            $html = '   <div class="col-12 col-md-6 col-lg-4 item">
+                            <div class="card m-0">
+                                <div class="card-body item-body" style="background-color: #F2F2F280">
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-4 col-3">
+                                            <img src="' . asset('img/no-pict.png') . '" alt=""class="rounded">
+                                        </div>
+                                    
+                                        <div class="col-lg-8 col-md-8 col-6">
+                                            <dl>
+                                                <dd>'.$value->name.'</dd>
+                                                ' . $total . '
+                                                <dd style="margin-bottom: 0px"><span>' . format_rupiah($value->qty) . '</span></dd>
+                                                <dd style="margin-bottom: 0px">' . $stock . '</dd>
+                                            </dl>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-3  px-0">
+                                            ' . $discount . '
+                                            <div class="input-group" style="margin-top: 0.5rem">
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-xs btn-danger btn-number-' . $value->id . '" onclick="minusItem(' . $value->id . ')" data-type="minus" data-field="quant[2]">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                </span>
+                                                <input type="text" name="quant[2]" class="form-control input-number-' . $value->id . '" value="0"
+                                                    min="0" max="' . $value->qty . '" style="background-color: #F2F2F280;border: 0px;text-align:center">
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-xs btn-soraba btn-number-' . $value->id . '" onclick="plusItem(' . $value->id . ')" data-type="plus" data-field="quant[2]">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-block btn-inventory" onclick="pesan(' . $value->id . ',1)">Tambahkan ke Pesanan</button>
+                                </div>
+                            </div>
+                        </div>';
 
             $htmls[$key] = $html;
         }
+        return $htmls;
+    }
 
+    function cardBundling($param)
+    {
+        if (!is_null($param)) {
+            $bundlings = Bundling::where('name', 'like', '%' . $param . '%')->get();
+        } else {
+            $bundlings = Bundling::all();
+        }
 
+        foreach ($bundlings as $key => $value) {
+            $harga = $value->price;
+            $total = '<dd><strong>Rp. ' . number_format($harga, 0, ',', '.') . '</strong></dd>';
+
+            $items = json_decode($value->item_id);
+
+            $li = '<ul style="margin-bottom: 0; padding-left: 10px;">';
+            foreach($items as $item) {
+                $item_name = Item::find($item->item);
+                $li .= '<li>';
+                $li .= '<input type="hidden" class="item-formula" value="'.$item_name->id.'">'.$item_name->name.' ';
+                $li .= '<input type="hidden" class="form-control qty-formula" name="__qty_item" id="__qty_item_'.$value->id.$item->item.'" value="'.$item->qty.'" readonly> | '.$item->qty.' '.$item_name->uom->name;
+                $li .= '</li>';
+            }
+            $li .= '</ul>';
+
+            $html = '   <div class="col-12 col-md-6 col-lg-4 item">
+                            <div class="card m-0">
+                                <div class="card-body item-body" style="background-color: #F2F2F280">
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-4 col-3">
+                                            <img src="' . asset('img/no-pict.png') . '" alt=""class="rounded">
+                                        </div>
+                                    
+                                        <div class="col-lg-8 col-md-8 col-6">
+                                            <dl>
+                                                <dd>'.$value->name.'</dd>
+                                                ' . $total . '
+                                                <dd style="margin-bottom: 0px"><span class="item_bundling">' . $li . '</span></dd>
+                                            </dl>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-3 px-0">
+                                            <div class="input-group d-flex align-items-center" style="margin-top: 0.5rem">
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-xs btn-danger btn-number-' . $value->id . '" onclick="minusBundling(' . $value->id . ')" data-type="minus" data-field="quant[2]">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                </span>
+                                                <input type="text" name="quant[2]" class="form-control input-number-' . $value->id . '" value="0"
+                                                    min="0" style="background-color: #F2F2F280;border: 0px;text-align:center">
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-xs btn-soraba btn-number-' . $value->id . '" onclick="plusBundling(' . $value->id . ')" data-type="plus" data-field="quant[2]">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-block btn-inventory" onclick="pesan(' . $value->id . ',2)">Tambahkan ke Pesanan</button>
+                                </div>
+                            </div>
+                        </div>';
+
+            $htmls[$key] = $html;
+        }
         return $htmls;
     }
 
@@ -321,17 +396,20 @@ class PosOnlineController extends Controller
                 ->header('Content-Type', 'json');
         }
 
-        if ($request->tipe == 2) {
+        if ($request->tipe == 2) { //tipe bundling
+            $bundling = Bundling::find($request->item_id);
+            $lists_item = json_decode($bundling->item_id);
 
             $harga = 0;
             $totPajak = 0;
             $string = '';
             $disc = 0;
-            $cost = str_replace('.', '', $request->cost);
-            foreach ($request->item_id as $key => $value) {
+            $cost = $bundling->price * $request->item;
 
-                $item = Item::find($value);
-                if ($item->qty < ($request->qty_item[$key] * $request->qty)) {
+            foreach($lists_item as $key => $value) {
+
+                $item = Item::find($value->item);
+                if($item->qty < ((int)$value->qty * $request->qty)) {
                     $data = [
                         'message' => 'Sisa stok ' . $item->name . ' adalah ' . $item->qty,
                     ];
@@ -342,16 +420,15 @@ class PosOnlineController extends Controller
                     return (new Response($content, $status))
                         ->header('Content-Type', 'json');
                 }
-                $discount = is_null($item->discount) ? 0 : 0;// (($item->sale_price * $request->qty_item[$key])) * $item->discount / 100;
-                // $sebelum_pajak = round(reverse_tax($item->sale_price * $request->qty_item[$key]));
-                $subprice = $item->sale_price * $request->qty_item[$key];
 
-                $item_price = $item->sale_price;
-                // $item_pajak = $item->sale_price - $item_price;
+                $discount = is_null($item->discount) ? 0 : 0;
+                $subprice = $bundling->price * $request->qty;
+
+                $item_price = $bundling->price;
 
                 $string .= '<input type="hidden" name="item_id[' . $time . '][' . $key . ']" value="' . $item->id . '">';
-                $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' . $request->qty_item[$key] * $request->qty. '">';
-                // $string .= '<input type="hidden" name="item_pajak[' . $time . '][' . $key . ']" value="' . $item_pajak . '">';
+                $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' .$value->qty * $request->qty. '">';
+
                 $string .= '<input type="hidden" name="item_price[' . $time . '][' . $key . ']" value="' . $item_price . '">';
                 $string .= '<input type="hidden" name="item_discount[' . $time . '][' . $key . ']" value="' . $discount . '">';
 
@@ -359,12 +436,43 @@ class PosOnlineController extends Controller
                 $disc += $discount;
             }
 
+            // foreach ($request->item_id as $key => $value) {
+
+            //     $item = Item::find($value);
+            //     if ($item->qty < ($request->qty_item[$key] * $request->qty)) {
+            //         $data = [
+            //             'message' => 'Sisa stok ' . $item->name . ' adalah ' . $item->qty,
+            //         ];
+
+            //         $content = returnJson(false, $data);
+            //         $status = 200;
+
+            //         return (new Response($content, $status))
+            //             ->header('Content-Type', 'json');
+            //     }
+            //     $discount = is_null($item->discount) ? 0 : 0;// (($item->sale_price * $request->qty_item[$key])) * $item->discount / 100;
+            //     // $sebelum_pajak = round(reverse_tax($item->sale_price * $request->qty_item[$key]));
+            //     $subprice = $item->sale_price * $request->qty_item[$key];
+
+            //     $item_price = $item->sale_price;
+            //     // $item_pajak = $item->sale_price - $item_price;
+
+            //     $string .= '<input type="hidden" name="item_id[' . $time . '][' . $key . ']" value="' . $item->id . '">';
+            //     $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' . $request->qty_item[$key] * $request->qty. '">';
+            //     // $string .= '<input type="hidden" name="item_pajak[' . $time . '][' . $key . ']" value="' . $item_pajak . '">';
+            //     $string .= '<input type="hidden" name="item_price[' . $time . '][' . $key . ']" value="' . $item_price . '">';
+            //     $string .= '<input type="hidden" name="item_discount[' . $time . '][' . $key . ']" value="' . $discount . '">';
+
+            //     $harga += $subprice;
+            //     $disc += $discount;
+            // }
+
             // $price = $harga / $request->qty;
             $sub = $harga;
             // $totPajak = round(pajak($sub + $cost));
             $totPajak = 0;
 
-            $harga = $request->qty * $cost;//$sub  - $disc + $request->cost;
+            $harga = $request->qty * $bundling->price;//$sub  - $disc + $request->cost;
             $price = ($sub + $request->cost) / $request->qty;
 
             $html = '<div class="row item-detail" id="detail-' . $time . '">
@@ -373,9 +481,9 @@ class PosOnlineController extends Controller
                         </div>
                         <div class="col-10">
                             <dl>
-                                <dd style="margin-bottom: 0px">' . strtoupper($request->item_name) . '</dd>
+                                <dd style="margin-bottom: 0px">' . strtoupper($bundling->name) . '</dd>
                                 <input type="hidden" name="index[]" value="' . $time . '">
-                                <input type="hidden" name="item_name[]" value="' . $request->item_name . '">
+                                <input type="hidden" name="item_name[]" value="' . $bundling->name . '">
                                 ' . $string . '
                                 <input type="hidden" name="type[]" value="' . $request->tipe . '">
                                 <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
@@ -393,8 +501,8 @@ class PosOnlineController extends Controller
                                                 <input type="hidden" name="price[]" id="price_' . $time . '" value="' . str_replace('.', '', $harga) . '">
                                                     <input type="hidden" name="pajak[]" id="pajak_' . $time . '" value="' . $totPajak . '">
                                                     <input type="hidden" name="discount[]" value="' . $disc . '">
-                                                    <input type="hidden" name="cost[]" id="cost_' . $time . '" value="' . str_replace('.', '', $request->cost) . '">
-                                                    <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $cost . '">
+                                                    <input type="hidden" name="cost[]" id="cost_' . $time . '" value="' . str_replace('.', '', $cost) . '">
+                                                    <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $harga . '">
                                                 <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ')">
                                                     <i class="fas fa-minus"></i>
                                                 </button>
@@ -406,7 +514,7 @@ class PosOnlineController extends Controller
                         </div>
                     </div>';
             // $harga -=  $disc;
-        } else {
+        } else { // tipe item
             $item = Item::find($request->item_id);
             $sub = $item->sale_price;
             // $pajak = $item->sale_price - $sub;
@@ -463,6 +571,11 @@ class PosOnlineController extends Controller
             'html' => $html,
             'item' => $item,
         ];
+        
+        // $qty = $request->qty;
+        // $tipe = $request->tipe;
+        // $item_id = $request->item_id;
+        // $data['html'] = '<b>qty : '.$qty.', tipe : '.$tipe.', item id : '.$item_id.'</b>';
 
         $content = returnJson(true, $data);
         $status = 200;
@@ -479,7 +592,7 @@ class PosOnlineController extends Controller
                 $string = '<div class="btn-group">';
                 // $string .= '<a href="' . route('invoice.show', ['id' => base64_encode($model->id)]) . '" type="button"  class="btn btn-sm btn-info" title="Edit Item"><i class="fas fa-receipt"></i></a>';
                 // $string .= '&nbsp;&nbsp;<a href="' . route('invoice.download', ['id' => base64_encode($model->id)]) . '" type="button" class="btn btn-sm btn-success" title="Download"><i class="fa fa-download"></i></a>';
-                $string .= '<a href="' . route('pos.show', ['id' => base64_encode($model->id)]) . '" type="button"  class="btn btn-inventory" title="Lihat Item">Lihat Pesanan</i></a>';
+                $string .= '<a href="' . route('pesanan-online.show', ['id' => base64_encode($model->id)]) . '" type="button"  class="btn btn-inventory" title="Lihat Item">Lihat Pesanan</i></a>';
 
                 $string .= '</div>';
                 return
@@ -542,7 +655,7 @@ class PosOnlineController extends Controller
 
             DB::commit();
             $data = [
-                'url' => route('pos.show', ['id' => base64_encode($model->id)]),
+                'url' => route('pesanan-online.show', ['id' => base64_encode($model->id)]),
             ];
 
             $content = returnJson(true, $data);
@@ -571,7 +684,7 @@ class PosOnlineController extends Controller
         $id = base64_decode($id);
         $data['transaction'] = Transaction::find($id);
         $data['title'] =  'invoice '.$data['transaction']->invoice_no;
-        return view('pos.invoice', $data);
+        return view('pesanan-online.invoice', $data);
     }
 
     public function struk($id)

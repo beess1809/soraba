@@ -1,4 +1,4 @@
-@extends('pos.layout')
+@extends('pesanan-online.layout')
 @push('css')
     <style>
         @media print {

@@ -1,10 +1,11 @@
-@extends('pos.layout')
+@extends('pesanan-online.layout')
 
 @section('content')
     <img src="{{ asset('img/login-back.png') }}" alt="Logo" class="logo-detail-transaction">
     <div class="container-inventory">
         <!-- Content Header (Page header) -->
-        <form action="{{ route('pos.update', ['id' => base64_encode($model->id)]) }}" method="patch" id="form-transaction">
+        <form action="{{ route('pesanan-online.update', ['id' => base64_encode($model->id)]) }}" method="patch"
+            id="form-transaction">
             @csrf
             <div class="row">
                 <div class="col-lg-3 customer" style="overflow-y: scroll;height: 86.8vh">
@@ -17,20 +18,29 @@
                         <label>Nama</label>
                         <input type="text" class="form-control" name="name" id="name"
                             value="{{ $model->customer_name }}" {{ $model->status_id != 1 ? 'readonly' : '' }}>
+                        @error('name')
+                            <small class="text-red">Nama Pembeli Wajib Diisi</small>
+                        @enderror
                     </div>
                     <div class="form-group">
                         <label>Usia</label>
                         <input type="text" class="form-control" name="usia" id="usia"
                             value="{{ $model->customer_age }}" {{ $model->status_id != 1 ? 'readonly' : '' }}>
+                        @error('usia')
+                            <small class="text-red">Usia Pembeli wajib Diisi</small>
+                        @enderror
                     </div>
                     <div class="form-group">
                         <label>No. Telp</label>
                         <input type="text" class="form-control" name="no_telp" id="no_telp"
                             value="{{ $model->customer_phone }}" {{ $model->status_id != 1 ? 'readonly' : '' }}>
+                        @error('no_telp')
+                            <small class="text-red">No. Telp Pembeli wajib Diisi</small>
+                        @enderror
                     </div>
                     <div class="form-group">
                         <label>Alamat</label>
-                        <Textarea class="form-control" name="alamat" id="alamat" {{ $model->status_id != 1 ? 'readonly' : '' }}>{{ $model->customer_address }}</Textarea>
+                        <textarea class="form-control" name="alamat" id="alamat" {{ $model->status_id != 1 ? 'readonly' : '' }}>{{ $model->customer_address }}</textarea>
                     </div>
                     <div class="form-group">
                         <label>Tanggal</label>
@@ -59,11 +69,11 @@
                 </div>
                 <div class="col-lg-9 detail-transaction">
                     <div class="content-header">
-                        <div class="row col-12">
-                            <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-6">
                                 <h5 class="m-0" style="color: #191b2580"> <strong>Detail Transaction</strong></h5>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-6">
                                 @if ($model->status_id == 1)
                                     <button type="button" class="btn btn-outline-danger float-right btn-cancel"><i
                                             class="fa fa-trash"></i>
@@ -72,12 +82,11 @@
                             </div>
                         </div>
                     </div>
-                    <br>
                     <div class="col-12">
-                        <table class="table table-striped ">
+                        <table class="table table-striped">
                             <thead>
                                 <tr style="text-align: center">
-                                    <th style="width: 50px">No</th>
+                                    <th>No</th>
                                     <th>Nama Item</th>
                                     <th>Kuantitas</th>
                                     <th>Harga Satuan</th>
@@ -112,17 +121,16 @@
                         </table>
                     </div>
                     <div class="row col-12" style="padding-right: unset;">
-                        <div class="col-6">
+                        <div class="col-4 col-md-6 col-lg-6">
                             {{-- <div class="form-group" style="position: absolute; bottom: 0px;width:90%">
                                 <label>Kode Diskon</label>
                                 <input type="text" class="form-control" name="kode_diskon" id="kode_diskon"
                                     value="" {{ $model->status_id != 1 ? 'readonly' : '' }}>
                             </div> --}}
 
-                            <small>* Sub Total = Dpp {{ number_format($model->sub_total, 0, ',', '.') }} + Pajak
-                                {{ number_format($model->pajak, 0, ',', '.') }}</small>
+
                         </div>
-                        <div class="col-6" style="background: white;padding-inline:1rem;padding-top:1.5rem">
+                        <div class="col-8 col-md-6 col-lg-6 grand-total">
                             <dl class="row">
                                 <dt class="col-8"><label class="label-bordered">Sub Total</label></dt>
                                 <dd class="col-4" style="text-align: right"><label class="label-bordered"><strong>
@@ -131,15 +139,8 @@
                             <dl class="row">
                                 <dt class="col-8"><label class="label-bordered">Discount</label></dt>
                                 <dd class="col-4" style="text-align: right">
-                                    @if ($model->status_id != 1)
-                                        <label class="label-bordered"><strong>
-                                                {{ number_format($model->discount, 0, ',', '.') }}</strong></label>
-                                    @else
-                                        <input type="text" class="form-control number text-right" name="discount"
-                                            id="discount" value="{{ $model->discount ? $model->discount : 0 }}"
-                                            onkeyup="disc()">
-                                    @endif
-
+                                    <label class="label-bordered"><strong>
+                                            {{ number_format($model->discount, 0, ',', '.') }}</strong></label>
                                 </dd>
                             </dl>
                             <dl class="row">
@@ -152,26 +153,24 @@
 
                         </div>
                     </div>
-                    <br>
-                    <div>
-                        @if ($model->status_id == 1)
-                            <button type="button" class="btn btn-inventory float-right"
-                                style="width: 360px;height:60px;border-radius: 1rem;" id="done">Selesaikan
-                                Transaksi</button>
-                        @elseif($model->status_id == 2)
-                            <div class="float-right">
-                                <a href="{{ route('pos.invoice', ['id' => base64_encode($model->id)]) }}" target="_blank"
-                                    type="button" class="btn btn-info" title="Edit Item"><i class="fas fa-receipt"></i>
-                                    Cetak Invoice</a>
-                                <a href="{{ route('pos.struk', ['id' => base64_encode($model->id)]) }}" target="_blank"
-                                    type="button" class="btn btn-secondary" title="Edit Item"><i
-                                        class="fas fa-receipt"></i>
-                                    Cetak Struk</a>
+                    <div class="row col-12 d-flex justify-content-end mt-2" style="padding-right: unset;">
+                        <div class="col-8 col-md-6 col-lg-6 d-flex justify-content-end pr-0">
+                            @if ($model->status_id == 1)
+                                <button type="button" class="btn btn-sm btn-inventory float-right"
+                                    id="done">Selesaikan
+                                    Transaksi</button>
+                            @elseif($model->status_id == 2)
+                                <a href="{{ route('pesanan-online.invoice', ['id' => base64_encode($model->id)]) }}"
+                                    target="_blank" type="button" class="btn btn-sm btn-info" title="Edit Item"><i
+                                        class="fas fa-receipt"></i>Cetak Invoice</a>
+                                <a href="{{ route('pesanan-online.struk', ['id' => base64_encode($model->id)]) }}"
+                                    target="_blank" type="button" class="btn btn-sm btn-secondary ml-1"
+                                    title="Edit Item"><i class="fas fa-receipt"></i>Cetak Struk</a>
                                 {{-- &nbsp;&nbsp;<a href="{{ route('invoice.download', ['id' => base64_encode($model->id)]) }}"
-                                    type="button" class="btn btn-sm btn-success" title="Download"><i
-                                        class="fa fa-download"></i></a> --}}
-                            </div>
-                        @endif
+                                type="button" class="btn btn-sm btn-success" title="Download"><i
+                                    class="fa fa-download"></i></a> --}}
+                            @endif
+                        </div>
                     </div>
                 </div>
                 <!-- /.col-md-6 -->
@@ -184,7 +183,7 @@
     <script>
         $(".btn-cancel").click(function() {
             Swal.fire({
-                title: " Batalkan Transaksi",
+                title: "Batalkan Transaksi",
                 text: "Apakah Anda yakin membatalkan Transaksi ini ?",
                 icon: "warning",
                 showCancelButton: true,
@@ -195,7 +194,7 @@
             }).then((result) => {
                 if (result.value) {
                     $.ajax({
-                        url: "{{ route('pos.batal', ['id' => base64_encode($model->id)]) }}",
+                        url: "{{ route('pesanan-online.batal', ['id' => base64_encode($model->id)]) }}",
                         method: "put",
                         data: {
                             _token: $('meta[name="csrf-token"]').attr("content"),
@@ -251,9 +250,9 @@
             var form = $("#form-transaction")
             form.find(".invalid-feedback").remove();
             $.ajax({
-                url: "{{ route('pos.update', ['id' => base64_encode($model->id)]) }}",
+                url: "{{ route('pesanan-online.update', ['id' => base64_encode($model->id)]) }}",
                 method: "put",
-                data: form.serialize(),
+                data: form.serialize() + "&discount=0",
                 success: function(response) {
                     if (response.success) {
                         Swal.fire({

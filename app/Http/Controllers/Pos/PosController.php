@@ -246,51 +246,51 @@ class PosController extends Controller
             }
 
             $html = '<div class="col-4">
-            <div class="card">
-        <div class="card-body" style="background-color: #F2F2F280">
-            <div class="row">
-                <div class="col-md-4">
-                    <img src="' . asset('img/no-pict.png') . '" alt="" width="100%" height="100px" class="rounded">
-                </div>
-                <div class="col-md-8">
-                    <dl>
-                        <dd>' . $value->name . '</dd>
-                        <dd><small>' . $value->composition . '</small></dd>
+                        <div class="card">
+                            <div class="card-body" style="background-color: #F2F2F280">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <img src="' . asset('img/no-pict.png') . '" alt="" width="100%" height="100px" class="rounded">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <dl>
+                                            <dd>' . $value->name . '</dd>
+                                            <dd><small>' . $value->composition . '</small></dd>
 
-                    </dl>
-                </div>
-            </div>
-            <br>
-            <div class="row">
-                <div class="col-md-6">
-                    <dl>
-                        ' . $total . '
-                        <dd style="margin-bottom: 0px"><span>' . format_rupiah($value->qty) . '</span></dd>
-                        <dd style="margin-bottom: 0px">' . $stock . '</dd>
-                    </dl>
-                </div>
-                <div class="col-md-6">
-                    ' . $discount . '
-                    <div class="input-group" style="margin-top: 0.5rem">
-                        <span class="input-group-btn">
-                            <button type="button" class="btn btn-xs btn-danger btn-number-' . $value->id . '" onclick="minusItem(' . $value->id . ')" data-type="minus" data-field="quant[2]">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </span>
-                        <input type="text" name="quant[2]" class="form-control input-number-' . $value->id . '" value="0"
-                            min="0" max="' . $value->qty . '" style="background-color: #F2F2F280;border: 0px;text-align:center">
-                        <span class="input-group-btn">
-                            <button type="button" class="btn btn-xs btn-soraba btn-number-' . $value->id . '" onclick="plusItem(' . $value->id . ')" data-type="plus" data-field="quant[2]">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <button class="btn btn-block btn-inventory" onclick="pesan(' . $value->id . ',1)">Tambahkan ke Pesanan</button>
-        </div>
-    </div>
-    </div>';
+                                        </dl>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <dl>
+                                            ' . $total . '
+                                            <dd style="margin-bottom: 0px"><span>' . format_rupiah($value->qty) . '</span></dd>
+                                            <dd style="margin-bottom: 0px">' . $stock . '</dd>
+                                        </dl>
+                                    </div>
+                                    <div class="col-md-6">
+                                        ' . $discount . '
+                                        <div class="input-group" style="margin-top: 0.5rem">
+                                            <span class="input-group-btn">
+                                                <button type="button" class="btn btn-xs btn-danger btn-number-' . $value->id . '" onclick="minusItem(' . $value->id . ')" data-type="minus" data-field="quant[2]">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                            </span>
+                                            <input type="text" name="quant[2]" class="form-control input-number-' . $value->id . '" value="0"
+                                                min="0" max="' . $value->qty . '" style="background-color: #F2F2F280;border: 0px;text-align:center">
+                                            <span class="input-group-btn">
+                                                <button type="button" class="btn btn-xs btn-soraba btn-number-' . $value->id . '" onclick="plusItem(' . $value->id . ')" data-type="plus" data-field="quant[2]">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-block btn-inventory" onclick="pesan(' . $value->id . ',1)">Tambahkan ke Pesanan</button>
+                            </div>
+                        </div>
+                    </div>';
 
             $htmls[$key] = $html;
         }
