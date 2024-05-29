@@ -7,9 +7,9 @@
             <th>Quantity</th>
             <th>Uom</th>
             <th>Sell Price</th>
+            <th>Flash Sale Price</th>
             <th>Discount (Rp)</th>
             <th>Discount Expired Date</th>
-            <th>Vendor</th>
             <th>Warehouse</th>
             <th class="no-sort" style="width: 100px"></th>
         </tr>
@@ -64,10 +64,13 @@
                         data: 'uom',
                         name: 'uom'
                     },
-
                     {
                         data: 'sale_price',
                         name: 'sale_price'
+                    },
+                    {
+                        data: 'flash_sale_price',
+                        name: 'flash_sale_price'
                     },
                     {
                         data: 'discount',
@@ -76,10 +79,6 @@
                     {
                         data: 'expired_date',
                         name: 'expired_date'
-                    },
-                    {
-                        data: 'vendor',
-                        name: 'vendor'
                     },
                     {
                         data: 'warehouse',

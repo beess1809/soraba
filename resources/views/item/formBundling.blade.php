@@ -46,7 +46,7 @@
                             <input type="hidden" name="_method" value="PUT">
                         @endif
                         <div class="row">
-                            <div class="form-group col-md-6">
+                            <div class="form-group col-md-12">
                                 <label for="name" class="col-sm-12 col-form-label">Bundling Name <span
                                         class="text-red">*</span></label>
                                 <div class="col-sm-12">
@@ -70,6 +70,19 @@
                                         class="form-control form-control-sm number" placeholder="Harga"
                                         value="{{ $model->exists ? format_rupiah($model->price) : old('price') }}">
                                     @error('price')
+                                        <small class="text-red">
+                                            <strong>{{ $message }}</strong>
+                                        </small>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="flash_sale_price" class="col-sm-12 col-form-label">Flash Sell Price</label>
+                                <div class="col-sm-12">
+                                    <input type="text" name="flash_sale_price" id="flash_sale_price"
+                                        class="form-control form-control-sm number" placeholder="Harga Flash Sale"
+                                        value="{{ $model->exists ? format_rupiah($model->flash_sale_price) : old('flash_sale_price') }}">
+                                    @error('flash_sale_price')
                                         <small class="text-red">
                                             <strong>{{ $message }}</strong>
                                         </small>
