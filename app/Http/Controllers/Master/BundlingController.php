@@ -66,6 +66,8 @@ class BundlingController extends Controller
 
         $model->name = $request->name;
         $model->price = str_replace('.', '', $request->price);
+        $model->flash_sale_price = str_replace('.', '', $request->flash_sale_price);
+        
         $model->item_id = json_encode($item);
         if ($model->save()) {
             return redirect()->route('items.index')->with('alert.success', 'Bundling Has Been Added');
@@ -130,6 +132,7 @@ class BundlingController extends Controller
 
         $model->name = $request->name;
         $model->price = str_replace('.', '', $request->price);
+        $model->flash_sale_price = str_replace('.', '', $request->flash_sale_price);
         $model->item_id = json_encode($item);
 
         if ($model->save()) {
@@ -182,6 +185,9 @@ class BundlingController extends Controller
             })
             ->editColumn('price', function ($model) {
                 return  format_rupiah($model->price);
+            })
+            ->editColumn('flash_sale_price', function ($model) {
+                return  format_rupiah($model->flash_sale_price);
             })
             ->addColumn('items', function ($model) {
                 $string = '';

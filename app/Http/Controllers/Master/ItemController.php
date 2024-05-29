@@ -63,11 +63,11 @@ class ItemController extends Controller
         $model->name = strtoupper($request->name);
         $model->composition = $request->composition;
         $model->warehouse_id = $request->warehouse_id;
-        $model->vendor_id = $request->vendor_id;
         $model->category_id = $request->category_id;
         $model->qty = str_replace('.', '', $request->qty);
         $model->uom_id = $request->uom;
         $model->sale_price = str_replace('.', '', $request->sale_price);
+        $model->flash_sale_price = str_replace('.', '', $request->flash_sale_price);
         $model->discount = str_replace('.', '', $request->discount);
         $model->expired_discount = $request->expired_date;
 
@@ -134,6 +134,7 @@ class ItemController extends Controller
         $model->qty = str_replace('.', '', $request->qty);
         $model->uom_id = $request->uom;
         $model->sale_price = str_replace('.', '', $request->sale_price);
+        $model->flash_sale_price = str_replace('.', '', $request->flash_sale_price);
         $model->discount = str_replace('.', '', $request->discount);
         $model->expired_discount = $request->expired_date;
 
@@ -192,9 +193,6 @@ class ItemController extends Controller
             ->addColumn('warehouse', function ($model) {
                 return $model->warehouse_id ? $model->warehouse->name : "";
             })
-            ->addColumn('vendor', function ($model) {
-                return $model->vendor_id ? $model->vendor->name : "";
-            })
             ->addColumn('category', function ($model) {
                 return $model->category_id ? $model->category->name : "";
             })
@@ -203,6 +201,9 @@ class ItemController extends Controller
             })
             ->editColumn('sale_price', function ($model) {
                 return  format_rupiah($model->sale_price);
+            })
+            ->editColumn('flash_sale_price', function ($model) {
+                return  format_rupiah($model->flash_sale_price);
             })
             ->editColumn('discount', function ($model) {
                 return  format_rupiah($model->discount);
