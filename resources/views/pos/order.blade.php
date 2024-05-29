@@ -109,32 +109,23 @@
                 var qty = $(".input-number-" + id).val()
                 var item_id = id
             } else if (type == 2) {
-                var qty = $('#__qty').val();
-                var item_name = $('#bundling_id option:selected').text();
-
-                var item_id = $('.item-formula').map((_, i) => i.value).get()
-                var qty_item = $('.qty-formula').map((_, q) => q.value).get()
-                var cost = $('#cost').val()
+                var qty = $(".input-number-" + id).val();
+                var item_id = id;
             }
 
-            console.log(type);
-            console.log(item_name);
-            console.log(item_id);
-            console.log(qty_item);
-            console.log(cost);
+            console.log('type: ' + type);
+            console.log('item : ' + id);
+            console.log('qty : ' + qty);
 
             $.ajax({
                 url: "{{ route('pos.add-to-cart') }}",
                 method: 'post',
                 data: {
                     '_token': $('meta[name="csrf-token"]').attr('content'),
-                    'item_id': id,
                     'qty': qty,
                     'tipe': type,
-                    'item_name': item_name,
+                    'item_name': item_id,
                     'item_id': item_id,
-                    'qty_item': qty_item,
-                    'cost': cost,
                 },
                 success: function(response) {
 
