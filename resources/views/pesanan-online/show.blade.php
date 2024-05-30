@@ -8,9 +8,9 @@
             id="form-transaction">
             @csrf
             <div class="row">
-                <div class="col-lg-3 customer" style="overflow-y: scroll;height: 86.8vh">
+                <div class="col-lg-3 col-12 customer">
                     <div class="form-group">
-                        <h5 style="color: #191b2580;margin-bottom:0px"><strong>No. Invoice</strong></h5>
+                        <h5><strong>No. Invoice</strong></h5>
                         <p>{{ $model->invoice_no }}</p>
                         <input type="hidden" class="form-control" name="no_invoice" id="no_invoice" value="">
                     </div>
@@ -49,7 +49,8 @@
                     </div>
                     <div class="form-group">
                         <label>Tipe Pembayaran <span class="text-red">(* Wajib Diisi)</span></label>
-                        <select name="tipe_pembayaran" id="tipe_pembayaran" class="form-control select2">
+                        <select name="tipe_pembayaran" id="tipe_pembayaran" class="form-control select2"
+                            {{ $model->status_id != 1 ? 'disabled' : '' }}>
                             <option value="">Pilih Tipe Pembayaran</option>
                             @foreach (App\Models\Master\PaymentType::all() as $key => $item)
                                 <option value="{{ $item->id }}"
@@ -67,7 +68,7 @@
                             value="{{ $model->card_number }}" {{ $model->status_id != 1 ? 'readonly' : '' }}>
                     </div>
                 </div>
-                <div class="col-lg-9 detail-transaction">
+                <div class="col-lg-9 col-12 detail-transaction">
                     <div class="content-header">
                         <div class="row">
                             <div class="col-6">

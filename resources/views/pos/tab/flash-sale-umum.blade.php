@@ -38,15 +38,15 @@
     </div>
 </div>
 
-<div class="row col-12" id="card-item">
-    @foreach ($cards as $item)
+<div class="row col-12" id="card-item3" style="overflow-y: scroll;height: 86.8vh">
+    @foreach ($flash_sale_items as $item)
         {!! $item !!}
     @endforeach
 </div>
 
 @push('scripts')
     <script>
-        function plusItem(id) {
+        function plusFlashSaleItem(id) {
 
             var input = $(".input-number-" + id);
             var currentVal = parseInt(input.val());
@@ -63,7 +63,7 @@
             }
         }
 
-        function minusItem(id) {
+        function minusFlashSaleItem(id) {
 
             var input = $(".input-number-" + id);
             var currentVal = parseInt(input.val());

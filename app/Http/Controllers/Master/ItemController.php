@@ -68,7 +68,7 @@ class ItemController extends Controller
         $model->uom_id = $request->uom;
         $model->sale_price = str_replace('.', '', $request->sale_price);
         $model->flash_sale_price = str_replace('.', '', $request->flash_sale_price);
-        $model->discount = str_replace('.', '', $request->discount);
+        $model->discount = isset($request->discount) && 0 ? str_replace('.', '', $request->discount) : null;
         $model->expired_discount = $request->expired_date;
 
         if ($model->save()) {
@@ -135,7 +135,7 @@ class ItemController extends Controller
         $model->uom_id = $request->uom;
         $model->sale_price = str_replace('.', '', $request->sale_price);
         $model->flash_sale_price = str_replace('.', '', $request->flash_sale_price);
-        $model->discount = str_replace('.', '', $request->discount);
+        $model->discount = isset($request->discount) && 0 ? str_replace('.', '', $request->discount) : null;
         $model->expired_discount = $request->expired_date;
 
         if ($model->save()) {

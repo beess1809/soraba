@@ -38,7 +38,7 @@
     </div>
 </div>
 
-<div class="row col-12" id="card-item">
+<div class="row col-12" id="card-item" style="overflow-y: scroll;height: 86.8vh">
     @foreach ($cards as $item)
         {!! $item !!}
     @endforeach

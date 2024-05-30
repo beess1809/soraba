@@ -3,10 +3,8 @@
 @section('content')
     <div class="container-inventory">
         <!-- Content Header (Page header) -->
-
-
         <div class="row">
-            <div class="col-lg-8" style="overflow-y: scroll;height: 86.8vh">
+            <div class="col-lg-8 col-12">
                 <div class="content-header">
                     <div class="">
                         <div class="row mb-2">
@@ -18,17 +16,29 @@
                 </div>
 
                 <div class="row col-12">
-                    <div class="col-sm-6">
+                    <div class="col-12">
                         <ul class="nav nav-tabs" id="tab" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link active" id="umum-tab" data-toggle="pill" href="#umum" role="tab"
                                     aria-controls="umum" aria-selected="false"><i class="fas fa-notes-medical">
-                                        &nbsp;</i>Umum</a>
+                                        &nbsp;</i>Reguler</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" id="bundling-tab" data-toggle="pill" href="#bundling" role="tab"
                                     aria-controls="bundling" aria-selected="false"><i class="fas fa-pills">
-                                        &nbsp;</i>Bundling</a>
+                                        &nbsp;</i>Paket</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="flash-sale-umum-tab" data-toggle="pill" href="#flash-sale-umum"
+                                    role="tab" aria-controls="flash-sale-umum" aria-selected="false"><i
+                                        class="fas fa-stopwatch"></i>&nbsp;Flash
+                                    Sale Reguler</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="flash-sale-bundling-tab" data-toggle="pill"
+                                    href="#flash-sale-bundling" role="tab" aria-controls="flash-sale-bundling"
+                                    aria-selected="false"><i class="fas fa-stopwatch-20"></i>
+                                    &nbsp;Flash Sale Paket</a>
                             </li>
                         </ul>
                     </div>
@@ -42,10 +52,17 @@
                     <div class="tab-pane fade show" id="bundling" role="tabpanel" aria-labelledby="bundling">
                         @include('pesanan-online.tab.bundling')
                     </div>
+                    <div class="tab-pane fade show" id="flash-sale-umum" role="tabpanel" aria-labelledby="flash-sale-umum">
+                        @include('pesanan-online.tab.flash-sale-umum')
+                    </div>
+                    <div class="tab-pane fade show" id="flash-sale-bundling" role="tabpanel"
+                        aria-labelledby="flash-sale-bundling">
+                        @include('pesanan-online.tab.flash-sale-bundling')
+                    </div>
                 </div>
             </div>
             <!-- /.col-md-6 -->
-            <div class="col-lg-4 order" id="pesanan">
+            <div class="col-lg-4 col-12 order" id="pesanan">
                 {{-- <div class="p-3 order-title"> --}}
                 {{-- <span>tes</span> --}}
                 {{-- <br> --}}
@@ -99,23 +116,54 @@
             <!-- /.col-md-6 -->
         </div>
         <!-- /.row -->
-    </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.container-fluid -->
+
+    <div class="modal fade" id="modal-default">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Pengumuman</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                        onclick="closePopUp()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Sedang Ada Promo Flash Sale
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"
+                        onclick="closePopUp()">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
 @endsection
 @push('scripts')
     <script>
+        if (document.cookie.indexOf("popupShown=true") == -1) {
+            document.cookie = "popupShown=true; max-age=86400"; // 86400: seconds in a day
+            $('#modal-default').modal('show');
+        }
+
         function pesan(id, type) {
             if (type == 1) {
                 var qty = $(".input-number-" + id).val()
                 var item_id = id
             } else if (type == 2) {
-                // var qty = $('#__qty').val();
                 var qty = $(".input-number-" + id).val();
                 var item_id = id
-                // var item_name = $('#bundling_id option:selected').text();
-
-                // var item_id = $('.item-formula').map((_, i) => i.value).get()
-                // var qty_item = $('.qty-formula').map((_, q) => q.value).get()
-                // var cost = $('#cost').val()
+            } else if (type == 3) {
+                var qty = $(".input-number-" + id).val();
+                var item_id = id
+            } else if (type == 4) {
+                var qty = $(".input-number-" + id).val();
+                var item_id = id
             }
 
             var cart_amount = $('.cart-amount').text();

@@ -95,7 +95,7 @@
                                         <td>{{ $item->item_name }}</td>
                                         <td>x{{ $item->qty }}</td>
                                         <td style="text-align: center">
-                                            {{ number_format($item->price + $item->ppn, 0, ',', '.') }}
+                                            {{ number_format($item->price, 0, ',', '.') }}
                                         </td>
                                         <td style="text-align: center">
                                             {{ number_format($item->discount, 0, ',', '.') }}
@@ -118,9 +118,6 @@
                                 <input type="text" class="form-control" name="kode_diskon" id="kode_diskon"
                                     value="" {{ $model->status_id != 1 ? 'readonly' : '' }}>
                             </div> --}}
-
-                            <small>* Sub Total = Dpp {{ number_format($model->sub_total, 0, ',', '.') }} + Pajak
-                                {{ number_format($model->pajak, 0, ',', '.') }}</small>
                         </div>
                         <div class="col-6" style="background: white;padding-inline:1rem;padding-top:1.5rem">
                             <dl class="row">

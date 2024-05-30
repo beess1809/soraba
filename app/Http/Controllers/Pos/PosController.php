@@ -7,6 +7,7 @@ use App\Models\Master\Bundling;
 use App\Models\Transaction\Transaction;
 use App\Models\Master\Item;
 use App\Models\Master\Parameter;
+use App\Models\Master\FlashSaleBundling;
 use App\Models\Transaction\Transaction as TransactionTransaction;
 use App\Models\Transaction\TransactionDetail;
 use Illuminate\Http\Request;
@@ -41,6 +42,8 @@ class PosController extends Controller
     {
         $data['cards'] = $this->cardItem(null);
         $data['bundlings'] = $this->cardBundling(null);
+        $data['flash_sale_items'] = $this->cardFlashSaleItem(null);
+        $data['flash_sale_bundlings'] = $this->cardFlashSaleBundling(null);
         return view('pos.order', $data);
     }
 
@@ -367,6 +370,138 @@ class PosController extends Controller
         return $htmls;
     }
 
+    function cardFlashSaleItem($param)
+    {
+        if (!is_null($param)) {
+            $items = Item::whereNotNull('flash_sale_price')->where('name', 'like', '%' . $param . '%')->get();
+        } else {
+            $items = Item::whereNotNull('flash_sale_price')->get();
+        }
+
+        foreach ($items as $key => $value) {
+            $stock = ($value->qty == 0) ? '<small class="text-red">Out of Stock !</small>' : '<small>In Stock</small>';
+            $pajak = 0;
+            $harga = $value->sale_price + $pajak;
+
+            if (!is_null($value->flash_sale_price)) {
+                $total = '<dd style="color:grey"><strong><s>Rp. ' . number_format($harga, 0, ',', '.') . '</s></strong></dd>';
+                $harga = $value->flash_sale_price;
+                $discount = '<span><strong>Rp. ' . number_format($harga, 0, ',', '.') . '</strong></span>';
+            } else {
+                $total = '<dd style=""><strong>Rp. ' . number_format($harga, 0, ',', '.') . '</strong></dd>';
+                $discount = '';
+            }
+
+            $html = '   <div class="col-12 col-md-6 col-lg-4 item">
+                            <div class="card m-0">
+                                <div class="card-body item-body" style="background-color: #F2F2F280">
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-4 col-3">
+                                            <img src="' . asset('img/no-pict.png') . '" alt=""class="rounded">
+                                        </div>
+                                    
+                                        <div class="col-lg-8 col-md-8 col-6">
+                                            <dl>
+                                                <dd>'.$value->name.'</dd>
+                                                ' . $total . '
+                                                <dd style="margin-bottom: 0px"><span>' . format_rupiah($value->qty) . '</span></dd>
+                                                <dd style="margin-bottom: 0px">' . $stock . '</dd>
+                                            </dl>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-3  px-0">
+                                            ' . $discount . '
+                                            <div class="input-group" style="margin-top: 0.5rem">
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-xs btn-danger btn-number-' . $value->id . '" onclick="minusFlashSaleItem(' . $value->id . ')" data-type="minus" data-field="quant[2]">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                </span>
+                                                <input type="text" name="quant[2]" class="form-control input-number-' . $value->id . '" value="0"
+                                                    min="0" max="' . $value->qty . '" style="background-color: #F2F2F280;border: 0px;text-align:center">
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-xs btn-soraba btn-number-' . $value->id . '" onclick="plusFlashSaleItem(' . $value->id . ')" data-type="plus" data-field="quant[2]">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-block btn-inventory" onclick="pesan(' . $value->id . ',3)">Tambahkan ke Pesanan</button>
+                                </div>
+                            </div>
+                        </div>';
+
+            $htmls[$key] = $html;
+        }
+        return $htmls;
+    }
+
+    function cardFlashSaleBundling($param)
+    {
+        if (!is_null($param)) {
+            $bundlings = FlashSaleBundling::where('name', 'like', '%' . $param . '%')->get();
+        } else {
+            $bundlings = FlashSaleBundling::all();
+        }
+
+        foreach ($bundlings as $key => $value) {
+            $harga = $value->price;
+            $total = '<dd><strong>Rp. ' . number_format($harga, 0, ',', '.') . '</strong></dd>';
+
+            $items = json_decode($value->item_id);
+
+            $li = '<ul style="margin-bottom: 0; padding-left: 10px;">';
+            foreach($items as $item) {
+                $item_name = Item::find($item->item);
+                $li .= '<li>';
+                $li .= '<input type="hidden" class="item-formula" value="'.$item_name->id.'">'.$item_name->name.' ';
+                $li .= '<input type="hidden" class="form-control qty-formula" name="__qty_item" id="__qty_item_'.$value->id.$item->item.'" value="'.$item->qty.'" readonly> | '.$item->qty.' '.$item_name->uom->name;
+                $li .= '</li>';
+            }
+            $li .= '</ul>';
+
+            $html = '   <div class="col-12 col-md-6 col-lg-4 item">
+                            <div class="card m-0">
+                                <div class="card-body item-body" style="background-color: #F2F2F280">
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-4 col-3">
+                                            <img src="' . asset('img/no-pict.png') . '" alt=""class="rounded">
+                                        </div>
+                                    
+                                        <div class="col-lg-8 col-md-8 col-6">
+                                            <dl>
+                                                <dd>'.$value->name.'</dd>
+                                                ' . $total . '
+                                                <dd style="margin-bottom: 0px"><span class="item_bundling">' . $li . '</span></dd>
+                                            </dl>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-3 px-0">
+                                            <div class="input-group d-flex align-items-center" style="margin-top: 0.5rem">
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-xs btn-danger btn-number-' . $value->id . '" onclick="minusFlashSaleBundling(' . $value->id . ')" data-type="minus" data-field="quant[2]">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                </span>
+                                                <input type="text" name="quant[2]" class="form-control input-number-' . $value->id . '" value="0"
+                                                    min="0" style="background-color: #F2F2F280;border: 0px;text-align:center">
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-xs btn-soraba btn-number-' . $value->id . '" onclick="plusFlashSaleBundling(' . $value->id . ')" data-type="plus" data-field="quant[2]">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-block btn-inventory" onclick="pesan(' . $value->id . ',4)">Tambahkan ke Pesanan</button>
+                                </div>
+                            </div>
+                        </div>';
+
+            $htmls[$key] = $html;
+        }
+        return $htmls;
+    }
+
     function cari(Request $request)
     {
         $param = $request->cari;
@@ -396,7 +531,142 @@ class PosController extends Controller
                 ->header('Content-Type', 'json');
         }
 
-        if ($request->tipe == 2) {
+        if($request->tipe == 4) {
+            $bundling = FlashSaleBundling::find($request->item_id);
+            $lists_item = json_decode($bundling->item_id);
+
+            $harga = 0;
+            $totPajak = 0;
+            $string = '';
+            $disc = 0;
+            $cost = $bundling->price * $request->qty;
+
+            foreach($lists_item as $key => $value) {
+                $item = Item::find($value->item);
+                if($item->qty < ((int)$value->qty * $request->qty)) {
+                    $data = [
+                        'message' => 'Sisa stok ' . $item->name . ' adalah ' . $item->qty,
+                    ];
+
+                    $content = returnJson(false, $data);
+                    $status = 200;
+
+                    return (new Response($content, $status))
+                        ->header('Content-Type', 'json');
+                }
+
+                $discount = is_null($item->discount) ? 0 : 0;
+                $subprice = $bundling->price * $request->qty;
+
+                $item_price = $bundling->price;
+
+                $string .= '<input type="hidden" name="item_id[' . $time . '][' . $key . ']" value="' . $item->id . '">';
+                $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' .$value->qty * $request->qty. '">';
+
+                $string .= '<input type="hidden" name="item_price[' . $time . '][' . $key . ']" value="' . $item_price . '">';
+                $string .= '<input type="hidden" name="item_discount[' . $time . '][' . $key . ']" value="' . $discount . '">';
+
+                $harga += $subprice;
+                $disc += $discount;
+            }
+
+            $sub = $bundling->price;
+            $totPajak = 0;
+
+            $harga = $request->qty * $bundling->price;//$sub  - $disc + $request->cost;
+            $price = ($sub + $request->cost) / $request->qty;
+
+            $html = '<div class="row item-detail" id="detail-' . $time . '">
+                        <div class="col-2">
+                            <img src="' . asset('img/no-pict.png') . '" width="100%" height="84px" class="rounded">
+                        </div>
+                        <div class="col-10">
+                            <dl>
+                                <dd style="margin-bottom: 0px">' . strtoupper($bundling->name) . '</dd>
+                                <input type="hidden" name="index[]" value="' . $time . '">
+                                <input type="hidden" name="item_name[]" value="' . $bundling->name . '">
+                                ' . $string . '
+                                <input type="hidden" name="type[]" value="' . $request->tipe . '">
+                                <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
+                                <input type="hidden" name="qty[]" id="qty_'.$time.'" value="' . $request->qty . '">
+
+                                <dd style="margin-bottom: 0px">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <textarea class="form-control" rows="1" name="notes[]" placeholder="Catatan" style="min-width: 100%"></textarea>
+
+                                        </div>
+                                        <div class="col-7">
+                                            <strong class="float-right" style="margin-right: 2rem">
+                                            Rp. ' . number_format($harga, '0', ',', '.') . '
+                                                <input type="hidden" name="price[]" id="price_' . $time . '" value="' . str_replace('.', '', $harga) . '">
+                                                    <input type="hidden" name="pajak[]" id="pajak_' . $time . '" value="' . $totPajak . '">
+                                                    <input type="hidden" name="discount[]" value="' . $disc . '">
+                                                    <input type="hidden" name="cost[]" id="cost_' . $time . '" value="' . str_replace('.', '', $cost) . '">
+                                                    <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $sub . '">
+                                                <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ')">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>';
+            // $harga -=  $disc;
+        }
+        elseif($request->tipe == 3) {
+            $item = Item::find($request->item_id);
+            $sub = $item->flash_sale_price;
+            $harga = $item->flash_sale_price * $request->qty;
+            $discount = 0;
+
+            $flash_sale = $item->flash_sale_price;
+            $cost = 0;
+
+            $html = '<div class="row item-detail" id="detail-' . $time . '">
+                        <div class="col-2">
+                            <img src="' . asset('img/no-pict.png') . '" width="100%" height="84px" class="rounded">
+                        </div>
+                        <div class="col-10">
+                            <dl>
+                                <dd style="margin-bottom: 0px">' . strtoupper($item->name) . '</dd>
+                            <input type="hidden" name="item_name[]" value="' . $item->name . '">
+                            <input type="hidden" name="index[]" value="' . $time . '">
+                                <input type="hidden" name="item_id[' . $time . '][0]" value="' . $item->id . '">
+                                <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
+                                <input type="hidden" name="item_qty[' . $time . '][0]" value="' . $request->qty . '">
+                                <input type="hidden" name="item_price[' . $time . '][0]" value="' . $sub . '">
+                                <input type="hidden" name="item_discount[' . $time . '][0]" value="' . $flash_sale . '">
+                                <input type="hidden" name="discount[]" value="' . $discount . '">
+                                <input type="hidden" name="qty[]" id="qty_'.$time.'" value="' . $request->qty . '">
+                                <dd style="margin-bottom: 0px">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <textarea class="form-control" rows="1" name="notes[]" placeholder="Catatan" style="min-width: 100%"></textarea>
+
+                                        </div>
+                                        <div class="col-7">
+                                            <strong class="float-right" style="margin-right: 2rem">
+                                            Rp. ' . number_format($harga, '0', ',', '.') . '
+                                                <input type="hidden" name="price[]" id="price_' . $time . '" value="' . $harga. '">
+                                                <input type="hidden" name="cost[]" id="cost_' . $time . '"  value="' . $cost . '">
+                                                <input type="hidden" name="sub_price[]"  id="sub_price_' . $time . '" value="' . $sub . '">
+                                                <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ')">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>';
+            // $harga = $harga;
+        }
+
+        elseif ($request->tipe == 2) {
             $bundling = Bundling::find($request->item_id);
             $lists_item = json_decode($bundling->item_id);
             
@@ -436,7 +706,7 @@ class PosController extends Controller
                 $harga += $subprice;
                 $disc += $discount;
             }
-            $sub = $harga;
+            $sub = $bundling->price;
             $totPajak = 0;
 
             $harga = $request->qty * $bundling->price;
@@ -454,7 +724,7 @@ class PosController extends Controller
                                 ' . $string . '
                                 <input type="hidden" name="type[]" value="' . $request->tipe . '">
                                 <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
-                                <input type="hidden" name="qty[]" value="' . $request->qty . '">
+                                <input type="hidden" name="qty[]" id="qty_'.$time.'" value="' . $request->qty . '">
 
                                 <dd style="margin-bottom: 0px">
                                     <div class="row">
@@ -469,7 +739,7 @@ class PosController extends Controller
                                                     <input type="hidden" name="pajak[]" id="pajak_' . $time . '" value="' . $totPajak . '">
                                                     <input type="hidden" name="discount[]" value="' . $disc . '">
                                                     <input type="hidden" name="cost[]" id="cost_' . $time . '" value="' . str_replace('.', '', $cost) . '">
-                                                    <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $cost . '">
+                                                    <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $sub . '">
                                                 <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ')">
                                                     <i class="fas fa-minus"></i>
                                                 </button>
@@ -491,46 +761,47 @@ class PosController extends Controller
             $cost = 0;
 
             $html = '<div class="row item-detail" id="detail-' . $time . '">
-            <div class="col-2">
-                <img src="' . asset('img/no-pict.png') . '" width="100%" height="84px" class="rounded">
-            </div>
-            <div class="col-10">
-                <dl>
-                    <dd style="margin-bottom: 0px">' . strtoupper($item->name) . '</dd>
-                <input type="hidden" name="item_name[]" value="' . $item->name . '">
-                <input type="hidden" name="index[]" value="' . $time . '">
-                    <input type="hidden" name="item_id[' . $time . '][0]" value="' . $item->id . '">
-                    <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
-                    <input type="hidden" name="item_qty[' . $time . '][0]" value="' . $request->qty . '">
-                    <input type="hidden" name="item_price[' . $time . '][0]" value="' . $sub . '">
-                    <input type="hidden" name="item_discount[' . $time . '][0]" value="' . $discount . '">
-                    <input type="hidden" name="discount[]" value="' . $discount . '">
-                    <input type="hidden" name="qty[]" value="' . $request->qty . '">
-                    <dd style="margin-bottom: 0px">
-                        <div class="row">
-                            <div class="col-5">
-                                <textarea class="form-control" rows="1" name="notes[]" placeholder="Catatan" style="min-width: 100%"></textarea>
-
-                            </div>
-                            <div class="col-7">
-                                <strong class="float-right" style="margin-right: 2rem">
-                                Rp. ' . number_format($harga  - $discount, '0', ',', '.') . '
-                                    <input type="hidden" name="price[]" id="price_' . $time . '" value="' . $harga - $discount . '">
-                                    <input type="hidden" name="cost[]" id="cost_' . $time . '"  value="' . $cost . '">
-                                    <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $sub . '">
-                                    <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ')">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                </strong>
-                            </div>
+                        <div class="col-2">
+                            <img src="' . asset('img/no-pict.png') . '" width="100%" height="84px" class="rounded">
                         </div>
-                    </dd>
-                </dl>
-            </div>
-        </div>';
+                        <div class="col-10">
+                            <dl>
+                                <dd style="margin-bottom: 0px">' . strtoupper($item->name) . '</dd>
+                            <input type="hidden" name="item_name[]" value="' . $item->name . '">
+                            <input type="hidden" name="index[]" value="' . $time . '">
+                                <input type="hidden" name="item_id[' . $time . '][0]" value="' . $item->id . '">
+                                <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
+                                <input type="hidden" name="item_qty[' . $time . '][0]" value="' . $request->qty . '">
+                                <input type="hidden" name="item_price[' . $time . '][0]" value="' . $sub . '">
+                                <input type="hidden" name="item_discount[' . $time . '][0]" value="' . $discount . '">
+                                <input type="hidden" name="discount[]" value="' . $discount . '">
+                                <input type="hidden" name="qty[]" id="qty_'.$time.'" value="' . $request->qty . '">
+                                <dd style="margin-bottom: 0px">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <textarea class="form-control" rows="1" name="notes[]" placeholder="Catatan" style="min-width: 100%"></textarea>
+
+                                        </div>
+                                        <div class="col-7">
+                                            <strong class="float-right" style="margin-right: 2rem">
+                                            Rp. ' . number_format($harga  - $discount, '0', ',', '.') . '
+                                                <input type="hidden" name="price[]" id="price_' . $time . '" value="' . $harga - $discount . '">
+                                                <input type="hidden" name="cost[]" id="cost_' . $time . '"  value="' . $cost . '">
+                                                <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $sub . '">
+                                                <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ')">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>';
             $harga -=  $discount;
         }
 
+        $item->qty = $request->qty;
         $item->harga = $harga;
         $item->cost = $cost;
 

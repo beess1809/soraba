@@ -1,110 +1,18 @@
-<div class="row col-12" id="card-item2" style="overflow-y: scroll;height: 86.8vh">
-    @foreach ($bundlings as $item)
-        {!! $item !!}
-    @endforeach
-</div>
-
-{{-- <div class="form-group">
-    <label for="bundling" class="col-sm-12 col-form-label">Nama Bundle <span class="text-red">*</span></label>
-    <div class="col-sm-6">
-        <select name="bundling_id" id="bundling_id" class="form-control form-control-sm select2">
-            <option value="">Select All</option>
-            @foreach (App\Models\Master\Bundling::all() as $bund)
-                <option value="{{ $bund->id }}">{{ $bund->name }}</option>
+@foreach ($flash_sale as $fs)
+    @if (date('H:i:s') > $fs->time_start && date('H:i:s') < $fs->time_end)
+        <div class="row col-12" id="card-item4" style="overflow-y: scroll;height: 86.8vh">
+            @foreach ($flash_sale_bundlings as $item)
+                {!! $item !!}
             @endforeach
-        </select>
-        @error('bundling_id')
-            <small class="text-red">
-                <strong>{{ $message }}</strong>
-            </small>
-        @enderror
-    </div>
-</div> --}}
-
-{{-- <div class="row col-12">
-    <div class="form-group col-6">
-        <label for="item" class="col-sm-12 col-form-label">Pilih Item <span class="text-red">*</span></label>
-        <div class="col-sm-12">
-            <select class=" form-control select-item item-formula" name="__item_id[]" id="__item_ids">
-                <option value="">Pilih Item Untuk di bundle</option>
-            </select>
-            @error('item')
-                <small class="text-red">
-                    <strong>{{ $message }}</strong>
-                </small>
-            @enderror
         </div>
-    </div>
-
-    <div class="form-group col-2">
-        <label for="item" class="col-sm-12 col-form-label">Kuantitas <span class="text-red">*</span></label>
-        <div class="col-sm-12">
-            <input type="number" name="__qty_item[]" id="__qty_item_1" class="form-control qty-formula" placeholder="">
-            @error('qty')
-                <small class="text-red">
-                    <strong>{{ $message }}</strong>
-                </small>
-            @enderror
-        </div>
-    </div>
-</div> --}}
-
-{{-- <div id="item-detail">
-
-</div> --}}
-
-{{-- <div class="form-group col-12">
-    <button type="button" class="btn" id="add-obat" style="display: none">
-        <i class="fas fa-plus" style="color: var(--primary)"></i>
-        &nbsp;<span style="color: var(--primary)"> Tambah Item Bundling</span>
-    </button>
-</div>
-<div class="form-group col-6">
-    <label for="item" class="col-sm-12 col-form-label">Jumlah Paket <span class="text-red">*</span></label>
-    <div class="col-sm-12">
-        <input type="number" name="__qty" id="__qty" class="form-control" placeholder="">
-        @error('qty')
-            <small class="text-red">
-                <strong>{{ $message }}</strong>
-            </small>
-        @enderror
-    </div>
-</div> --}}
-
-{{-- <div class="form-group col-6">
-    <label for="item" class="col-sm-12 col-form-label">Harga Bundle <span class="text-red">*</span></label>
-    <div class="col-sm-12">
-        <input type="text" class="form-control number" name="cost" id="cost" value="{{ old('cost') }}"
-            readonly>
-        <select name="cost" id="cost" class="form-control select2">
-                <option value="">Pilih Harga</option>
-                @foreach (App\Models\Master\Parameter::whereIn('code', ['em1', 'em2'])->get() as $item)
-                    <option value="{{ $item->value }}">
-                        {{ $item->name . '(Rp. ' . number_format($item->value, 0, ',', '.') . ' )' }}</option>
-                @endforeach
-            </select>
-    </div>
-</div> --}}
-{{-- <div class="form-group">
-        <label for="item" class="col-sm-12 col-form-label">Discount (%) <span class="text-red">*</span></label>
-        <div class="col-sm-12">
-            <input type="number" name="__discount_formula" id="__discount_formula" class="form-control" placeholder=""
-                value="0">
-            @error('customer_address')
-                <small class="text-red">
-                    <strong>{{ $message }}</strong>
-                </small>
-            @enderror
-        </div>
-    </div> --}}
-{{-- <div class="col-12">
-    <button type="button" class="btn btn-inventory add-item" onclick="pesan(0,2)">Tambah Ke pesanan</button>
-</div> --}}
-
+    @else
+        {{ 'tidak ada flash sale' }}
+    @endif
+@endforeach
 
 @push('scripts')
     <script>
-        function plusBundling(id) {
+        function plusFlashSaleBundling(id) {
             var input = $(".input-number-" + id);
             var currentVal = parseInt(input.val());
 
@@ -115,7 +23,7 @@
             }
         }
 
-        function minusBundling(id) {
+        function minusFlashSaleBundling(id) {
             var input = $(".input-number-" + id);
             var currentVal = parseInt(input.val());
 
@@ -159,7 +67,7 @@
         function selectItem(params) {
             $('.select-item').select2({
                 ajax: {
-                    url: '{{ route('pesanan-online.items.data') }}',
+                    url: '{{ route('items.data') }}',
                     dataType: 'json',
                     data: function(params) {
                         return {
@@ -189,7 +97,7 @@
             var bundling_id = $('#bundling_id').val();
 
             $.ajax({
-                url: '{{ route('pesanan-online.getItemByBundling') }}',
+                url: '{{ route('bundling.getItemByBundling') }}',
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -295,8 +203,8 @@
             const d = new Date();
             let norow = d.getTime();
             var row = '<div id="' + norow + '" class="with-item">' +
-                '<div class="row">' +
-                '<div class="form-group col-lg-6 col-md-5 col-8">' +
+                '<div class="row col-12">' +
+                '<div class="form-group col-6">' +
                 '<label for="item" class="col-sm-12 col-form-label">Item <span class="text-red">*</span></label>' +
                 '<div class="col-sm-12">' +
                 '<select class=" form-control select-item item-formula" name="__item_id[]" id="__item_ids_' +
@@ -305,14 +213,14 @@
                 '</select>' +
                 '</div>' +
                 '</div>' +
-                '<div class="form-group col-lg-3 col-md-3 col-4">' +
+                '<div class="form-group col-2">' +
                 '<label for="item" class="col-sm-12 col-form-label">Item Quantity <span class="text-red">*</span></label>' +
                 '<div class="col-sm-12">' +
                 '<input type="number" name="__qty_item" class="form-control qty-formula" placeholder="">' +
                 '</div>' +
                 '</div>' +
-                '<div class="form-group col-lg-3 col-md-4 col-12"><label class="col-sm-12 col-form-label label-delete">&nbsp</label>' +
-
+                '<div class="form-group  col-4">' +
+                '<label for="item" class="col-sm-12 col-form-label"> <span class="text-white">*</span></label>' +
                 '<button type="button" class="btn " id="delete-obat"  onclick="deleteObat(this, ' +
                 norow + ')"><i class="fas fa-minus" style="color: red"></i> ' +
                 '&nbsp;<span style="color: red"> Hapus Item Racikan</span> </i></button>' +
@@ -321,6 +229,7 @@
                 '</div>';
             $("#item-detail").append(row)
             selectItem()
+
         })
 
         function deleteObat(btn, norow) {

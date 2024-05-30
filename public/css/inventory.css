@@ -143,9 +143,23 @@
 .order {
     background-color: #7ba4dd4d;
     padding: unset;
-    overflow-y: hidden;
+    overflow-y: scroll;
     overflow-x: hidden;
     height: 86.8vh;
+}
+
+@media (max-width: 575.98px) {
+    .order {
+        /* margin-top: -50px; */
+        background-color: #7ba4dd;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+    .order {
+        /* margin-top: -100px; */
+        background-color: #7ba4dd;
+    }
 }
 
 .order-title {
@@ -173,13 +187,37 @@
     padding: 2rem;
     overflow-y: hidden;
     overflow-x: hidden;
+    overflow-y: scroll;
+    height: 86.8vh;
+}
+
+.customer h5 {
+    color: #191b2580;
+    margin-bottom: 0px;
 }
 
 @media (max-width: 575.98px) {
     .customer {
         padding: 1rem;
-        overflow-y: hidden;
+        overflow-y: scroll;
         overflow-x: hidden;
+        height: 50.8vh;
+    }
+
+    .customer h5,
+    .customer p {
+        font-size: 14px;
+    }
+
+    .customer h5 {
+        color: #191b2580;
+        margin-bottom: 0px;
+    }
+
+    .customer,
+    .form-group,
+    .customer p {
+        margin: 0;
     }
 }
 
@@ -232,9 +270,6 @@
 
 .item {
     margin: 10px 0;
-}
-.card {
-    height: 100%;
 }
 
 @media (max-width: 767.98px) {
@@ -316,13 +351,6 @@
     padding-left: 1rem;
 }
 
-@media (max-width: 991.98px) {
-    .order {
-        margin-top: -100px;
-        background-color: #7ba4dd;
-    }
-}
-
 @media (min-width: 768px) {
     .grand-total {
         background: white;
@@ -356,7 +384,7 @@
     }
 
     .detail-transaction {
-        margin-top: -100px;
+        /* margin-top: -100px; */
         background-color: #7ba4dd;
     }
 

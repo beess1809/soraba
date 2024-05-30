@@ -3,10 +3,8 @@
 @section('content')
     <div class="container-inventory">
         <!-- Content Header (Page header) -->
-
-
         <div class="row">
-            <div class="col-lg-8" style="overflow-y: scroll;height: 86.8vh">
+            <div class="col-lg-8">
                 <div class="content-header">
                     <div class="">
                         <div class="row mb-2">
@@ -66,10 +64,16 @@
             </div>
             <!-- /.col-md-6 -->
             <div class="col-lg-4 order">
-                <div class="p-3 order-title">
-                    <span>{{ Auth::user()->roles[0]->name }}</span>
-                    <br>
-                    <strong>{{ Auth::user()->name }}</strong>
+                <div class="p-3 order-title d-flex justify-content-between">
+                    <div>
+                        <span>{{ Auth::user()->roles[0]->name }}</span>
+                        <br>
+                        <strong>{{ Auth::user()->name }}</strong>
+                    </div>
+                    <div class="d-flex align-items-center" style="font-weight: bold">
+                        <span id="free-gift"></span>
+                        <input type="hidden" name="total_qty" id="total_qty" value="0">
+                    </div>
                 </div>
                 <form action="{{ route('pos.store') }}" method="post" id="form-pesan">
                     @csrf
@@ -119,7 +123,8 @@
             <!-- /.col-md-6 -->
         </div>
         <!-- /.row -->
-    </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.container-fluid -->
 @endsection
 @push('scripts')
     <script>
@@ -130,7 +135,16 @@
             } else if (type == 2) {
                 var qty = $(".input-number-" + id).val();
                 var item_id = id;
+            } else if (type == 3) {
+                var qty = $(".input-number-" + id).val();
+                var item_id = id;
+            } else if (type == 4) {
+                var qty = $(".input-number-" + id).val();
+                var item_id = id;
             }
+
+            var _total_qty = $('#total_qty').val();
+            var _total_free_gift = $('#free-gift').val();
 
             console.log('type: ' + type);
             console.log('item : ' + id);
@@ -161,9 +175,14 @@
 
                         var _sub = $('#_subtotal').val();
                         var _cost = $('#_cost').val();
-
+                        var total_qty = parseInt(_total_qty) + parseInt(qty);
                         var sub = parseInt(_sub) + parseInt(response.data.item.harga);
                         var cost = parseInt(_cost) + parseInt((response.data.item.cost));
+
+                        var free_gift = Math.floor(total_qty / 2);
+
+                        $('#total_qty').val(total_qty.toString());
+                        $('#free-gift').text(free_gift.toString() + ' Free Gift');
 
                         $('#_subtotal').val(sub.toString());
                         $('#sub').html(formatRupiah(sub.toString()));
@@ -220,12 +239,22 @@
         }
 
         function hapusOrder(btn, id) {
+            var _total_qty = $('#total_qty').val();
+            var _total_free_gift = $('#free-gift').val();
+
+            var _qty = $('#qty_' + id).val();
 
             var _sub = $('#_subtotal').val();
             var _price = $('#price_' + id).val();
 
             var _cost = $('#cost_' + id).val();
             var cost = $('#_cost').val();
+
+            var total_qty = parseInt(_total_qty) - parseInt(_qty);
+            var free_gift = Math.floor(total_qty / 2);
+
+            $('#total_qty').val(total_qty.toString());
+            $('#free-gift').text(free_gift.toString() + ' Free Gift');
 
             var sub = parseInt(_sub) - parseInt(_price);
             var embalase = parseInt(cost) - parseInt(_cost);
@@ -362,7 +391,8 @@
                             $('#' + key)
                                 .closest('.form-control')
                                 .addClass('is-invalid')
-                            $('<span class="invalid-feedback" role="alert"><strong>' + value +
+                            $('<span class="invalid-feedback" role="alert"><strong>' +
+                                value +
                                 '</strong></span>').insertAfter($('#' + key))
                         });
                     }

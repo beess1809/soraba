@@ -1,4 +1,4 @@
-<div class="row col-12" id="card-item2">
+<div class="row col-12" id="card-item2" style="overflow-y: scroll;height: 86.8vh">
     @foreach ($bundlings as $item)
         {!! $item !!}
     @endforeach
