@@ -8,6 +8,7 @@ use App\Models\Auth\User;
 use App\Models\Master\Branch;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
 
 class UserController extends Controller
@@ -74,6 +75,8 @@ class UserController extends Controller
         $model->name = $request->name;
         $model->email = $request->email;
         $model->password = bcrypt($request->password);
+        $model->created_by = Auth::user()->id;
+        $model->created_at = date('Y-m-d H:i:s');
 
         if ($model->save()) {
             if ($request->role_id) {
@@ -125,8 +128,6 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'wilayah_id' => 'required',
-            'branch_id' => 'required',
             'role_id' => 'required',
             'name' => 'required',
             'email' => 'required',
@@ -135,12 +136,12 @@ class UserController extends Controller
         $id = base64_decode($id);
 
         $model = User::findOrFail($id);
-        $model->wilayah_id = $request->wilayah_id;
-        $model->branch_id = $request->branch_id;
         $model->parent_id = $request->parent_id;
         $model->name = $request->name;
         $model->email = $request->email;
         $model->password = bcrypt($request->password);
+        $model->updated_by = Auth::user()->id;
+        $model->updated_at = date('Y-m-d H:i:s');
 
         $oldRole = $model->roles;
         $model->detachRole($oldRole[0]);
@@ -171,7 +172,11 @@ class UserController extends Controller
     {
         $id = base64_decode($id);
 
-        User::destroy($id);
+        $model = User::find($id);
+
+        $model->deleted_by = Auth::user()->id;
+        $model->deleted_at = date('Y-m-d H:i:s');
+        $model->save();
     }
 
     public function datatable(Request $request)

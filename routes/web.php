@@ -73,14 +73,14 @@ Route::middleware('auth:employee')->group(function () {
             Route::post('/datatable', [MenuController::class, 'datatable'])->name('datatable');
             Route::resource('', MenuController::class, ['parameters' => ['' => 'id']]);
         });
-        // Route::name('wilayah.')->prefix('wilayah')->group(function () {
-        //     Route::get('/data', [WilayahController::class, 'data'])->name('data');
-        //     Route::get('/data/branch', [WilayahController::class, 'dataBranch'])->name('dataBranch');
-        //     Route::get('/data/user', [WilayahController::class, 'dataUser'])->name('dataUser');
-        //     Route::get('/data/vendor', [WilayahController::class, 'dataVendor'])->name('dataVendor');
-        //     Route::get('/data/customer', [WilayahController::class, 'data/customer'])->name('data/customer');
-        //     Route::resource('', MenuController::class, ['parameters' => ['' => 'id']]);
-        // });
+        Route::name('wilayah.')->prefix('wilayah')->group(function () {
+            Route::get('/data', [WilayahController::class, 'data'])->name('data');
+            Route::get('/data/branch', [WilayahController::class, 'dataBranch'])->name('dataBranch');
+            Route::get('/data/user', [WilayahController::class, 'dataUser'])->name('dataUser');
+            Route::get('/data/vendor', [WilayahController::class, 'dataVendor'])->name('dataVendor');
+            Route::get('/data/customer', [WilayahController::class, 'data/customer'])->name('data/customer');
+            Route::resource('', MenuController::class, ['parameters' => ['' => 'id']]);
+        });
     });
     Route::name('items.')->prefix('items')->group(function () {
         Route::get('/data', [ItemController::class, 'data'])->name('data');

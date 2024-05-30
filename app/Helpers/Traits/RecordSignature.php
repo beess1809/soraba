@@ -14,19 +14,19 @@ trait RecordSignature
 
         static::creating(function ($model) {
             if (Auth::user()) {
-                $model->created_by = Auth::user()->uuid;
+                $model->created_by = Auth::user()->id;
             }
         });
 
         static::updating(function ($model) {
             if (Auth::user()) {
-                $model->updated_by = Auth::user()->uuid;
+                $model->updated_by = Auth::user()->id;
             }
         });
 
         static::deleting(function ($model) {
             if (Auth::user()) {
-                $model->deleted_by = Auth::user()->uuid;
+                $model->deleted_by = Auth::user()->id;
             }
         });
     }
