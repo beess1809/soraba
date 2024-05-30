@@ -541,7 +541,7 @@ class PesananOnlineController extends Controller
             $totPajak = 0;
             $string = '';
             $disc = 0;
-            $cost = $bundling->price * $request->qty;
+            $cost = 0;
 
             foreach($lists_item as $key => $value) {
                 $item = Item::find($value->item);
@@ -560,7 +560,7 @@ class PesananOnlineController extends Controller
                 $discount = is_null($item->discount) ? 0 : 0;
                 $subprice = $bundling->price * $request->qty;
 
-                $item_price = $bundling->price;
+                $item_price = $item->sale_price;
 
                 $string .= '<input type="hidden" name="item_id[' . $time . '][' . $key . ']" value="' . $item->id . '">';
                 $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' .$value->qty * $request->qty. '">';
@@ -572,43 +572,10 @@ class PesananOnlineController extends Controller
                 $disc += $discount;
             }
 
-            // foreach ($request->item_id as $key => $value) {
-
-            //     $item = Item::find($value);
-            //     if ($item->qty < ($request->qty_item[$key] * $request->qty)) {
-            //         $data = [
-            //             'message' => 'Sisa stok ' . $item->name . ' adalah ' . $item->qty,
-            //         ];
-
-            //         $content = returnJson(false, $data);
-            //         $status = 200;
-
-            //         return (new Response($content, $status))
-            //             ->header('Content-Type', 'json');
-            //     }
-            //     $discount = is_null($item->discount) ? 0 : 0;// (($item->sale_price * $request->qty_item[$key])) * $item->discount / 100;
-            //     // $sebelum_pajak = round(reverse_tax($item->sale_price * $request->qty_item[$key]));
-            //     $subprice = $item->sale_price * $request->qty_item[$key];
-
-            //     $item_price = $item->sale_price;
-            //     // $item_pajak = $item->sale_price - $item_price;
-
-            //     $string .= '<input type="hidden" name="item_id[' . $time . '][' . $key . ']" value="' . $item->id . '">';
-            //     $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' . $request->qty_item[$key] * $request->qty. '">';
-            //     // $string .= '<input type="hidden" name="item_pajak[' . $time . '][' . $key . ']" value="' . $item_pajak . '">';
-            //     $string .= '<input type="hidden" name="item_price[' . $time . '][' . $key . ']" value="' . $item_price . '">';
-            //     $string .= '<input type="hidden" name="item_discount[' . $time . '][' . $key . ']" value="' . $discount . '">';
-
-            //     $harga += $subprice;
-            //     $disc += $discount;
-            // }
-
-            // $price = $harga / $request->qty;
-            $sub = $harga;
-            // $totPajak = round(pajak($sub + $cost));
+            $sub = $bundling->price;
             $totPajak = 0;
 
-            $harga = $request->qty * $bundling->price;//$sub  - $disc + $request->cost;
+            $harga = $request->qty * $bundling->price;
             $price = ($sub + $request->cost) / $request->qty;
 
             $html = '<div class="row item-detail" id="detail-' . $time . '">
@@ -623,7 +590,7 @@ class PesananOnlineController extends Controller
                                 ' . $string . '
                                 <input type="hidden" name="type[]" value="' . $request->tipe . '">
                                 <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
-                                <input type="hidden" name="qty[]" value="' . $request->qty . '">
+                                <input type="hidden" name="qty[]" id="qty_'.$time.'" value="' . $request->qty . '">
 
                                 <dd style="margin-bottom: 0px">
                                     <div class="row">
@@ -638,7 +605,7 @@ class PesananOnlineController extends Controller
                                                     <input type="hidden" name="pajak[]" id="pajak_' . $time . '" value="' . $totPajak . '">
                                                     <input type="hidden" name="discount[]" value="' . $disc . '">
                                                     <input type="hidden" name="cost[]" id="cost_' . $time . '" value="' . str_replace('.', '', $cost) . '">
-                                                    <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $harga . '">
+                                                    <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $sub . '">
                                                 <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ')">
                                                     <i class="fas fa-minus"></i>
                                                 </button>
@@ -653,8 +620,9 @@ class PesananOnlineController extends Controller
         }
         elseif($request->tipe == 3) {
             $item = Item::find($request->item_id);
-            $sub = $item->sale_price;
-            $harga = $item->sale_price * $request->qty;
+            $sub = $item->flash_sale_price;
+            $harga = $item->flash_sale_price * $request->qty;
+            $discount = 0;
 
             $flash_sale = $item->flash_sale_price;
             $cost = 0;
@@ -666,15 +634,15 @@ class PesananOnlineController extends Controller
                         <div class="col-10">
                             <dl>
                                 <dd style="margin-bottom: 0px">' . strtoupper($item->name) . '</dd>
-                            <input type="hidden" name="item_name[]" value="' . $item->name . '">
-                            <input type="hidden" name="index[]" value="' . $time . '">
+                                <input type="hidden" name="item_name[]" value="' . $item->name . '">
+                                <input type="hidden" name="index[]" value="' . $time . '">
                                 <input type="hidden" name="item_id[' . $time . '][0]" value="' . $item->id . '">
                                 <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
                                 <input type="hidden" name="item_qty[' . $time . '][0]" value="' . $request->qty . '">
                                 <input type="hidden" name="item_price[' . $time . '][0]" value="' . $sub . '">
-                                <input type="hidden" name="item_discount[' . $time . '][0]" value="' . $flash_sale . '">
-                                <input type="hidden" name="discount[]" value="' . $flash_sale . '">
-                                <input type="hidden" name="qty[]" value="' . $request->qty . '">
+                                <input type="hidden" name="item_discount[' . $time . '][0]" value="' . $discount . '">
+                                <input type="hidden" name="discount[]" value="' . $discount . '">
+                                <input type="hidden" name="qty[]" id="qty_'.$time.'" value="' . $request->qty . '">
                                 <dd style="margin-bottom: 0px">
                                     <div class="row">
                                         <div class="col-5">
@@ -683,8 +651,8 @@ class PesananOnlineController extends Controller
                                         </div>
                                         <div class="col-7">
                                             <strong class="float-right" style="margin-right: 2rem">
-                                            Rp. ' . number_format($flash_sale, '0', ',', '.') . '
-                                                <input type="hidden" name="price[]" id="price_' . $time . '" value="' . $flash_sale . '">
+                                            Rp. ' . number_format($harga, '0', ',', '.') . '
+                                                <input type="hidden" name="price[]" id="price_' . $time . '" value="' . $harga . '">
                                                 <input type="hidden" name="cost[]" id="cost_' . $time . '"  value="' . $cost . '">
                                                 <input type="hidden" name="sub_price[]"  id="sub_price_' . $time . '" value="' . $sub . '">
                                                 <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ')">
@@ -697,7 +665,7 @@ class PesananOnlineController extends Controller
                             </dl>
                         </div>
                     </div>';
-            $harga =  $flash_sale;
+            // $harga =  $flash_sale;
         }
 
         elseif ($request->tipe == 2) { //tipe bundling
@@ -708,7 +676,7 @@ class PesananOnlineController extends Controller
             $totPajak = 0;
             $string = '';
             $disc = 0;
-            $cost = $bundling->price * $request->item;
+            $cost = 0;//$bundling->price * $request->item;
 
             foreach($lists_item as $key => $value) {
 
@@ -728,7 +696,7 @@ class PesananOnlineController extends Controller
                 $discount = is_null($item->discount) ? 0 : 0;
                 $subprice = $bundling->price * $request->qty;
 
-                $item_price = $bundling->price;
+                $item_price = $item->sale_price;
 
                 $string .= '<input type="hidden" name="item_id[' . $time . '][' . $key . ']" value="' . $item->id . '">';
                 $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' .$value->qty * $request->qty. '">';
@@ -739,44 +707,10 @@ class PesananOnlineController extends Controller
                 $harga += $subprice;
                 $disc += $discount;
             }
-
-            // foreach ($request->item_id as $key => $value) {
-
-            //     $item = Item::find($value);
-            //     if ($item->qty < ($request->qty_item[$key] * $request->qty)) {
-            //         $data = [
-            //             'message' => 'Sisa stok ' . $item->name . ' adalah ' . $item->qty,
-            //         ];
-
-            //         $content = returnJson(false, $data);
-            //         $status = 200;
-
-            //         return (new Response($content, $status))
-            //             ->header('Content-Type', 'json');
-            //     }
-            //     $discount = is_null($item->discount) ? 0 : 0;// (($item->sale_price * $request->qty_item[$key])) * $item->discount / 100;
-            //     // $sebelum_pajak = round(reverse_tax($item->sale_price * $request->qty_item[$key]));
-            //     $subprice = $item->sale_price * $request->qty_item[$key];
-
-            //     $item_price = $item->sale_price;
-            //     // $item_pajak = $item->sale_price - $item_price;
-
-            //     $string .= '<input type="hidden" name="item_id[' . $time . '][' . $key . ']" value="' . $item->id . '">';
-            //     $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' . $request->qty_item[$key] * $request->qty. '">';
-            //     // $string .= '<input type="hidden" name="item_pajak[' . $time . '][' . $key . ']" value="' . $item_pajak . '">';
-            //     $string .= '<input type="hidden" name="item_price[' . $time . '][' . $key . ']" value="' . $item_price . '">';
-            //     $string .= '<input type="hidden" name="item_discount[' . $time . '][' . $key . ']" value="' . $discount . '">';
-
-            //     $harga += $subprice;
-            //     $disc += $discount;
-            // }
-
-            // $price = $harga / $request->qty;
-            $sub = $harga;
-            // $totPajak = round(pajak($sub + $cost));
+            $sub = $bundling->price;
             $totPajak = 0;
 
-            $harga = $request->qty * $bundling->price;//$sub  - $disc + $request->cost;
+            $harga = $request->qty * $bundling->price;
             $price = ($sub + $request->cost) / $request->qty;
 
             $html = '<div class="row item-detail" id="detail-' . $time . '">
@@ -791,7 +725,7 @@ class PesananOnlineController extends Controller
                                 ' . $string . '
                                 <input type="hidden" name="type[]" value="' . $request->tipe . '">
                                 <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
-                                <input type="hidden" name="qty[]" value="' . $request->qty . '">
+                                <input type="hidden" name="qty[]" id="qty_'.$time.'" value="' . $request->qty . '">
 
                                 <dd style="margin-bottom: 0px">
                                     <div class="row">
@@ -806,7 +740,7 @@ class PesananOnlineController extends Controller
                                                     <input type="hidden" name="pajak[]" id="pajak_' . $time . '" value="' . $totPajak . '">
                                                     <input type="hidden" name="discount[]" value="' . $disc . '">
                                                     <input type="hidden" name="cost[]" id="cost_' . $time . '" value="' . str_replace('.', '', $cost) . '">
-                                                    <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $harga . '">
+                                                    <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $sub . '">
                                                 <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ')">
                                                     <i class="fas fa-minus"></i>
                                                 </button>
@@ -821,7 +755,6 @@ class PesananOnlineController extends Controller
         } else { // tipe item
             $item = Item::find($request->item_id);
             $sub = $item->sale_price;
-            // $pajak = $item->sale_price - $sub;
             $harga = $item->sale_price * $request->qty;
 
             $discount = is_null($item->discount) ? 0 : $item->discount * $request->qty;
@@ -842,7 +775,7 @@ class PesananOnlineController extends Controller
                                 <input type="hidden" name="item_price[' . $time . '][0]" value="' . $sub . '">
                                 <input type="hidden" name="item_discount[' . $time . '][0]" value="' . $discount . '">
                                 <input type="hidden" name="discount[]" value="' . $discount . '">
-                                <input type="hidden" name="qty[]" value="' . $request->qty . '">
+                                <input type="hidden" name="qty[]" id="qty_'.$time.'" value="' . $request->qty . '">
                                 <dd style="margin-bottom: 0px">
                                     <div class="row">
                                         <div class="col-5">
@@ -876,11 +809,6 @@ class PesananOnlineController extends Controller
             'item' => $item,
         ];
         
-        // $qty = $request->qty;
-        // $tipe = $request->tipe;
-        // $item_id = $request->item_id;
-        // $data['html'] = '<b>qty : '.$qty.', tipe : '.$tipe.', item id : '.$item_id.'</b>';
-
         $content = returnJson(true, $data);
         $status = 200;
 

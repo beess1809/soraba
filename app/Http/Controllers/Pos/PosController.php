@@ -539,7 +539,7 @@ class PosController extends Controller
             $totPajak = 0;
             $string = '';
             $disc = 0;
-            $cost = $bundling->price * $request->qty;
+            $cost = 0;
 
             foreach($lists_item as $key => $value) {
                 $item = Item::find($value->item);
@@ -558,7 +558,7 @@ class PosController extends Controller
                 $discount = is_null($item->discount) ? 0 : 0;
                 $subprice = $bundling->price * $request->qty;
 
-                $item_price = $bundling->price;
+                $item_price = $item->sale_price;
 
                 $string .= '<input type="hidden" name="item_id[' . $time . '][' . $key . ']" value="' . $item->id . '">';
                 $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' .$value->qty * $request->qty. '">';
@@ -638,7 +638,7 @@ class PosController extends Controller
                                 <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
                                 <input type="hidden" name="item_qty[' . $time . '][0]" value="' . $request->qty . '">
                                 <input type="hidden" name="item_price[' . $time . '][0]" value="' . $sub . '">
-                                <input type="hidden" name="item_discount[' . $time . '][0]" value="' . $flash_sale . '">
+                                <input type="hidden" name="item_discount[' . $time . '][0]" value="' . $discount . '">
                                 <input type="hidden" name="discount[]" value="' . $discount . '">
                                 <input type="hidden" name="qty[]" id="qty_'.$time.'" value="' . $request->qty . '">
                                 <dd style="margin-bottom: 0px">
@@ -674,8 +674,7 @@ class PosController extends Controller
             $totPajak = 0;
             $string = '';
             $disc = 0;
-            // $cost = str_replace('.', '', $request->cost);
-            $cost = $bundling->price * $request->item;
+            $cost = 0;//$bundling->price * $request->item;
 
             foreach ($lists_item as $key => $value) {
 
@@ -691,11 +690,10 @@ class PosController extends Controller
                     return (new Response($content, $status))
                         ->header('Content-Type', 'json');
                 }
-                $discount = is_null($item->discount) ? 0 : 0;// (($item->sale_price * $request->qty_item[$key])) * $item->discount / 100;
-                // $sebelum_pajak = round(reverse_tax($item->sale_price * $request->qty_item[$key]));
+                $discount = is_null($item->discount) ? 0 : 0;
                 $subprice = $bundling->price * $request->qty;
 
-                $item_price = $bundling->price;
+                $item_price = $item->sale_price;
 
                 $string .= '<input type="hidden" name="item_id[' . $time . '][' . $key . ']" value="' . $item->id . '">';
                 $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' . $value->qty * $request->qty. '">';
@@ -754,7 +752,6 @@ class PosController extends Controller
         } else {
             $item = Item::find($request->item_id);
             $sub = $item->sale_price;
-            // $pajak = $item->sale_price - $sub;
             $harga = $item->sale_price * $request->qty;
 
             $discount = is_null($item->discount) ? 0 : $item->discount * $request->qty;
