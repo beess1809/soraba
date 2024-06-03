@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
 use App\Models\Master\Vendor as MasterVendor;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,7 +12,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Response as res;
 
 use Illuminate\Http\Response;
-
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -52,16 +53,24 @@ class VendorController extends Controller
             'address' => 'required',
         ]);
 
-        $model = new MasterVendor();
-        // $model->code = $request->code;
-        $model->name = $request->name;
-        $model->address = $request->address;
-        $model->created_by = Auth::user()->id;
+        DB::beginTransaction();
+        try {
+            $model = new MasterVendor();
+            // $model->code = $request->code;
+            $model->name = $request->name;
+            $model->address = $request->address;
+            $model->created_by = Auth::user()->id;
 
-        if ($model->save()) {
-            return redirect()->route('master.vendor.index')->with('alert.success', 'Vendor Has Been Added');
-        } else {
-            return redirect()->route('master.vendor.create')->with('alert.failed', 'Something Wrong');
+            if ($model->save()) {
+                DB::commit();
+                return redirect()->route('master.vendor.index')->with('alert.success', 'Vendor Has Been Added');
+            } else {
+                return redirect()->route('master.vendor.create')->with('alert.failed', 'Something Wrong');
+            }
+        }
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
         }
     }
 
@@ -104,18 +113,26 @@ class VendorController extends Controller
             'address' => 'required',
         ]);
 
-        $id = base64_decode($id);
+        DB::beginTransaction();
+        try {
+            $id = base64_decode($id);
 
-        $model = MasterVendor::find($id);
-        // $model->code = $request->code;
-        $model->name = $request->name;
-        $model->address = $request->address;
-        $model->updated_by = Auth::user()->id;
+            $model = MasterVendor::find($id);
+            // $model->code = $request->code;
+            $model->name = $request->name;
+            $model->address = $request->address;
+            $model->updated_by = Auth::user()->id;
 
-        if ($model->save()) {
-            return redirect()->route('master.vendor.index')->with('alert.success', 'Vendor Has Been Updated');
-        } else {
-            return redirect()->route('master.vendor.create')->with('alert.failed', 'Something Wrong');
+            if ($model->save()) {
+                DB::commit();
+                return redirect()->route('master.vendor.index')->with('alert.success', 'Vendor Has Been Updated');
+            } else {
+                return redirect()->route('master.vendor.create')->with('alert.failed', 'Something Wrong');
+            }
+        }
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
         }
     }
 

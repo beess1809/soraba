@@ -6,10 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Master\Category;
+use Exception;
 use Yajra\DataTables\Facades\DataTables;
 
 use Illuminate\Http\Response;
-
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -49,15 +50,23 @@ class CategoryController extends Controller
             // 'code' => 'required',
         ]);
 
-        $model = new Category();
-        // $model->code = $request->code;
-        $model->name = $request->name;
-        $model->created_by = Auth::user()->id;
+        DB::beginTransaction();
+        try {
+            $model = new Category();
+            // $model->code = $request->code;
+            $model->name = $request->name;
+            $model->created_by = Auth::user()->id;
 
-        if ($model->save()) {
-            return redirect()->route('master.category.index')->with('alert.success', 'Category Has Been Added');
-        } else {
-            return redirect()->route('master.category.create')->with('alert.failed', 'Something Wrong');
+            if ($model->save()) {
+                DB::commit();
+                return redirect()->route('master.category.index')->with('alert.success', 'Category Has Been Added');
+            } else {
+                return redirect()->route('master.category.create')->with('alert.failed', 'Something Wrong');
+            }
+        }
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
         }
     }
 
@@ -99,17 +108,25 @@ class CategoryController extends Controller
             'name' => 'required',
         ]);
 
-        $id = base64_decode($id);
+        DB::beginTransaction();
+        try {
+            $id = base64_decode($id);
 
-        $model = Category::find($id);
-        // $model->code = $request->code;
-        $model->name = $request->name;
-        $model->updated_by = Auth::user()->id;
+            $model = Category::find($id);
+            // $model->code = $request->code;
+            $model->name = $request->name;
+            $model->updated_by = Auth::user()->id;
 
-        if ($model->save()) {
-            return redirect()->route('master.category.index')->with('alert.success', 'Category Has Been Updated');
-        } else {
-            return redirect()->route('master.category.create')->with('alert.failed', 'Something Wrong');
+            if ($model->save()) {
+                DB::commit();
+                return redirect()->route('master.category.index')->with('alert.success', 'Category Has Been Updated');
+            } else {
+                return redirect()->route('master.category.create')->with('alert.failed', 'Something Wrong');
+            }
+        }
+        catch (Exception $e) {
+                DB::rollBack();
+                print($e);
         }
     }
 
@@ -190,15 +207,24 @@ class CategoryController extends Controller
         }
         unlink(public_path('/file/upload_category/' . $nama_file));
 
-        foreach ($dataTemp as $key => $value) {
-            $model = new Category();
-            // $model->code = $value['code'];
-            $model->name = $value['name'];
-            $model->created_by = Auth::user()->id;
-            $model->save();
+        DB::beginTransaction();
+        try {
+            foreach ($dataTemp as $key => $value) {
+                $model = new Category();
+                // $model->code = $value['code'];
+                $model->name = $value['name'];
+                $model->created_by = Auth::user()->id;
+                $model->save();
+            }
+            DB::commit();
+            $res = ['res' => 'success'];
+            return $res;
         }
-
-        $res = ['res' => 'success'];
-        return $res;
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
+            $res = ['res' => 'error', 'error' => json_encode($e),];
+            return $res;
+        }
     }
 }

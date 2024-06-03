@@ -4,7 +4,6 @@
             <th class="no-sort" style="width: 30px">No</th>
             <th>Nama Bundling</th>
             <th>Harga</th>
-            <th>Harga Flash Sale</th>
             <th>Data Item</th>
             <th class="no-sort" style="width: 100px"></th>
         </tr>
@@ -50,10 +49,6 @@
                     {
                         data: 'price',
                         name: 'price'
-                    },
-                    {
-                        data: 'flash_sale_price',
-                        name: 'flash_sale_price'
                     },
                     {
                         data: 'items',

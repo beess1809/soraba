@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
 use App\Models\Master\Uom;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,7 +12,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Response as res;
 
 use Illuminate\Http\Response;
-
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -47,20 +48,28 @@ class UomController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'code' => 'required',
+            'code' => 'required|max:6',
             'name' => 'required',
         ]);
 
-        $model = new Uom();
-        $model->code = $request->code;
-        $model->name = $request->name;
-        $model->created_by = Auth::user()->id;
+        DB::beginTransaction();
+        try {
+            $model = new Uom();
+            $model->code = $request->code;
+            $model->name = $request->name;
+            $model->created_by = Auth::user()->id;
 
-        if ($model->save()) {
-            return redirect()->route('master.uom.index')->with('alert.success', 'Unit Of Material Has Been Added');
-        } else {
-            $content = 'failed';
-            $status = '400';
+            if ($model->save()) {
+                DB::commit();
+                return redirect()->route('master.uom.index')->with('alert.success', 'Unit Of Material Has Been Added');
+            } else {
+                $content = 'failed';
+                $status = '400';
+            }
+        }
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
         }
 
         return (new Response($content, $status))
@@ -101,21 +110,29 @@ class UomController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'code' => 'required',
+            'code' => 'required|max:6',
             'name' => 'required',
         ]);
 
-        $id = base64_decode($id);
+        DB::beginTransaction();
+        try {
+            $id = base64_decode($id);
 
-        $model = Uom::find($id);
-        $model->code = $request->code;
-        $model->name = $request->name;
-        $model->updated_by = Auth::user()->id;
+            $model = Uom::find($id);
+            $model->code = $request->code;
+            $model->name = $request->name;
+            $model->updated_by = Auth::user()->id;
 
-        if ($model->save()) {
-            return redirect()->route('master.uom.index')->with('alert.success', 'Unit Of Material Has Been Updated');
-        } else {
-            return redirect()->route('master.uom.create')->with('alert.failed', 'Something Wrong');
+            if ($model->save()) {
+                DB::commit();
+                return redirect()->route('master.uom.index')->with('alert.success', 'Unit Of Material Has Been Updated');
+            } else {
+                return redirect()->route('master.uom.create')->with('alert.failed', 'Something Wrong');
+            }
+        }
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
         }
     }
 

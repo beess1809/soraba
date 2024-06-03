@@ -9,7 +9,9 @@ use App\Models\Master\Item;
 use App\Models\Master\Uom;
 use App\Models\Master\Vendor;
 use App\Models\Master\Warehouse;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
 use Illuminate\Support\Facades\Response as res;
@@ -59,22 +61,30 @@ class ItemController extends Controller
             'sale_price' => 'required',
         ]);
 
-        $model = new Item();
-        $model->name = strtoupper($request->name);
-        $model->composition = $request->composition;
-        $model->warehouse_id = $request->warehouse_id;
-        $model->category_id = $request->category_id;
-        $model->qty = str_replace('.', '', $request->qty);
-        $model->uom_id = $request->uom;
-        $model->sale_price = str_replace('.', '', $request->sale_price);
-        $model->flash_sale_price = str_replace('.', '', $request->flash_sale_price);
-        $model->discount = isset($request->discount) && 0 ? str_replace('.', '', $request->discount) : null;
-        $model->expired_discount = $request->expired_date;
+        DB::beginTransaction();
+        try {
+            $model = new Item();
+            $model->name = strtoupper($request->name);
+            $model->composition = $request->composition;
+            $model->warehouse_id = $request->warehouse_id;
+            $model->category_id = $request->category_id;
+            $model->qty = str_replace('.', '', $request->qty);
+            $model->uom_id = $request->uom;
+            $model->sale_price = str_replace('.', '', $request->sale_price);
+            $model->flash_sale_price = isset($request->flash_sale_price) && $request->flash_sale_price <> 0 ? str_replace('.', '', $request->flash_sale_price) : null;
+            $model->discount = isset($request->discount) && $request->discount <> 0 ? str_replace('.', '', $request->discount) : null;
+            $model->expired_discount = $request->expired_date;
 
-        if ($model->save()) {
-            return redirect()->route('items.index')->with('alert.success', 'Item Has Been Added');
-        } else {
-            return redirect()->route('items.create')->with('alert.failed', 'Something Wrong');
+            if ($model->save()) {
+                DB::commit();
+                return redirect()->route('items.index')->with('alert.success', 'Item Has Been Added');
+            } else {
+                return redirect()->route('items.create')->with('alert.failed', 'Something Wrong');
+            }
+        }
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
         }
     }
 
@@ -123,25 +133,33 @@ class ItemController extends Controller
             'sale_price' => 'required',
         ]);
 
-        $id = base64_decode($id);
+        DB::beginTransaction();
+        try {
+            $id = base64_decode($id);
 
-        $model = Item::find($id);
-        $model->name = strtoupper($request->name);
-        $model->composition = $request->composition;
-        $model->warehouse_id = $request->warehouse_id;
-        $model->vendor_id = $request->vendor_id;
-        $model->category_id = $request->category_id;
-        $model->qty = str_replace('.', '', $request->qty);
-        $model->uom_id = $request->uom;
-        $model->sale_price = str_replace('.', '', $request->sale_price);
-        $model->flash_sale_price = str_replace('.', '', $request->flash_sale_price);
-        $model->discount = isset($request->discount) && 0 ? str_replace('.', '', $request->discount) : null;
-        $model->expired_discount = $request->expired_date;
-
-        if ($model->save()) {
-            return redirect()->route('items.index')->with('alert.success', 'Item Has Been Updated');
-        } else {
-            return redirect()->route('items.create')->with('alert.failed', 'Something Wrong');
+            $model = Item::find($id);
+            $model->name = strtoupper($request->name);
+            $model->composition = $request->composition;
+            $model->warehouse_id = $request->warehouse_id;
+            $model->vendor_id = $request->vendor_id;
+            $model->category_id = $request->category_id;
+            $model->qty = str_replace('.', '', $request->qty);
+            $model->uom_id = $request->uom;
+            $model->sale_price = str_replace('.', '', $request->sale_price);
+            $model->flash_sale_price = isset($request->flash_sale_price) && $request->flash_sale_price <> 0 ? str_replace('.', '', $request->flash_sale_price) : null;
+            $model->discount = isset($request->discount) && $request->discount <> 0 ? str_replace('.', '', $request->discount) : null;
+            $model->expired_discount = $request->expired_date;
+    
+            if ($model->save()) {
+                DB::commit();
+                return redirect()->route('items.index')->with('alert.success', 'Item Has Been Updated');
+            } else {
+                return redirect()->route('items.create')->with('alert.failed', 'Something Wrong');
+            }
+        }
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
         }
     }
 
@@ -236,9 +254,10 @@ class ItemController extends Controller
         $activeWorksheet->setCellValue('D1', 'Composition');
         $activeWorksheet->setCellValue('E1', 'Quantity');
         $activeWorksheet->setCellValue('F1', 'Uom');
-        $activeWorksheet->setCellValue('G1', 'Vendor');
-        $activeWorksheet->setCellValue('H1', 'Warehouse');
-        $activeWorksheet->setCellValue('I1', 'Sell Price');
+        $activeWorksheet->setCellValue('G1', 'Warehouse');
+        $activeWorksheet->setCellValue('H1', 'Sell Price');
+        $activeWorksheet->setCellValue('I1', 'Discount Price (Rp) (If Any)')->getColumnDimension('I')->setWidth(25);
+        $activeWorksheet->setCellValue('J1', 'Flash Sale Price (Rp) (If Any)')->getColumnDimension('J')->setWidth(25);
 
         $sheet1 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Categories');
         $spreadsheet->addSheet($sheet1, 1);
@@ -268,35 +287,36 @@ class ItemController extends Controller
             $idx++;
         }
 
-        $sheet3 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Vendor');
+        $sheet3 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Uoms');
         $spreadsheet->addSheet($sheet3, 3);
         $sheet3 = $spreadsheet->getSheet(3);
         $sheet3->setCellValue('A1', 'ID');
-        $sheet3->setCellValue('B1', 'Vendor');
-        $vendor = Vendor::all();
+        $sheet3->setCellValue('B1', 'Code');
+        $sheet3->setCellValue('C1', 'Name');
+        $vendor = Uom::all();
         $idx = 2;
 
         foreach ($vendor as $key => $value) {
             $sheet3->setCellValue('A' . $idx, $value->id);
-            $sheet3->setCellValue('B' . $idx, $value->name);
+            $sheet3->setCellValue('B' . $idx, $value->code);
+            $sheet3->setCellValue('C' . $idx, $value->name);
             $idx++;
         }
 
-        $sheet4 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Uoms');
-        $spreadsheet->addSheet($sheet4, 4);
-        $sheet4 = $spreadsheet->getSheet(4);
-        $sheet4->setCellValue('A1', 'ID');
-        $sheet4->setCellValue('B1', 'Code');
-        $sheet4->setCellValue('C1', 'Name');
-        $uom = Uom::all();
-        $idx = 2;
+        //Vendor
+        // $sheet4 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Vendor');
+        // $spreadsheet->addSheet($sheet4, 4);
+        // $sheet4 = $spreadsheet->getSheet(4);
+        // $sheet4->setCellValue('A1', 'ID');
+        // $sheet4->setCellValue('B1', 'Name');
+        // $vendor = Vendor::all();
+        // $idx = 2;
 
-        foreach ($uom as $key => $value) {
-            $sheet4->setCellValue('A' . $idx, $value->id);
-            $sheet4->setCellValue('B' . $idx, $value->code);
-            $sheet4->setCellValue('C' . $idx, $value->name);
-            $idx++;
-        }
+        // foreach ($vendor as $key => $value) {
+        //     $sheet4->setCellValue('A' . $idx, $value->id);
+        //     $sheet4->setCellValue('B' . $idx, $value->name);
+        //     $idx++;
+        // }
 
 
         header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -329,28 +349,40 @@ class ItemController extends Controller
             $temp['composition'] = $worksheet->getCell('D' . $row)->getValue();
             $temp['quantity'] = $worksheet->getCell('E' . $row)->getValue();
             $temp['uom'] = $worksheet->getCell('F' . $row)->getValue();
-            $temp['vendor'] = $worksheet->getCell('G' . $row)->getValue();
-            $temp['warehouse'] = $worksheet->getCell('H' . $row)->getValue();
-            $temp['sell_price'] = $worksheet->getCell('I' . $row)->getValue();
+            $temp['warehouse'] = $worksheet->getCell('G' . $row)->getValue();
+            $temp['sell_price'] = $worksheet->getCell('H' . $row)->getValue();
+            $temp['discount'] = $worksheet->getCell('I' . $row)->getValue();
+            $temp['flash_sale'] = $worksheet->getCell('J' . $row)->getValue();
             $dataTemp[] = $temp;
         }
         unlink(public_path('/file/upload_item/' . $nama_file));
 
-        foreach ($dataTemp as $key => $value) {
-            $model = new Item();
-            $model->name = strtoupper($value['name']);
-            $model->category_id = $value['category'];
-            $model->warehouse_id = $value['warehouse'];
-            $model->vendor_id = $value['vendor'];
-            $model->uom_id = $value['uom'];
-            $model->composition = $value['composition'];
-            $model->qty = $value['quantity'];
-            $model->sale_price = $value['sell_price'];
-            $model->save();
+        DB::beginTransaction();
+        try {
+            foreach ($dataTemp as $key => $value) {
+                $model = new Item();
+                $model->name = strtoupper($value['name']);
+                $model->category_id = $value['category'];
+                $model->warehouse_id = $value['warehouse'];
+                $model->uom_id = $value['uom'];
+                $model->composition = $value['composition'];
+                $model->qty = $value['quantity'];
+                $model->sale_price = $value['sell_price'];
+                $model->discount = $value['discount'];
+                $model->flash_sale_price = $value['flash_sale'];
+                $model->save();
+            }
+            DB::commit();
+    
+            $res = ['res' => 'success'];
+            return $res;
         }
-
-        $res = ['res' => 'success'];
-        return $res;
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
+            $res = ['res' => 'error', 'error' => json_encode($e),];
+            return $res;
+        }
     }
 
     public function getItemByCategory(Request $request)
@@ -433,19 +465,19 @@ class ItemController extends Controller
         $spreadsheet = new Spreadsheet();
         $activeWorksheet = $spreadsheet->getActiveSheet();
         $activeWorksheet->setCellValue('A1', 'ID Item (Jangan Diganti)');
-        $activeWorksheet->setCellValue('B1', 'Name');
-        $activeWorksheet->getColumnDimension('B')->setWidth(30);
+        $activeWorksheet->setCellValue('B1', 'Name')->getColumnDimension('B')->setWidth(30);
         $activeWorksheet->setCellValue('C1', 'Quantity');
         $activeWorksheet->setCellValue('D1', 'Sell Price');
-        $activeWorksheet->setCellValue('E1', 'Category');
-        $activeWorksheet->setCellValue('F1', 'ID Category');
-        $activeWorksheet->setCellValue('G1', 'Uom');
-        $activeWorksheet->setCellValue('H1', 'Uom ID');
-        $activeWorksheet->setCellValue('I1', 'Vendor');
-        $activeWorksheet->getColumnDimension('I')->setWidth(23);
-        $activeWorksheet->setCellValue('J1', 'Vendor ID');
-        $activeWorksheet->setCellValue('K1', 'Warehouse');
-        $activeWorksheet->getColumnDimension('K')->setWidth(21);
+        $activeWorksheet->setCellValue('E1', 'Discount');
+        $activeWorksheet->setCellValue('F1', 'Flash Sale Price');
+        $activeWorksheet->setCellValue('G1', 'Category');
+        $activeWorksheet->setCellValue('H1', 'ID Category');
+        $activeWorksheet->setCellValue('I1', 'Uom');
+        $activeWorksheet->setCellValue('J1', 'Uom ID');
+        // $activeWorksheet->setCellValue('I1', 'Vendor');
+        // $activeWorksheet->getColumnDimension('I')->setWidth(23);
+        // $activeWorksheet->setCellValue('J1', 'Vendor ID');
+        $activeWorksheet->setCellValue('K1', 'Warehouse')->getColumnDimension('I')->setWidth(21);
         $activeWorksheet->setCellValue('L1', 'Warehouse ID');
         $no = 2;
         $data = Item::all();
@@ -456,14 +488,15 @@ class ItemController extends Controller
             $activeWorksheet->setCellValue('B' . $no, $item->name);
             $activeWorksheet->setCellValue('C' . $no, $item->qty);
             $activeWorksheet->getStyle('C' . $no)->getNumberFormat()->setFormatCode('#,##0');
-            $activeWorksheet->setCellValue('D' . $no, $item->sale_price);
-            $activeWorksheet->getStyle('D' . $no)->getNumberFormat()->setFormatCode('#,##0');
-            $activeWorksheet->setCellValue('E' . $no, $item->category->name);
-            $activeWorksheet->setCellValue('F' . $no, $item->category_id);
-            $activeWorksheet->setCellValue('G' . $no, $item->uom->name);
-            $activeWorksheet->setCellValue('H' . $no, $item->uom_id);
-            $activeWorksheet->setCellValue('I' . $no, $item->vendor->name);
-            $activeWorksheet->setCellValue('J' . $no, $item->vendor_id);
+            $activeWorksheet->setCellValue('D' . $no, $item->sale_price)->getStyle('D' . $no)->getNumberFormat()->setFormatCode('#,##0');
+            $activeWorksheet->setCellValue('E' . $no, $item->discount)->getStyle('E' . $no)->getNumberFormat()->setFormatCode('#,##0');
+            $activeWorksheet->setCellValue('F' . $no, $item->flash_sale_price)->getStyle('F' . $no)->getNumberFormat()->setFormatCode('#,##0');
+            $activeWorksheet->setCellValue('G' . $no, $item->category->name);
+            $activeWorksheet->setCellValue('H' . $no, $item->category_id);
+            $activeWorksheet->setCellValue('I' . $no, $item->uom->name);
+            $activeWorksheet->setCellValue('J' . $no, $item->uom_id);
+            // $activeWorksheet->setCellValue('I' . $no, $item->vendor->name);
+            // $activeWorksheet->setCellValue('J' . $no, $item->vendor_id);
             $activeWorksheet->setCellValue('K' . $no, $item->warehouse->name);
             $activeWorksheet->setCellValue('L' . $no, $item->warehouse_id);
 
@@ -499,33 +532,19 @@ class ItemController extends Controller
             $idx++;
         }
 
-        $sheet3 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Vendor');
+        $sheet3 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Uoms');
         $spreadsheet->addSheet($sheet3, 3);
         $sheet3 = $spreadsheet->getSheet(3);
         $sheet3->setCellValue('A1', 'ID');
-        $sheet3->setCellValue('B1', 'Vendor');
-        $vendor = Vendor::all();
+        $sheet3->setCellValue('B1', 'Code');
+        $sheet3->setCellValue('C1', 'Name');
+        $vendor = Uom::all();
         $idx = 2;
 
         foreach ($vendor as $key => $value) {
             $sheet3->setCellValue('A' . $idx, $value->id);
-            $sheet3->setCellValue('B' . $idx, $value->name);
-            $idx++;
-        }
-
-        $sheet4 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Uoms');
-        $spreadsheet->addSheet($sheet4, 4);
-        $sheet4 = $spreadsheet->getSheet(4);
-        $sheet4->setCellValue('A1', 'ID');
-        $sheet4->setCellValue('B1', 'Code');
-        $sheet4->setCellValue('C1', 'Name');
-        $uom = Uom::all();
-        $idx = 2;
-
-        foreach ($uom as $key => $value) {
-            $sheet4->setCellValue('A' . $idx, $value->id);
-            $sheet4->setCellValue('B' . $idx, $value->code);
-            $sheet4->setCellValue('C' . $idx, $value->name);
+            $sheet3->setCellValue('B' . $idx, $value->code);
+            $sheet3->setCellValue('C' . $idx, $value->name);
             $idx++;
         }
 
@@ -556,27 +575,41 @@ class ItemController extends Controller
             $temp['name'] = $worksheet->getCell('B' . $row)->getFormattedValue();
             $temp['quantity'] = $worksheet->getCell('C' . $row)->getValue();
             $temp['sell_price'] = $worksheet->getCell('D' . $row)->getValue();
-            $temp['category_id'] = $worksheet->getCell('F' . $row)->getValue();
-            $temp['uom_id'] = $worksheet->getCell('H' . $row)->getValue();
-            $temp['vendor_id'] = $worksheet->getCell('J' . $row)->getValue();
+            $temp['discount'] = $worksheet->getCell('E' . $row)->getValue();
+            $temp['flash_sale'] = $worksheet->getCell('F' . $row)->getValue();
+            $temp['category_id'] = $worksheet->getCell('H' . $row)->getValue();
+            $temp['uom_id'] = $worksheet->getCell('J' . $row)->getValue();
+            // $temp['vendor_id'] = $worksheet->getCell('J' . $row)->getValue();
             $temp['warehouse_id'] = $worksheet->getCell('L' . $row)->getValue();
             $dataTemp[] = $temp;
         }
         unlink(public_path('/file/upload_item/' . $nama_file));
 
-        foreach ($dataTemp as $key => $value) {
-            $model = Item::find($value['id']);
-            $model->name = strtoupper($value['name']);
-            $model->qty = $value['quantity'];
-            $model->sale_price = $value['sell_price'];
-            $model->category_id = $value['category_id'];
-            $model->uom_id = $value['uom_id'];
-            $model->vendor_id = $value['vendor_id'];
-            $model->warehouse_id = $value['warehouse_id'];
-            $model->save();
+        DB::beginTransaction();
+        try {
+            foreach ($dataTemp as $key => $value) {
+                $model = Item::find($value['id']);
+                $model->name = strtoupper($value['name']);
+                $model->qty = $value['quantity'];
+                $model->sale_price = $value['sell_price'];
+                $model->discount = $value['discount'];
+                $model->flash_sale_price = $value['flash_sale'];
+                $model->category_id = $value['category_id'];
+                $model->uom_id = $value['uom_id'];
+                // $model->vendor_id = $value['vendor_id'];
+                $model->warehouse_id = $value['warehouse_id'];
+                $model->save();
+            }
+            DB::commit();
+            $res = ['res' => 'success'];
+            return $res;
         }
-
-        $res = ['res' => 'success'];
-        return $res;
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
+            $res = ['res' => 'error', 'error' => json_encode($e),];
+            return $res;
+        }
+        
     }
 }

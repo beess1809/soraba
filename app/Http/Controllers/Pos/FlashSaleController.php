@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Master\FlashSale;
 use App\Models\Master\FlashSaleBundling;
 use App\Models\Master\Item;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
 class FlashSaleController extends Controller
@@ -47,15 +49,22 @@ class FlashSaleController extends Controller
      */
     public function store(Request $request)
     {
-        $model = new FlashSale();
-        $model->time_start = $request->time_start;
-        $model->time_end = $request->time_end;
-        $model->active = $request->active;
-        $model->save();
-        if ($model->save()) {
-            return redirect()->route('flash-sale.index')->with('alert.success', 'Bundling Has Been Added');
-        } else {
-            return redirect()->route('flash-sale.createBundling')->with('alert.failed', 'Something Wrong');
+        DB::beginTransaction();
+        try {
+            $model = new FlashSale();
+            $model->time_start = $request->time_start;
+            $model->time_end = $request->time_end;
+            $model->active = $request->active;
+            if ($model->save()) {
+                DB::commit();
+                return redirect()->route('flash-sale.index')->with('alert.success', 'Bundling Has Been Added');
+            } else {
+                return redirect()->route('flash-sale.createBundling')->with('alert.failed', 'Something Wrong');
+            }
+        }
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
         }
     }
 
@@ -67,22 +76,30 @@ class FlashSaleController extends Controller
             'price' => 'required',
         ]);
 
-        $model = new FlashSaleBundling();
+        DB::beginTransaction();
+        try {
+            $model = new FlashSaleBundling();
 
-        foreach ($request->item as $key => $value) {
-            $item[] = [
-                'item' => $request->item[$key],
-                'qty' => $request->qty[$key]
-            ];
+            foreach ($request->item as $key => $value) {
+                $item[] = [
+                    'item' => $request->item[$key],
+                    'qty' => $request->qty[$key]
+                ];
+            }
+
+            $model->name = $request->name;
+            $model->price = str_replace('.', '', $request->price);
+            $model->item_id = json_encode($item);
+            if ($model->save()) {
+                DB::commit();
+                return redirect()->route('flash-sale.index')->with('alert.success', 'Bundling Has Been Added');
+            } else {
+                return redirect()->route('flash-sale.createBundling')->with('alert.failed', 'Something Wrong');
+            }
         }
-
-        $model->name = $request->name;
-        $model->price = str_replace('.', '', $request->price);
-        $model->item_id = json_encode($item);
-        if ($model->save()) {
-            return redirect()->route('flash-sale.index')->with('alert.success', 'Bundling Has Been Added');
-        } else {
-            return redirect()->route('flash-sale.createBundling')->with('alert.failed', 'Something Wrong');
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
         }
     }
     /**
@@ -125,15 +142,22 @@ class FlashSaleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $model =  FlashSale::find(base64_decode($id));
-        $model->time_start = $request->time_start;
-        $model->time_end = $request->time_end;
-        $model->active = $request->active;
-        $model->save();
-        if ($model->save()) {
-            return redirect()->route('flash-sale.index')->with('alert.success', 'Bundling Has Been Added');
-        } else {
-            return redirect()->route('flash-sale.createBundling')->with('alert.failed', 'Something Wrong');
+        DB::beginTransaction();
+        try {
+            $model =  FlashSale::find(base64_decode($id));
+            $model->time_start = $request->time_start;
+            $model->time_end = $request->time_end;
+            $model->active = $request->active;
+            if ($model->save()) {
+                DB::commit();
+                return redirect()->route('flash-sale.index')->with('alert.success', 'Bundling Has Been Added');
+            } else {
+                return redirect()->route('flash-sale.createBundling')->with('alert.failed', 'Something Wrong');
+            }
+        }
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
         }
     }
 
@@ -145,25 +169,33 @@ class FlashSaleController extends Controller
             'price' => 'required',
         ]);
 
-        $id = base64_decode($id);
+        DB::beginTransaction();
+        try {
+            $id = base64_decode($id);
 
-        $model = FlashSaleBundling::find($id);
+            $model = FlashSaleBundling::find($id);
 
-        foreach ($request->item as $key => $value) {
-            $item[] = [
-                'item' => $request->item[$key],
-                'qty' => $request->qty[$key]
-            ];
+            foreach ($request->item as $key => $value) {
+                $item[] = [
+                    'item' => $request->item[$key],
+                    'qty' => $request->qty[$key]
+                ];
+            }
+
+            $model->name = $request->name;
+            $model->price = str_replace('.', '', $request->price);
+            $model->item_id = json_encode($item);
+
+            if ($model->save()) {
+                DB::commit();
+                return redirect()->route('flash-sale.index')->with('alert.success', 'Bundling Has Been Updated');
+            } else {
+                return redirect()->route('flash-sale.createBundling')->with('alert.failed', 'Something Wrong');
+            }
         }
-
-        $model->name = $request->name;
-        $model->price = str_replace('.', '', $request->price);
-        $model->item_id = json_encode($item);
-
-        if ($model->save()) {
-            return redirect()->route('flash-sale.index')->with('alert.success', 'Bundling Has Been Updated');
-        } else {
-            return redirect()->route('flash-sale.createBundling')->with('alert.failed', 'Something Wrong');
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
         }
     }
 

@@ -9,7 +9,11 @@ use App\Models\Master\Item;
 use App\Models\Master\Uom;
 use App\Models\Master\Vendor;
 use App\Models\Master\Warehouse;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 use Illuminate\Support\Facades\Response as res;
@@ -17,6 +21,7 @@ use Illuminate\Support\Facades\Response as res;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Protection;
+use Symfony\Component\HttpFoundation\Response;
 
 class BundlingController extends Controller
 {
@@ -53,26 +58,36 @@ class BundlingController extends Controller
         $request->validate([
             'name' => 'required',
             'price' => 'required',
+        ], [
+            'name.required' => 'Nama Paket Wajib Diisi',
+            'price.required' => 'Harga Wajib Diisi'
         ]);
-
-        $model = new Bundling();
-
-        foreach($request->item as $key => $value) {
-            $item[] = [
-                'item' => $request->item[$key],
-                'qty' => $request->qty[$key]
-            ];
-        }
-
-        $model->name = $request->name;
-        $model->price = str_replace('.', '', $request->price);
-        $model->flash_sale_price = str_replace('.', '', $request->flash_sale_price);
         
-        $model->item_id = json_encode($item);
-        if ($model->save()) {
-            return redirect()->route('items.index')->with('alert.success', 'Bundling Has Been Added');
-        } else {
-            return redirect()->route('items.create')->with('alert.failed', 'Something Wrong');
+        DB::beginTransaction();
+        try {
+            $model = new Bundling();
+
+            foreach($request->item as $key => $value) {
+                $item[] = [
+                    'item' => $request->item[$key],
+                    'qty' => $request->qty[$key]
+                ];
+            }
+    
+            $model->name = $request->name;
+            $model->price = str_replace('.', '', $request->price);
+            $model->item_id = json_encode($item);
+            $model->created_by = Auth::user()->id;
+            if ($model->save()) {
+                DB::commit();
+                return redirect()->route('items.index')->with('alert.success', 'Bundling Has Been Added');
+            } else {
+                return redirect()->route('items.create')->with('alert.failed', 'Something Wrong');
+            }
+        }
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
         }
     }
 
@@ -117,28 +132,38 @@ class BundlingController extends Controller
         $request->validate([
             'name' => 'required',
             'price' => 'required',
+        ], [
+            'name.required' => 'Nama Paket Wajib Diisi',
+            'price.required' => 'Harga Wajib Diisi'
         ]);
 
-        $id = base64_decode($id);
+        DB::beginTransaction();
+        try {
+            $id = base64_decode($id);
 
-        $model = Bundling::find($id);
+            $model = Bundling::find($id);
 
-        foreach($request->item as $key => $value) {
-            $item[] = [
-                'item' => $request->item[$key],
-                'qty' => $request->qty[$key]
-            ];
+            foreach($request->item as $key => $value) {
+                $item[] = [
+                    'item' => $request->item[$key],
+                    'qty' => $request->qty[$key]
+                ];
+            }
+
+            $model->name = $request->name;
+            $model->price = str_replace('.', '', $request->price);
+            $model->item_id = json_encode($item);
+            $model->updated_by = Auth::user()->id;
+            if ($model->save()) {
+                DB::commit();
+                return redirect()->route('items.index')->with('alert.success', 'Bundling Has Been Updated');
+            } else {
+                return redirect()->route('items.create')->with('alert.failed', 'Something Wrong');
+            }
         }
-
-        $model->name = $request->name;
-        $model->price = str_replace('.', '', $request->price);
-        $model->flash_sale_price = str_replace('.', '', $request->flash_sale_price);
-        $model->item_id = json_encode($item);
-
-        if ($model->save()) {
-            return redirect()->route('items.index')->with('alert.success', 'Bundling Has Been Updated');
-        } else {
-            return redirect()->route('items.create')->with('alert.failed', 'Something Wrong');
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
         }
     }
 
@@ -152,7 +177,9 @@ class BundlingController extends Controller
     {
         $id = base64_decode($id);
         $model = Bundling::find($id);
-        $model->delete();
+        $model->deleted_by = Auth::user()->id;
+        $model->deleted_at = date('Y-m-d H:i:s');
+        $model->save();
     }
 
     public function data(Request $request)
@@ -185,9 +212,6 @@ class BundlingController extends Controller
             })
             ->editColumn('price', function ($model) {
                 return  format_rupiah($model->price);
-            })
-            ->editColumn('flash_sale_price', function ($model) {
-                return  format_rupiah($model->flash_sale_price);
             })
             ->addColumn('items', function ($model) {
                 $string = '';

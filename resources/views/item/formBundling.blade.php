@@ -46,7 +46,7 @@
                             <input type="hidden" name="_method" value="PUT">
                         @endif
                         <div class="row">
-                            <div class="form-group col-md-12">
+                            <div class="form-group col-md-6">
                                 <label for="name" class="col-sm-12 col-form-label">Bundling Name <span
                                         class="text-red">*</span></label>
                                 <div class="col-sm-12">
@@ -76,7 +76,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="form-group col-md-6">
+                            {{-- <div class="form-group col-md-6">
                                 <label for="flash_sale_price" class="col-sm-12 col-form-label">Flash Sell Price</label>
                                 <div class="col-sm-12">
                                     <input type="text" name="flash_sale_price" id="flash_sale_price"
@@ -88,7 +88,7 @@
                                         </small>
                                     @enderror
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
 
                         <div class="row">

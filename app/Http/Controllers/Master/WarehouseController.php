@@ -6,10 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Master\Warehouse;
+use Exception;
 use Yajra\DataTables\Facades\DataTables;
 
 use Illuminate\Http\Response;
-
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -53,19 +54,27 @@ class WarehouseController extends Controller
             'npwp' => 'required',
         ]);
 
-        $model = new Warehouse();
-        $model->code = $request->code;
-        $model->name = $request->name;
-        $model->address = $request->address;
-        $model->no_telp = $request->no_telp;
-        $model->email = $request->email;
-        $model->npwp = $request->npwp;
-        $model->created_by = Auth::user()->id;
+        DB::beginTransaction();
+        try {
+            $model = new Warehouse();
+            $model->code = $request->code;
+            $model->name = $request->name;
+            $model->address = $request->address;
+            $model->no_telp = $request->no_telp;
+            $model->email = $request->email;
+            $model->npwp = $request->npwp;
+            $model->created_by = Auth::user()->id;
 
-        if ($model->save()) {
-            return redirect()->route('master.warehouse.index')->with('alert.success', 'Warehouse Berhasil Ditambahkan');
-        } else {
-            return redirect()->route('master.warehouse.create')->with('alert.failed', 'Terjadi Sesuatu');
+            if ($model->save()) {
+                DB::commit();
+                return redirect()->route('master.warehouse.index')->with('alert.success', 'Warehouse Berhasil Ditambahkan');
+            } else {
+                return redirect()->route('master.warehouse.create')->with('alert.failed', 'Terjadi Sesuatu');
+            }
+        }
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
         }
     }
 
@@ -110,22 +119,30 @@ class WarehouseController extends Controller
             'email' => 'required',
             'npwp' => 'required',
         ]);
+        
+        DB::beginTransaction();
+        try {
+            $id = base64_decode($id);
 
-        $id = base64_decode($id);
+            $model = Warehouse::find($id);
+            $model->code = $request->code;
+            $model->name = $request->name;
+            $model->address = $request->address;
+            $model->no_telp = $request->no_telp;
+            $model->email = $request->email;
+            $model->npwp = $request->npwp;
+            $model->updated_by = Auth::user()->id;
 
-        $model = Warehouse::find($id);
-        $model->code = $request->code;
-        $model->name = $request->name;
-        $model->address = $request->address;
-        $model->no_telp = $request->no_telp;
-        $model->email = $request->email;
-        $model->npwp = $request->npwp;
-        $model->updated_by = Auth::user()->id;
-
-        if ($model->save()) {
-            return redirect()->route('master.warehouse.index')->with('alert.success', 'Warehouse Has Been Updated');
-        } else {
-            return redirect()->route('master.warehouse.create')->with('alert.failed', 'Something Wrong');
+            if ($model->save()) {
+                DB::commit();
+                return redirect()->route('master.warehouse.index')->with('alert.success', 'Warehouse Has Been Updated');
+            } else {
+                return redirect()->route('master.warehouse.create')->with('alert.failed', 'Something Wrong');
+            }
+        }
+        catch (Exception $e) {
+            DB::rollBack();
+            print($e);
         }
     }
 
