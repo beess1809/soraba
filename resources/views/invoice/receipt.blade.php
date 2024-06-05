@@ -197,7 +197,7 @@
                     </td>
                 </tr>
                 @if ($transaction->discount > 0)
-                    <tr>
+                    <tr style="font-size:12px; font-weight:600">
                         <td style="text-align: right" colspan="2">DISCOUNT</td>
                         <td style="text-align: right">Rp. {{ number_format($transaction->discount, 0, ',', '.') }}</td>
                     </tr>

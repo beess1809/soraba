@@ -219,7 +219,7 @@
 
     <main>
         <div class="content">
-            <div class="title">Laporan Transaksi</div>
+            <div class="title">Laporan Transaksi Penjualan</div>
             <div class="goods">
                 <table width="100%">
                     <thead>
@@ -230,15 +230,18 @@
                             <th>Tanggal Pemesanan</th>
                             <th>Tipe Pembayaran</th>
                             <th>Tanggal Pembayaran</th>
-                            <th>Subtotal Item</th>
-                            <th>Subtotal</th>
                             <th>Total</th>
                             <th>Diskon</th>
                             <th>Grand Total</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @php $no = 1; @endphp
+                        @php
+                            $no = 1;
+                            $total_total = 0;
+                            $discount_total = 0;
+                            $grand_total_total = 0;
+                        @endphp
                         @foreach ($transaction as $key => $item)
                             <tr>
                                 <td>{{ $no }}</td>
@@ -247,10 +250,6 @@
                                 <td>{{ sqlindo_datetime_to_datetime($item->created_at) }}</td>
                                 <td>{{ $item->paymentType->name }}</td>
                                 <td>{{ sqlindo_datetime_to_datetime($item->updated_at) }}</td>
-                                <td style="text-align:right; padding-right: 10px;">{{ format_rupiah($item->sub_total) }}
-                                </td>
-                                <td style="text-align:right; padding-right: 10px;">{{ format_rupiah($item->sub_total) }}
-                                </td>
                                 <td style="text-align:right; padding-right: 10px;">{{ format_rupiah($item->total) }}
                                 </td>
                                 <td style="text-align:right; padding-right: 10px;">{{ format_rupiah($item->discount) }}
@@ -258,9 +257,24 @@
                                 <td style="text-align:right; padding-right: 10px;">
                                     {{ format_rupiah($item->grand_total) }}</td>
                             </tr>
+                            @php
+                                $total_total = $total_total + $item->total;
+                                $discount_total = $discount_total + $item->discount;
+                                $grand_total_total = $grand_total_total + $item->grand_total;
+                            @endphp
                             {{ $no++ }}
                         @endforeach
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td style="text-align:center; font-weight:bold" colspan="6">Total Keseluruhan</td>
+                            <td style="text-align:right; padding-right: 10px;">{{ format_rupiah($total_total) }}</td>
+                            <td style="text-align:right; padding-right: 10px;">{{ format_rupiah($discount_total) }}
+                            </td>
+                            <td style="text-align:right; padding-right: 10px;">{{ format_rupiah($grand_total_total) }}
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
             <div class="signature">

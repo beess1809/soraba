@@ -62,10 +62,6 @@
                                 <th>Tanggal Pemesanan</th>
                                 <th>Tipe Pembayaran</th>
                                 <th>Tanggal Pembayaran</th>
-                                <th>Subtotal Item</th>
-                                <th>Embalase</th>
-                                <th>Subtotal</th>
-                                <th>Pajak</th>
                                 <th>Total</th>
                                 <th>Diskon</th>
                                 <th>Grand Total</th>
@@ -130,22 +126,6 @@
                     {
                         data: 'waktu_pembayaran',
                         name: 'updated_at'
-                    },
-                    {
-                        data: 'subtotal',
-                        name: 'subtotal'
-                    },
-                    {
-                        data: 'cost',
-                        name: 'cost'
-                    },
-                    {
-                        data: 'sub_total',
-                        name: 'sub_total'
-                    },
-                    {
-                        data: 'pajak',
-                        name: 'pajak'
                     },
                     {
                         data: 'total',

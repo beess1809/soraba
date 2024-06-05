@@ -219,7 +219,7 @@
 
     <main>
         <div class="content">
-            <div class="title">Laporan Transaksi</div>
+            <div class="title">Laporan Transaksi Penjualan Barang</div>
             <div class="goods">
                 <table width="100%">
                     <thead>
@@ -228,15 +228,19 @@
                             <th>No. Invoice</th>
                             <th>Nama Item</th>
                             <th>Kuantitas</th>
-                            <th>Harga Jual</th>
-                            <th>Subtotal</th>
-                            <th>Pajak</th>
+                            <th>Harga Satuan</th>
                             <th>Diskon</th>
                             <th>Total</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @php $no = 1; @endphp
+                        @php
+                            $no = 1;
+                            $qty_total = 0;
+                            $harga_satuan_total = 0;
+                            $discount_total = 0;
+                            $total_total = 0;
+                        @endphp
                         @foreach ($details as $key => $item)
                             <tr>
                                 <td>{{ $no }}</td>
@@ -246,19 +250,31 @@
                                 <td style="text-align:right; padding-right: 10px;">{{ format_rupiah($item['price']) }}
                                 </td>
                                 <td style="text-align:right; padding-right: 10px;">
-                                    {{ format_rupiah($item['subtotal']) }}
-                                </td>
-                                <td style="text-align:right; padding-right: 10px;">{{ format_rupiah($item['pajak']) }}
-                                </td>
-                                <td style="text-align:right; padding-right: 10px;">
                                     {{ format_rupiah($item['discount']) }}
                                 </td>
                                 <td style="text-align:right; padding-right: 10px;">{{ format_rupiah($item['total']) }}
                                 </td>
                             </tr>
+                            @php
+                                $qty_total = $qty_total + $item['qty'];
+                                $harga_satuan_total = $harga_satuan_total + $item['price'];
+                                $discount_total = $discount_total + $item['discount'];
+                                $total_total = $total_total + $item['total'];
+                            @endphp
                             {{ $no++ }}
                         @endforeach
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td style="text-align:center; font-weight:bold" colspan="3">Total Keseluruhan</td>
+                            <td style="text-align:center">{{ $qty_total }}</td>
+                            <td style="text-align:right; padding-right: 10px;">{{ format_rupiah($harga_satuan_total) }}
+                            </td>
+                            <td style="text-align:right; padding-right: 10px;">{{ format_rupiah($discount_total) }}
+                            </td>
+                            <td style="text-align:right; padding-right: 10px;">{{ format_rupiah($total_total) }}</td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
             <div class="signature">
