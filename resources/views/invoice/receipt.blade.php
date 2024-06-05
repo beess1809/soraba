@@ -66,9 +66,10 @@
         @media print {
             @page {
                 size: 100%;
-                width: 90mm;
+                width: 100%;
                 margin: 1rem;
                 height: 100% !important;
+                padding: 5px;
             }
 
             html,
@@ -81,7 +82,7 @@
         body {
             /* font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; */
             font-size: 13.5pt;
-            width: 90mm;
+            width: 100%;
             /* Lebar kertas thermal */
             margin: 0;
             padding: 0;
@@ -98,10 +99,10 @@
         }
 
         .struk-container {
-            width: 100%;
-            padding: 5px;
+            width: 60%;
             border: 1px solid #ccc;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            margin: auto;
         }
 
         .struk-container table {
@@ -112,12 +113,12 @@
         .struk-header,
         .struk-body,
         .struk-footer {
-            margin: 10px 30px 0 30px;
+            /* margin: 10px 30px 0 30px; */
         }
 
-        .struk-header {
+        /* .struk-header {
             font-weight: 600;
-        }
+        } */
 
 
         /* .item {
@@ -137,7 +138,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td style="text-align: left; font-size:12px">
+                    <td style="text-align: left; font-size:14px">
                         Office 88 Kasablanka Tower A, 18<sup>th</sup>Floor<br>
                         Jl. Casablanca Raya Kav 88<br> Jakarta 12870,
                         Indonesia. <br> <span>+62 859-1065-30391, support@natha.co.id </span>
@@ -147,12 +148,12 @@
             <hr>
         </div>
 
-        <p style="margin: 0 30px;font-size:12px; font-weight:600">
+        <p style="margin: 0 1px;font-size:14px; font-weight:600">
             {{ date('d / m / y', strtotime($transaction->date)) . ' - ' . date('H:i', strtotime($transaction->created_at)) }}
             | {{ $transaction->created_by }} | {{ $transaction->invoice_no }}
         </p>
 
-        <p style="margin: 0 30px;font-size:12px; font-weight:600">Customer :
+        <p style="margin: 0 1px;font-size:14px; font-weight:600">Customer :
             {{ substr($transaction->customer_name, 0, 20) }} |
             {{ $transaction->customer_phone }}
         </p>
@@ -172,11 +173,11 @@
                         $total = $total + $subtotal;
                     @endphp
                     <tr>
-                        <td colspan="3" style="font-size:13px; font-weight:600">
+                        <td colspan="3" style="font-size:15px; font-weight:600">
                             {{ strtoupper($item->item_name) }}
                         </td>
                     </tr>
-                    <tr style="font-size:12px; font-weight:500">
+                    <tr style="font-size:14px; font-weight:500">
                         <td>Rp.
                             {{ number_format($item->price + $item->ppn / $item->qty, 0, ',', '.') }}</td>
                         <td>x {{ $item->qty }}</td>
@@ -185,7 +186,7 @@
                         </td>
                     </tr>
                     @if ($item->discount > 0.0)
-                        <tr style="font-size:12px; font-weight:500">
+                        <tr style="font-size:14px; font-weight:500">
                             <td colspan="2" style="text-align: right">Discount</td>
                             <td style="text-align: right">Rp. {{ format_rupiah($item->discount) }}</td>
                         </tr>
@@ -210,7 +211,7 @@
             </table>
             <hr>
         </div>
-        <div class="struk-footer" style="font-size:12px; font-weight:500">
+        <div class="struk-footer" style="font-size:14px; font-weight:500">
             <p>TERIMA KASIH</p>
         </div>
     </div>
