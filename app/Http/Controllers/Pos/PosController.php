@@ -270,6 +270,7 @@ class PosController extends Controller
                                     <div class="col-md-6">
                                         <dl>
                                             ' . $total . '
+                                            <input type="hidden" name="input_price" class="input-price-'.$value->id.'" value="'.number_format($value->sale_price, '0', ',', '.').'">
                                             <dd style="margin-bottom: 0px"><span>' . format_rupiah($value->qty) . '</span></dd>
                                             <dd style="margin-bottom: 0px">' . $stock . '</dd>
                                         </dl>
@@ -340,6 +341,7 @@ class PosController extends Controller
                                             <dl>
                                                 <dd>'.$value->name.'</dd>
                                                 ' . $total . '
+                                                <input type="hidden" name="input_price" class="input-price-'.$value->id.'" value="'.number_format($value->price, '0', ',', '.').'">
                                                 <dd style="margin-bottom: 0px"><span class="item_bundling">' . $li . '</span></dd>
                                             </dl>
                                         </div>
@@ -404,6 +406,7 @@ class PosController extends Controller
                                             <dl>
                                                 <dd>'.$value->name.'</dd>
                                                 ' . $total . '
+                                                <input type="hidden" name="input_price" class="input-price-'.$value->id.'" value="'.number_format($value->flash_sale_price, '0', ',', '.').'">
                                                 <dd style="margin-bottom: 0px"><span>' . format_rupiah($value->qty) . '</span></dd>
                                                 <dd style="margin-bottom: 0px">' . $stock . '</dd>
                                             </dl>
@@ -472,6 +475,7 @@ class PosController extends Controller
                                             <dl>
                                                 <dd>'.$value->name.'</dd>
                                                 ' . $total . '
+                                                <input type="hidden" name="input_price" class="input-price-'.$value->id.'" value="'.number_format($value->price, '0', ',', '.').'">
                                                 <dd style="margin-bottom: 0px"><span class="item_bundling">' . $li . '</span></dd>
                                             </dl>
                                         </div>

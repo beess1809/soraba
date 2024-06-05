@@ -130,16 +130,20 @@
     <script>
         function pesan(id, type) {
             if (type == 1) {
-                var qty = $(".input-number-" + id).val()
+                var qty = $(".input-number-" + id).val();
+                var price = $(".input-price-" + id).val();
                 var item_id = id
             } else if (type == 2) {
                 var qty = $(".input-number-" + id).val();
+                var price = $(".input-price-" + id).val();
                 var item_id = id;
             } else if (type == 3) {
                 var qty = $(".input-number-" + id).val();
+                var price = $(".input-price-" + id).val();
                 var item_id = id;
             } else if (type == 4) {
                 var qty = $(".input-number-" + id).val();
+                var price = $(".input-price-" + id).val();
                 var item_id = id;
             }
 
@@ -163,7 +167,6 @@
                 success: function(response) {
 
                     if (response.success) {
-
                         $('#__item_name').val('')
                         $('#__qty_item_1').val('')
                         $("#__item_ids").val('').trigger('change');
@@ -175,14 +178,17 @@
 
                         var _sub = $('#_subtotal').val();
                         var _cost = $('#_cost').val();
-                        var total_qty = parseInt(_total_qty) + parseInt(qty);
+
+                        if (parseInt(price) > 0) {
+                            var total_qty = parseInt(_total_qty) + parseInt(qty);
+                            var free_gift = Math.floor(total_qty / 2);
+
+                            $('#total_qty').val(total_qty.toString());
+                            $('#free-gift').text(free_gift.toString() + ' Free Gift');
+                        }
+
                         var sub = parseInt(_sub) + parseInt(response.data.item.harga);
                         var cost = parseInt(_cost) + parseInt((response.data.item.cost));
-
-                        var free_gift = Math.floor(total_qty / 2);
-
-                        $('#total_qty').val(total_qty.toString());
-                        $('#free-gift').text(free_gift.toString() + ' Free Gift');
 
                         $('#_subtotal').val(sub.toString());
                         $('#sub').html(formatRupiah(sub.toString()));
@@ -239,9 +245,6 @@
         }
 
         function hapusOrder(btn, id) {
-            var _total_qty = $('#total_qty').val();
-            var _total_free_gift = $('#free-gift').val();
-
             var _qty = $('#qty_' + id).val();
 
             var _sub = $('#_subtotal').val();
@@ -250,11 +253,16 @@
             var _cost = $('#cost_' + id).val();
             var cost = $('#_cost').val();
 
-            var total_qty = parseInt(_total_qty) - parseInt(_qty);
-            var free_gift = Math.floor(total_qty / 2);
+            var _total_qty = $('#total_qty').val();
+            var _total_free_gift = $('#free-gift').val();
 
-            $('#total_qty').val(total_qty.toString());
-            $('#free-gift').text(free_gift.toString() + ' Free Gift');
+            if (parseInt(_price) > 0) {
+                var total_qty = parseInt(_total_qty) - parseInt(_qty);
+                var free_gift = Math.floor(total_qty / 2);
+
+                $('#total_qty').val(total_qty.toString());
+                $('#free-gift').text(free_gift.toString() + ' Free Gift');
+            }
 
             var sub = parseInt(_sub) - parseInt(_price);
             var embalase = parseInt(cost) - parseInt(_cost);
