@@ -105,7 +105,7 @@ class PosController extends Controller
                             ->header('Content-Type', 'json');
                     }
 
-                    $item->qty = $item->qty - ($request->item_qty[$value][$k]) ;
+                    $item->qty = $item->qty - ($request->item_qty[$value][$k]);
                     $item->save();
                 }
 
@@ -270,7 +270,7 @@ class PosController extends Controller
                                     <div class="col-md-6">
                                         <dl>
                                             ' . $total . '
-                                            <input type="hidden" name="input_price" class="input-price-'.$value->id.'" value="'.number_format($value->sale_price, '0', ',', '.').'">
+                                            <input type="hidden" name="input_price" class="input-price-' . $value->id . '" value="' . number_format($value->sale_price, '0', ',', '.') . '">
                                             <dd style="margin-bottom: 0px"><span>' . format_rupiah($value->qty) . '</span></dd>
                                             <dd style="margin-bottom: 0px">' . $stock . '</dd>
                                         </dl>
@@ -320,11 +320,11 @@ class PosController extends Controller
             $items = json_decode($value->item_id);
 
             $li = '<ul style="margin-bottom: 0; padding-left: 10px;">';
-            foreach($items as $item) {
+            foreach ($items as $item) {
                 $item_name = Item::find($item->item);
                 $li .= '<li>';
-                $li .= '<input type="hidden" class="item-formula" value="'.$item_name->id.'">'.$item_name->name.' ';
-                $li .= '<input type="hidden" class="form-control qty-formula" name="__qty_item" id="__qty_item_'.$value->id.$item->item.'" value="'.$item->qty.'" readonly> | '.$item->qty.' '.$item_name->uom->name;
+                $li .= '<input type="hidden" class="item-formula" value="' . $item_name->id . '">' . $item_name->name . ' ';
+                $li .= '<input type="hidden" class="form-control qty-formula" name="__qty_item" id="__qty_item_' . $value->id . $item->item . '" value="' . $item->qty . '" readonly> | ' . $item->qty . ' ' . $item_name->uom->name;
                 $li .= '</li>';
             }
             $li .= '</ul>';
@@ -336,12 +336,12 @@ class PosController extends Controller
                                         <div class="col-lg-4 col-md-4 col-3">
                                             <img src="' . asset('img/no-pict.png') . '" alt=""class="rounded">
                                         </div>
-                                    
+
                                         <div class="col-lg-8 col-md-8 col-6">
                                             <dl>
-                                                <dd>'.$value->name.'</dd>
+                                                <dd>' . $value->name . '</dd>
                                                 ' . $total . '
-                                                <input type="hidden" name="input_price" class="input-price-'.$value->id.'" value="'.number_format($value->price, '0', ',', '.').'">
+                                                <input type="hidden" name="input_price" class="input-price-' . $value->id . '" value="' . number_format($value->price, '0', ',', '.') . '">
                                                 <dd style="margin-bottom: 0px"><span class="item_bundling">' . $li . '</span></dd>
                                             </dl>
                                         </div>
@@ -401,12 +401,12 @@ class PosController extends Controller
                                         <div class="col-lg-4 col-md-4 col-3">
                                             <img src="' . asset('img/no-pict.png') . '" alt=""class="rounded">
                                         </div>
-                                    
+
                                         <div class="col-lg-8 col-md-8 col-6">
                                             <dl>
-                                                <dd>'.$value->name.'</dd>
+                                                <dd>' . $value->name . '</dd>
                                                 ' . $total . '
-                                                <input type="hidden" name="input_price" class="input-price-'.$value->id.'" value="'.number_format($value->flash_sale_price, '0', ',', '.').'">
+                                                <input type="hidden" name="input_price" class="input-price-' . $value->id . '" value="' . number_format($value->flash_sale_price, '0', ',', '.') . '">
                                                 <dd style="margin-bottom: 0px"><span>' . format_rupiah($value->qty) . '</span></dd>
                                                 <dd style="margin-bottom: 0px">' . $stock . '</dd>
                                             </dl>
@@ -436,7 +436,7 @@ class PosController extends Controller
 
             $htmls[$key] = $html;
         }
-        return $htmls;
+        return '';
     }
 
     function cardFlashSaleBundling($param)
@@ -454,11 +454,11 @@ class PosController extends Controller
             $items = json_decode($value->item_id);
 
             $li = '<ul style="margin-bottom: 0; padding-left: 10px;">';
-            foreach($items as $item) {
+            foreach ($items as $item) {
                 $item_name = Item::find($item->item);
                 $li .= '<li>';
-                $li .= '<input type="hidden" class="item-formula" value="'.$item_name->id.'">'.$item_name->name.' ';
-                $li .= '<input type="hidden" class="form-control qty-formula" name="__qty_item" id="__qty_item_'.$value->id.$item->item.'" value="'.$item->qty.'" readonly> | '.$item->qty.' '.$item_name->uom->name;
+                $li .= '<input type="hidden" class="item-formula" value="' . $item_name->id . '">' . $item_name->name . ' ';
+                $li .= '<input type="hidden" class="form-control qty-formula" name="__qty_item" id="__qty_item_' . $value->id . $item->item . '" value="' . $item->qty . '" readonly> | ' . $item->qty . ' ' . $item_name->uom->name;
                 $li .= '</li>';
             }
             $li .= '</ul>';
@@ -470,12 +470,12 @@ class PosController extends Controller
                                         <div class="col-lg-4 col-md-4 col-3">
                                             <img src="' . asset('img/no-pict.png') . '" alt=""class="rounded">
                                         </div>
-                                    
+
                                         <div class="col-lg-8 col-md-8 col-6">
                                             <dl>
-                                                <dd>'.$value->name.'</dd>
+                                                <dd>' . $value->name . '</dd>
                                                 ' . $total . '
-                                                <input type="hidden" name="input_price" class="input-price-'.$value->id.'" value="'.number_format($value->price, '0', ',', '.').'">
+                                                <input type="hidden" name="input_price" class="input-price-' . $value->id . '" value="' . number_format($value->price, '0', ',', '.') . '">
                                                 <dd style="margin-bottom: 0px"><span class="item_bundling">' . $li . '</span></dd>
                                             </dl>
                                         </div>
@@ -503,7 +503,7 @@ class PosController extends Controller
 
             $htmls[$key] = $html;
         }
-        return $htmls;
+        return '';
     }
 
     function cari(Request $request)
@@ -535,7 +535,7 @@ class PosController extends Controller
                 ->header('Content-Type', 'json');
         }
 
-        if($request->tipe == 4) {
+        if ($request->tipe == 4) {
             $bundling = FlashSaleBundling::find($request->item_id);
             $lists_item = json_decode($bundling->item_id);
 
@@ -545,9 +545,9 @@ class PosController extends Controller
             $disc = 0;
             $cost = 0;
 
-            foreach($lists_item as $key => $value) {
+            foreach ($lists_item as $key => $value) {
                 $item = Item::find($value->item);
-                if($item->qty < ((int)$value->qty * $request->qty)) {
+                if ($item->qty < ((int)$value->qty * $request->qty)) {
                     $data = [
                         'message' => 'Sisa stok ' . $item->name . ' adalah ' . $item->qty,
                     ];
@@ -565,7 +565,7 @@ class PosController extends Controller
                 $item_price = $item->sale_price;
 
                 $string .= '<input type="hidden" name="item_id[' . $time . '][' . $key . ']" value="' . $item->id . '">';
-                $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' .$value->qty * $request->qty. '">';
+                $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' . $value->qty * $request->qty . '">';
 
                 $string .= '<input type="hidden" name="item_price[' . $time . '][' . $key . ']" value="' . $item_price . '">';
                 $string .= '<input type="hidden" name="item_discount[' . $time . '][' . $key . ']" value="' . $discount . '">';
@@ -577,7 +577,7 @@ class PosController extends Controller
             $sub = $bundling->price;
             $totPajak = 0;
 
-            $harga = $request->qty * $bundling->price;//$sub  - $disc + $request->cost;
+            $harga = $request->qty * $bundling->price; //$sub  - $disc + $request->cost;
             $price = ($sub + $request->cost) / $request->qty;
 
             $html = '<div class="row item-detail" id="detail-' . $time . '">
@@ -592,7 +592,7 @@ class PosController extends Controller
                                 ' . $string . '
                                 <input type="hidden" name="type[]" value="' . $request->tipe . '">
                                 <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
-                                <input type="hidden" name="qty[]" id="qty_'.$time.'" value="' . $request->qty . '">
+                                <input type="hidden" name="qty[]" id="qty_' . $time . '" value="' . $request->qty . '">
 
                                 <dd style="margin-bottom: 0px">
                                     <div class="row">
@@ -619,8 +619,7 @@ class PosController extends Controller
                         </div>
                     </div>';
             // $harga -=  $disc;
-        }
-        elseif($request->tipe == 3) {
+        } elseif ($request->tipe == 3) {
             $item = Item::find($request->item_id);
             $sub = $item->flash_sale_price;
             $harga = $item->flash_sale_price * $request->qty;
@@ -644,7 +643,7 @@ class PosController extends Controller
                                 <input type="hidden" name="item_price[' . $time . '][0]" value="' . $sub . '">
                                 <input type="hidden" name="item_discount[' . $time . '][0]" value="' . $discount . '">
                                 <input type="hidden" name="discount[]" value="' . $discount . '">
-                                <input type="hidden" name="qty[]" id="qty_'.$time.'" value="' . $request->qty . '">
+                                <input type="hidden" name="qty[]" id="qty_' . $time . '" value="' . $request->qty . '">
                                 <dd style="margin-bottom: 0px">
                                     <div class="row">
                                         <div class="col-5">
@@ -654,7 +653,7 @@ class PosController extends Controller
                                         <div class="col-7">
                                             <strong class="float-right" style="margin-right: 2rem">
                                             Rp. ' . number_format($harga, '0', ',', '.') . '
-                                                <input type="hidden" name="price[]" id="price_' . $time . '" value="' . $harga. '">
+                                                <input type="hidden" name="price[]" id="price_' . $time . '" value="' . $harga . '">
                                                 <input type="hidden" name="cost[]" id="cost_' . $time . '"  value="' . $cost . '">
                                                 <input type="hidden" name="sub_price[]"  id="sub_price_' . $time . '" value="' . $sub . '">
                                                 <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ')">
@@ -668,22 +667,20 @@ class PosController extends Controller
                         </div>
                     </div>';
             // $harga = $harga;
-        }
-
-        elseif ($request->tipe == 2) {
+        } elseif ($request->tipe == 2) {
             $bundling = Bundling::find($request->item_id);
             $lists_item = json_decode($bundling->item_id);
-            
+
             $harga = 0;
             $totPajak = 0;
             $string = '';
             $disc = 0;
-            $cost = 0;//$bundling->price * $request->item;
+            $cost = 0; //$bundling->price * $request->item;
 
             foreach ($lists_item as $key => $value) {
 
                 $item = Item::find($value->item);
-                if($item->qty < ((int)$value->qty * $request->qty)) {
+                if ($item->qty < ((int)$value->qty * $request->qty)) {
                     $data = [
                         'message' => 'Sisa stok ' . $item->name . ' adalah ' . $item->qty,
                     ];
@@ -700,8 +697,8 @@ class PosController extends Controller
                 $item_price = $item->sale_price;
 
                 $string .= '<input type="hidden" name="item_id[' . $time . '][' . $key . ']" value="' . $item->id . '">';
-                $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' . $value->qty * $request->qty. '">';
-                
+                $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' . $value->qty * $request->qty . '">';
+
                 $string .= '<input type="hidden" name="item_price[' . $time . '][' . $key . ']" value="' . $item_price . '">';
                 $string .= '<input type="hidden" name="item_discount[' . $time . '][' . $key . ']" value="' . $discount . '">';
 
@@ -726,7 +723,7 @@ class PosController extends Controller
                                 ' . $string . '
                                 <input type="hidden" name="type[]" value="' . $request->tipe . '">
                                 <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
-                                <input type="hidden" name="qty[]" id="qty_'.$time.'" value="' . $request->qty . '">
+                                <input type="hidden" name="qty[]" id="qty_' . $time . '" value="' . $request->qty . '">
 
                                 <dd style="margin-bottom: 0px">
                                     <div class="row">
@@ -776,7 +773,7 @@ class PosController extends Controller
                                 <input type="hidden" name="item_price[' . $time . '][0]" value="' . $sub . '">
                                 <input type="hidden" name="item_discount[' . $time . '][0]" value="' . $discount . '">
                                 <input type="hidden" name="discount[]" value="' . $discount . '">
-                                <input type="hidden" name="qty[]" id="qty_'.$time.'" value="' . $request->qty . '">
+                                <input type="hidden" name="qty[]" id="qty_' . $time . '" value="' . $request->qty . '">
                                 <dd style="margin-bottom: 0px">
                                     <div class="row">
                                         <div class="col-5">
@@ -917,7 +914,7 @@ class PosController extends Controller
     {
         $id = base64_decode($id);
         $data['transaction'] = Transaction::find($id);
-        $data['title'] =  'invoice '.$data['transaction']->invoice_no;
+        $data['title'] =  'invoice ' . $data['transaction']->invoice_no;
         return view('pos.invoice', $data);
     }
 

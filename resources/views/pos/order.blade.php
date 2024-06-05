@@ -29,7 +29,7 @@
                                     aria-controls="bundling" aria-selected="false"><i class="fas fa-pills">
                                         &nbsp;</i>Paket</a>
                             </li>
-                            <li class="nav-item">
+                            {{-- <li class="nav-item">
                                 <a class="nav-link" id="flash-sale-umum-tab" data-toggle="pill" href="#flash-sale-umum"
                                     role="tab" aria-controls="flash-sale-umum" aria-selected="false"><i
                                         class="fas fa-stopwatch"></i>&nbsp;Flash
@@ -40,7 +40,7 @@
                                     href="#flash-sale-bundling" role="tab" aria-controls="flash-sale-bundling"
                                     aria-selected="false"><i class="fas fa-stopwatch-20"></i>
                                     &nbsp;Flash Sale Paket</a>
-                            </li>
+                            </li> --}}
                         </ul>
                     </div>
 
@@ -53,13 +53,13 @@
                     <div class="tab-pane fade show" id="bundling" role="tabpanel" aria-labelledby="bundling">
                         @include('pos.tab.bundling')
                     </div>
-                    <div class="tab-pane fade show" id="flash-sale-umum" role="tabpanel" aria-labelledby="flash-sale-umum">
+                    {{-- <div class="tab-pane fade show" id="flash-sale-umum" role="tabpanel" aria-labelledby="flash-sale-umum">
                         @include('pos.tab.flash-sale-umum')
                     </div>
                     <div class="tab-pane fade show" id="flash-sale-bundling" role="tabpanel"
                         aria-labelledby="flash-sale-bundling">
                         @include('pos.tab.flash-sale-bundling')
-                    </div>
+                    </div> --}}
                 </div>
             </div>
             <!-- /.col-md-6 -->
