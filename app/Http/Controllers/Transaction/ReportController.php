@@ -109,15 +109,6 @@ class ReportController extends Controller
             ->editColumn('total', function ($model) {
                 return format_rupiah($model->total);
             })
-            ->editColumn('subtotal', function ($model) {
-                return format_rupiah($model->sub_total - $model->cost);
-            })
-            ->editColumn('sub_total', function ($model) {
-                return format_rupiah($model->sub_total);
-            })
-            ->editColumn('pajak', function ($model) {
-                return format_rupiah($model->pajak);
-            })
             ->editColumn('discount', function ($model) {
                 return format_rupiah($model->discount);
             })
@@ -172,11 +163,9 @@ class ReportController extends Controller
         $sheet->setCellValue('D1', 'Tanggal Pemesanan')->getColumnDimension('D')->setWidth(20);
         $sheet->setCellValue('E1', 'Tipe Pembayaran')->getColumnDimension('E')->setWidth(15);
         $sheet->setCellValue('F1', 'Tanggal Pembayaran')->getColumnDimension('F')->setWidth(20);
-        $sheet->setCellValue('G1', 'Subtotal Item')->getColumnDimension('G')->setWidth(15);
-        $sheet->setCellValue('H1', 'Subtotal')->getColumnDimension('H')->setWidth(15);
-        $sheet->setCellValue('I1', 'Total')->getColumnDimension('I')->setWidth(15);
-        $sheet->setCellValue('J1', 'Diskon')->getColumnDimension('J')->setWidth(15);
-        $sheet->setCellValue('K1', 'Grand Total')->getColumnDimension('K')->setWidth(15);
+        $sheet->setCellValue('G1', 'Total')->getColumnDimension('I')->setWidth(15);
+        $sheet->setCellValue('H1', 'Diskon')->getColumnDimension('J')->setWidth(15);
+        $sheet->setCellValue('I1', 'Grand Total')->getColumnDimension('K')->setWidth(15);
         $no = 2;
         foreach ($data as $key => $item) {
 
@@ -186,19 +175,12 @@ class ReportController extends Controller
             $sheet->setCellValue('D' . $no, sqlindo_datetime_to_datetime($item->created_at));
             $sheet->setCellValue('E' . $no, $item->paymentType->name);
             $sheet->setCellValue('F' . $no, sqlindo_datetime_to_datetime($item->updated_at));
-            $sheet->setCellValue('G' . $no, $item->sub_total);
+            $sheet->setCellValue('G' . $no, $item->total);
             $sheet->getStyle('G' . $no)->getNumberFormat()->setFormatCode('#,##0');
-      
-           
-            $sheet->setCellValue('H' . $no, $item->sub_total);
+            $sheet->setCellValue('H' . $no, $item->discount);
             $sheet->getStyle('H' . $no)->getNumberFormat()->setFormatCode('#,##0');
-           
-            $sheet->setCellValue('I' . $no, $item->total);
+            $sheet->setCellValue('I' . $no, $item->grand_total);
             $sheet->getStyle('I' . $no)->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->setCellValue('J' . $no, $item->discount);
-            $sheet->getStyle('J' . $no)->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->setCellValue('K' . $no, $item->grand_total);
-            $sheet->getStyle('K' . $no)->getNumberFormat()->setFormatCode('#,##0');
 
             $no++;
         }
@@ -224,7 +206,6 @@ class ReportController extends Controller
         foreach ($query as $key => $value) {
             $items = json_decode($value->item_id);
             $qty = json_decode($value->qty_item);
-            $pajak = json_decode($value->item_pajak);
             $price = json_decode($value->item_price);
             $discount = json_decode($value->item_discount);
 
@@ -236,11 +217,10 @@ class ReportController extends Controller
                     'no_invoice' => $value->invoice_no,
                     'name' => $dtl->name,
                     'qty' => $qty[$idx],
-                    'price' => $price[$idx] + $pajak[$idx],
+                    'price' => $price[$idx],
                     'subtotal' => $price[$idx],
-                    'pajak' => $pajak[$idx],
                     'discount' => $discount[$idx],
-                    'total' => (($price[$idx] + $pajak[$idx] - $discount[$idx]))
+                    'total' => (($price[$idx] - $discount[$idx]) * $qty[$idx])
                 );
             }
         }
@@ -254,9 +234,6 @@ class ReportController extends Controller
             })
             ->editColumn('subtotal', function ($model) {
                 return format_rupiah($model['subtotal']);
-            })
-            ->editColumn('pajak', function ($model) {
-                return format_rupiah($model['pajak']);
             })
             ->editColumn('discount', function ($model) {
                 return format_rupiah($model['discount']);
@@ -279,7 +256,6 @@ class ReportController extends Controller
         foreach ($query as $key => $value) {
             $items = json_decode($value->item_id);
             $qty = json_decode($value->qty_item);
-            $pajak = json_decode($value->item_pajak);
             $price = json_decode($value->item_price);
             $discount = json_decode($value->item_discount);
 
@@ -290,11 +266,9 @@ class ReportController extends Controller
                     'no_invoice' => $value->invoice_no,
                     'name' => $dtl->name,
                     'qty' => $qty[$idx],
-                    'price' => $price[$idx] + $pajak[$idx],
-                    'subtotal' => $price[$idx],
-                    'pajak' => $pajak[$idx],
+                    'price' => $price[$idx],
                     'discount' => $discount[$idx],
-                    'total' => (($price[$idx] + $pajak[$idx] - $discount[$idx]))
+                    'total' => (($price[$idx] - $discount[$idx]) * $qty[$idx])
                 );
             }
         }
@@ -306,11 +280,9 @@ class ReportController extends Controller
         $sheet->setCellValue('B1', 'No Invoice')->getColumnDimension('B')->setWidth(30);
         $sheet->setCellValue('C1', 'Nama Item')->getColumnDimension('C')->setWidth(35);
         $sheet->setCellValue('D1', 'Kuantitas')->getColumnDimension('D')->setWidth(15);
-        $sheet->setCellValue('E1', 'Harga Jual')->getColumnDimension('E')->setWidth(15);
-        $sheet->setCellValue('F1', 'Subtotal')->getColumnDimension('F')->setWidth(15);
-        $sheet->setCellValue('G1', 'Pajak')->getColumnDimension('G')->setWidth(15);
-        $sheet->setCellValue('H1', 'Diskon')->getColumnDimension('H')->setWidth(15);
-        $sheet->setCellValue('I1', 'Total')->getColumnDimension('I')->setWidth(15);
+        $sheet->setCellValue('E1', 'Harga Satuan')->getColumnDimension('E')->setWidth(15);
+        $sheet->setCellValue('F1', 'Diskon')->getColumnDimension('H')->setWidth(15);
+        $sheet->setCellValue('G1', 'Total')->getColumnDimension('I')->setWidth(15);
         $no = 2;
         foreach ($details as $key => $item) {
             $sheet->setCellValue('A' . $no, $no);
@@ -319,14 +291,10 @@ class ReportController extends Controller
             $sheet->setCellValue('D' . $no, $item['qty']);
             $sheet->setCellValue('E' . $no, $item['price']);
             $sheet->getStyle('E' . $no)->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->setCellValue('F' . $no, $item['subtotal']);
+            $sheet->setCellValue('F' . $no, $item['discount']);
             $sheet->getStyle('F' . $no)->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->setCellValue('G' . $no, $item['pajak']);
+            $sheet->setCellValue('G' . $no, $item['total']);
             $sheet->getStyle('G' . $no)->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->setCellValue('H' . $no, $item['discount']);
-            $sheet->getStyle('H' . $no)->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->setCellValue('I' . $no, $item['total']);
-            $sheet->getStyle('I' . $no)->getNumberFormat()->setFormatCode('#,##0');
             $no++;
         }
 
@@ -374,7 +342,6 @@ class ReportController extends Controller
         foreach ($query as $key => $value) {
             $items = json_decode($value->item_id);
             $qty = json_decode($value->qty_item);
-            $pajak = json_decode($value->item_pajak);
             $price = json_decode($value->item_price);
             $discount = json_decode($value->item_discount);
 
@@ -385,11 +352,9 @@ class ReportController extends Controller
                     'no_invoice' => $value->invoice_no,
                     'name' => $dtl->name,
                     'qty' => $qty[$idx],
-                    'price' => $price[$idx] + $pajak[$idx],
-                    'subtotal' => $price[$idx],
-                    'pajak' => $pajak[$idx],
+                    'price' => $price[$idx],
                     'discount' => $discount[$idx],
-                    'total' => (($price[$idx] + $pajak[$idx] - $discount[$idx]) * $qty[$idx])
+                    'total' => (($price[$idx] - $discount[$idx]) * $qty[$idx])
                 );
             }
         }

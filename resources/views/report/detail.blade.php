@@ -61,11 +61,10 @@
                                 <th>No Invoice</th>
                                 <th>Name</th>
                                 <th>Kuantitas</th>
-                                <th>Price</th>
-                                <th>Subtotal</th>
-                                <th>Pajak</th>
+                                <th>Harga Satuan</th>
                                 <th>Discount</th>
                                 <th>Total</th>
+                                {{--  <th>Subtotal</th> --}}
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -121,14 +120,6 @@
                         name: 'price'
                     },
                     {
-                        data: 'subtotal',
-                        name: 'subtotal'
-                    },
-                    {
-                        data: 'pajak',
-                        name: 'pajak'
-                    },
-                    {
                         data: 'discount',
                         name: 'discount'
                     },
@@ -136,6 +127,15 @@
                         data: 'total',
                         name: 'total'
                     }
+                    // {
+                    //     data: 'subtotal',
+                    //     name: 'subtotal'
+                    // },
+                    // {
+                    //     data: 'pajak',
+                    //     name: 'pajak'
+                    // },
+
                 ],
 
 
