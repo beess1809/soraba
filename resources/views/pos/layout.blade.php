@@ -43,7 +43,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
         <!-- Navbar -->
 
-        <nav class="main-header navbar navbar-expand-md bg-inventory" style="font-size: 14pt">
+        <nav class="main-header navbar navbar-expand bg-inventory" style="font-size: 14pt">
 
             <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#navbarCollapse"
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,35 +58,29 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <!-- Left navbar links -->
                 <ul class="navbar-nav">
                     <li class="nav-item @if ($url == '/pos') active-link @endif">
-                        <a href="{{ route('pos.index') }}" class="nav-link link-pos"><i class="fas fa-home"></i>
-                            Home
-                        </a>
+                        <a href="{{ route('pos.index') }}" class="nav-link link-pos"><i
+                                class="fas fa-home"></i><span>Home</span></a>
                     </li>
-                    <li class="nav-item @if ($url == '/pos/create') ) active-link @endif">
+                    <li class="nav-item @if ($url == '/pos/create') active-link @endif">
                         <a href="{{ route('pos.create') }}" class="nav-link link-pos "><i
-                                class="fas fa-cash-register"></i>
-                            Buat Pesanan
-                        </a>
+                                class="fas fa-cash-register"></i><span>Buat Pesanan</span></a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('home') }}" class="nav-link link-pos"><i class="fas fa-store-alt"></i>
-                            Inventori
-                        </a>
+                        <a href="{{ route('home') }}" class="nav-link link-pos"><i
+                                class="fas fa-store-alt"></i><span>Inventori</span></a>
                     </li>
                 </ul>
                 <ul class="navbar-nav nav-center">
-
                     <li class="nav-item">
-                        <img src="{{ asset('img/logo-white.png') }}" alt="Logo" class="login-box-msg"
-                            width="230px">
+                        <img src="{{ asset('img/logo-white.png') }}" alt="Logo">
                     </li>
                 </ul>
 
                 <!-- Right navbar links -->
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item dropdown">
-                        <a id="navbarDropdown" class="nav-link dropdown-toggle link-pos" href="#" role="button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle link-pos px-0" href="#"
+                            role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                             <i class="fas fa-user-cog"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
@@ -109,7 +103,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             </li>
                         </ul>
                     </li>
-                    <li class="nav-item" style="font-size: 12pt;margin-right:2rem">
+                    <li class="nav-item mr-lg-4 clock">
                         <span>{{ date('l') . ', ' . date('d F Y') }}</span>
                         <br>
                         <span><i class="far fa-clock"></i> <span id="time"> {{ date('H:i:s') }}</span></span>
