@@ -73,14 +73,14 @@ Route::middleware('auth:employee')->group(function () {
             Route::post('/datatable', [MenuController::class, 'datatable'])->name('datatable');
             Route::resource('', MenuController::class, ['parameters' => ['' => 'id']]);
         });
-        Route::name('wilayah.')->prefix('wilayah')->group(function () {
-            Route::get('/data', [WilayahController::class, 'data'])->name('data');
-            Route::get('/data/branch', [WilayahController::class, 'dataBranch'])->name('dataBranch');
-            Route::get('/data/user', [WilayahController::class, 'dataUser'])->name('dataUser');
-            Route::get('/data/vendor', [WilayahController::class, 'dataVendor'])->name('dataVendor');
-            Route::get('/data/customer', [WilayahController::class, 'data/customer'])->name('data/customer');
-            Route::resource('', MenuController::class, ['parameters' => ['' => 'id']]);
-        });
+        // Route::name('wilayah.')->prefix('wilayah')->group(function () {
+        //     Route::get('/data', [WilayahController::class, 'data'])->name('data');
+        //     Route::get('/data/branch', [WilayahController::class, 'dataBranch'])->name('dataBranch');
+        //     Route::get('/data/user', [WilayahController::class, 'dataUser'])->name('dataUser');
+        //     Route::get('/data/vendor', [WilayahController::class, 'dataVendor'])->name('dataVendor');
+        //     Route::get('/data/customer', [WilayahController::class, 'data/customer'])->name('data/customer');
+        //     Route::resource('', MenuController::class, ['parameters' => ['' => 'id']]);
+        // });
     });
     Route::name('items.')->prefix('items')->group(function () {
         Route::get('/data', [ItemController::class, 'data'])->name('data');
@@ -172,7 +172,11 @@ Route::middleware('auth:employee')->group(function () {
         Route::put('/batal/{id}', [PosController::class, 'batal',])->name('batal');
         Route::get('/invoice/{id}', [PosController::class, 'invoice',])->name('invoice');
         Route::get('/struk/{id}', [PosController::class, 'struk',])->name('struk');
+        Route::post('/update-cart', [PosController::class, 'updateCart'])->name('update-cart');
+        Route::post('/edit-order', [PosController::class, 'editOrder',])->name('editOrder');
         Route::post('/cari', [PosController::class, 'cari'])->name('cari');
+        
+        Route::post('/update-order', [PosController::class, 'updateOrder'])->name('updateOrder');
         Route::resource('', PosController::class, ['parameters' => ['' => 'id']]);
     });
 

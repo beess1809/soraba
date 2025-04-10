@@ -40,7 +40,8 @@ class PosController extends Controller
      */
     public function create()
     {
-        $data['cards'] = $this->cardItem(null);
+        $data['model'] = new Transaction();
+        $data['cards'] = $this->cardItem($data['model'], null);
         $data['bundlings'] = $this->cardBundling(null);
         $data['flash_sale_items'] = $this->cardFlashSaleItem(null);
         $data['flash_sale_bundlings'] = $this->cardFlashSaleBundling(null);
@@ -161,7 +162,13 @@ class PosController extends Controller
      */
     public function edit($id)
     {
-        //
+        $id = base64_decode($id);
+        $data['model'] = Transaction::find($id);
+        $data['cards'] = $this->cardItem($data['model'], null);
+        $data['bundlings'] = $this->cardBundling(null);
+        $data['flash_sale_items'] = $this->cardFlashSaleItem(null);
+        $data['flash_sale_bundlings'] = $this->cardFlashSaleBundling(null);
+        return view('pos.edit-order', $data);
     }
 
     /**
@@ -228,8 +235,10 @@ class PosController extends Controller
         //
     }
 
-    function cardItem($param)
+    function cardItem($transaction, $param)
     {
+        $model = $transaction;
+        
         if (!is_null($param)) {
             $items = Item::where('name', 'like', '%' . $param . '%')->get();
         } else {
@@ -508,8 +517,9 @@ class PosController extends Controller
 
     function cari(Request $request)
     {
+        $data['model'] = new Transaction();
         $param = $request->cari;
-        $card = $this->cardItem($param);
+        $card = $this->cardItem($data['model'], $param);
 
 
         $content = returnJson(true, $card);
@@ -765,8 +775,8 @@ class PosController extends Controller
                         <div class="col-10">
                             <dl>
                                 <dd style="margin-bottom: 0px">' . strtoupper($item->name) . '</dd>
-                            <input type="hidden" name="item_name[]" value="' . $item->name . '">
-                            <input type="hidden" name="index[]" value="' . $time . '">
+                                <input type="hidden" name="item_name[]" value="' . $item->name . '">
+                                <input type="hidden" name="index[]" value="' . $time . '">
                                 <input type="hidden" name="item_id[' . $time . '][0]" value="' . $item->id . '">
                                 <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
                                 <input type="hidden" name="item_qty[' . $time . '][0]" value="' . $request->qty . '">
@@ -782,7 +792,7 @@ class PosController extends Controller
                                         </div>
                                         <div class="col-7">
                                             <strong class="float-right" style="margin-right: 2rem">
-                                            Rp. ' . number_format($harga  - $discount, '0', ',', '.') . '
+                                            Rp. ' . number_format($harga - $discount, '0', ',', '.') . '
                                                 <input type="hidden" name="price[]" id="price_' . $time . '" value="' . $harga - $discount . '">
                                                 <input type="hidden" name="cost[]" id="cost_' . $time . '"  value="' . $cost . '">
                                                 <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $sub . '">
@@ -926,5 +936,477 @@ class PosController extends Controller
         // return $pdf->download('receipt ' . $data['transaction']->invoice_no . ' .pdf');
 
         return view('invoice.receipt', $data);
+    }
+
+    public function editOrder(Request $request)
+    {
+        $id = $request->transaction_detail_id;
+        $new_qty = $request->qty;
+        $old_total = $request->old_total;
+        $model = TransactionDetail::find($id);
+        
+        $qty_item = json_decode($model->qty_item);
+        $item_id = json_decode($model->item_id);
+        $item_price = json_decode($model->item_price);
+        $item_discount = json_decode($model->item_discount);
+
+        $data['item_id'] = $item_id;
+        $data['model'] = $model;
+        if(count($item_id) <= 1) {
+            $data['tipe'] = 1;
+            $data['item'] = Item::find($item_id[0]);
+            $data['qty_item'] = isset($new_qty) ? $new_qty : $qty_item[0];
+            $data['item_price'] = $item_price[0];
+            $data['item_discount'] = $item_discount[0];
+        }
+        else {
+            $data['tipe'] = 2;
+            // $data['item'] = Item::find($item_id[0]);
+            $data['bundling'] = Bundling::where('name', $model->item_name)->first();
+            $data['qty_item'] = isset($new_qty) ? $new_qty : $qty_item[0];
+            $data['item_price'] = $item_price[0];
+            $data['item_discount'] = $item_discount[0];
+        }
+        $data['old_total'] = $old_total;
+        $data['new_qty'] = $new_qty;
+
+        return view('pos.modal-edit', $data);
+    }
+
+    function updateCart(Request $request)
+    {
+        $time = strtotime("now");
+
+        $transaction_detail_id = $request->transaction_detail_id;
+        $transaction_detail = TransactionDetail::find($transaction_detail_id);
+        $item_id = json_decode($transaction_detail->item_id);
+        $qty_item = json_decode($transaction_detail->qty_item);
+        $item_price = json_decode($transaction_detail->item_price);
+        $item_discount = json_decode($transaction_detail->item_discount);
+
+        if(count($item_id) <= 1) {
+            $data['item'] = Item::find($item_id[0]);
+            $data['item_id'] = $item_id[0];
+            $data['qty_item'] = $qty_item[0];
+            $data['item_price'] = $item_price[0];
+            $data['item_discount'] = $item_discount[0];
+        }
+
+        if ($request->qty == 0) {
+            $data = [
+                'message' => 'Kuantitas Tidak Boleh 0',
+            ];
+
+            $content = returnJson(false, $data);
+            $status = 200;
+
+            return (new Response($content, $status))
+                ->header('Content-Type', 'json');
+        }
+
+        if ($request->tipe == 4) {
+            $bundling = FlashSaleBundling::find($request->item_id);
+            $lists_item = json_decode($bundling->item_id);
+
+            $harga = 0;
+            $totPajak = 0;
+            $string = '';
+            $disc = 0;
+            $cost = 0;
+
+            foreach ($lists_item as $key => $value) {
+                $item = Item::find($value->item);
+                if ($item->qty < ((int)$value->qty * $request->qty)) {
+                    $data = [
+                        'message' => 'Sisa stok ' . $item->name . ' adalah ' . $item->qty,
+                    ];
+
+                    $content = returnJson(false, $data);
+                    $status = 200;
+
+                    return (new Response($content, $status))
+                        ->header('Content-Type', 'json');
+                }
+
+                $discount = is_null($item->discount) ? 0 : 0;
+                $subprice = $bundling->price * $request->qty;
+
+                $item_price = $item->sale_price;
+
+                $string .= '<input type="hidden" name="item_id[' . $time . '][' . $key . ']" value="' . $item->id . '">';
+                $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' . $value->qty * $request->qty . '">';
+
+                $string .= '<input type="hidden" name="item_price[' . $time . '][' . $key . ']" value="' . $item_price . '">';
+                $string .= '<input type="hidden" name="item_discount[' . $time . '][' . $key . ']" value="' . $discount . '">';
+
+                $harga += $subprice;
+                $disc += $discount;
+            }
+
+            $sub = $bundling->price;
+            $totPajak = 0;
+
+            $harga = $request->qty * $bundling->price; //$sub  - $disc + $request->cost;
+            $price = ($sub + $request->cost) / $request->qty;
+
+            $html = '<div class="row item-detail" id="detail-' . $time . '">
+                        <div class="col-2">
+                            <img src="' . asset('img/no-pict.png') . '" width="100%" height="84px" class="rounded">
+                        </div>
+                        <div class="col-10">
+                            <dl>
+                                <dd style="margin-bottom: 0px">' . strtoupper($bundling->name) . '</dd>
+                                <input type="hidden" name="index[]" value="' . $time . '">
+                                <input type="hidden" name="item_name[]" value="' . $bundling->name . '">
+                                ' . $string . '
+                                <input type="hidden" name="type[]" value="' . $request->tipe . '">
+                                <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
+                                <input type="hidden" name="qty[]" id="qty_' . $time . '" value="' . $request->qty . '">
+
+                                <dd style="margin-bottom: 0px">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <textarea class="form-control" rows="1" name="notes[]" placeholder="Catatan" style="min-width: 100%"></textarea>
+
+                                        </div>
+                                        <div class="col-7">
+                                            <strong class="float-right" style="margin-right: 2rem">
+                                            Rp. ' . number_format($harga, '0', ',', '.') . '
+                                                <input type="hidden" name="price[]" id="price_' . $time . '" value="' . str_replace('.', '', $harga) . '">
+                                                    <input type="hidden" name="pajak[]" id="pajak_' . $time . '" value="' . $totPajak . '">
+                                                    <input type="hidden" name="discount[]" value="' . $disc . '">
+                                                    <input type="hidden" name="cost[]" id="cost_' . $time . '" value="' . str_replace('.', '', $cost) . '">
+                                                    <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $sub . '">
+                                                <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ')">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>';
+            // $harga -=  $disc;
+        } elseif ($request->tipe == 3) {
+            $item = Item::find($request->item_id);
+            $sub = $item->flash_sale_price;
+            $harga = $item->flash_sale_price * $request->qty;
+            $discount = 0;
+
+            $flash_sale = $item->flash_sale_price;
+            $cost = 0;
+
+            $html = '<div class="row item-detail" id="detail-' . $time . '">
+                        <div class="col-2">
+                            <img src="' . asset('img/no-pict.png') . '" width="100%" height="84px" class="rounded">
+                        </div>
+                        <div class="col-10">
+                            <dl>
+                                <dd style="margin-bottom: 0px">' . strtoupper($item->name) . '</dd>
+                            <input type="hidden" name="item_name[]" value="' . $item->name . '">
+                            <input type="hidden" name="index[]" value="' . $time . '">
+                                <input type="hidden" name="item_id[' . $time . '][0]" value="' . $item->id . '">
+                                <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
+                                <input type="hidden" name="item_qty[' . $time . '][0]" value="' . $request->qty . '">
+                                <input type="hidden" name="item_price[' . $time . '][0]" value="' . $sub . '">
+                                <input type="hidden" name="item_discount[' . $time . '][0]" value="' . $discount . '">
+                                <input type="hidden" name="discount[]" value="' . $discount . '">
+                                <input type="hidden" name="qty[]" id="qty_' . $time . '" value="' . $request->qty . '">
+                                <dd style="margin-bottom: 0px">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <textarea class="form-control" rows="1" name="notes[]" placeholder="Catatan" style="min-width: 100%"></textarea>
+
+                                        </div>
+                                        <div class="col-7">
+                                            <strong class="float-right" style="margin-right: 2rem">
+                                            Rp. ' . number_format($harga, '0', ',', '.') . '
+                                                <input type="hidden" name="price[]" id="price_' . $time . '" value="' . $harga . '">
+                                                <input type="hidden" name="cost[]" id="cost_' . $time . '"  value="' . $cost . '">
+                                                <input type="hidden" name="sub_price[]"  id="sub_price_' . $time . '" value="' . $sub . '">
+                                                <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ')">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>';
+            // $harga = $harga;
+        } elseif ($request->tipe == 2) {
+            $bundling = Bundling::find($request->item_id);
+            $lists_item = json_decode($bundling->item_id);
+
+            $harga = 0;
+            $totPajak = 0;
+            $string = '';
+            $disc = 0;
+            $cost = 0; //$bundling->price * $request->item;
+
+            $last_total = $request->old_total_update;
+
+            foreach ($lists_item as $key => $value) {
+
+                $item = Item::find($value->item);
+                if ($item->qty < ((int)$value->qty * $request->qty)) {
+                    $data = [
+                        'message' => 'Sisa stok ' . $item->name . ' adalah ' . $item->qty,
+                    ];
+
+                    $content = returnJson(false, $data);
+                    $status = 200;
+
+                    return (new Response($content, $status))
+                        ->header('Content-Type', 'json');
+                }
+                $discount = is_null($item->discount) ? 0 : 0;
+                $subprice = $bundling->price * $request->qty;
+
+                $item_price = $item->sale_price;
+
+                $string .= '<input type="hidden" name="item_id[' . $time . '][' . $key . ']" value="' . $item->id . '">';
+                $string .= '<input type="hidden" name="item_qty[' . $time . '][' . $key . ']" value="' . $value->qty * $request->qty . '">';
+
+                $string .= '<input type="hidden" name="item_price[' . $time . '][' . $key . ']" value="' . $item_price . '">';
+                $string .= '<input type="hidden" name="item_discount[' . $time . '][' . $key . ']" value="' . $discount . '">';
+
+                $harga += $subprice;
+                $disc += $discount;
+            }
+            $sub = $bundling->price;
+            $totPajak = 0;
+
+            $harga = $request->qty * $bundling->price;
+            $price = ($sub + $request->cost) / $request->qty;
+
+            $html = '
+                        <div class="col-2">
+                            <img src="' . asset('img/no-pict.png') . '" width="100%" height="84px" class="rounded">
+                        </div>
+                        <div class="col-10">
+                            <dl>
+                                <dd style="margin-bottom: 0px">' . strtoupper($bundling->name) . '</dd>
+                                <input type="hidden" name="index[]" value="' . $time . '">
+                                <input type="hidden" name="item_name[]" value="' . $bundling->name . '">
+                                ' . $string . '
+                                <input type="hidden" name="type[]" value="' . $request->tipe . '">
+                                <dd style="margin-bottom: 0px;color:#626E73"><strong>x' . $request->qty . '</strong></dd>
+                                <input type="hidden" name="qty[]" id="qty_' . $time . '" value="' . $request->qty . '">
+
+                                <dd style="margin-bottom: 0px">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <textarea class="form-control" rows="1" name="notes[]" placeholder="Catatan" style="min-width: 100%"></textarea>
+                                        </div>
+                                        <div class="col-7">
+                                            <strong class="float-right" style="margin-right: 2rem">
+                                            Rp. ' . number_format($harga, '0', ',', '.') . '
+                                                    <input type="hidden" name="price[]" id="price_' . $time . '" value="' . str_replace('.', '', $harga) . '">
+                                                    <input type="hidden" name="old_total[]" id="old_total_' . $time . '" value="' . str_replace('.', '', $harga) . '">
+                                                    <input type="hidden" name="pajak[]" id="pajak_' . $time . '" value="' . $totPajak . '">
+                                                    <input type="hidden" name="discount[]" value="' . $disc . '">
+                                                    <input type="hidden" name="cost[]" id="cost_' . $time . '" value="' . str_replace('.', '', $cost) . '">
+                                                    <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $sub . '">
+                                                <a type="button" class="btn btn-xs btn-warning"
+                                                    title="Edit Item" onClick="getData('.$time.','.$bundling->id.','.$transaction_detail_id.')">
+                                                     <i class="fas fa-pencil-alt"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ','.$transaction_detail_id.')">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </dd>
+                            </dl>
+                        </div>';
+            // $harga -=  $disc;
+        } else {
+            $item = Item::find($request->item_id);
+            $sub = $item->sale_price;
+            $harga = $item->sale_price * $request->qty;
+
+            $discount = is_null($item->discount) ? 0 : $item->discount * $request->qty;
+            $cost = 0;
+
+            $last_total = $request->old_total_update;
+            // $old_total = isset($request->old_total_update) ? $request->old_total_update : $harga - $discount;
+            // $old_total = $request->old_total_update;
+            $html = '
+                        <div class="col-2">
+                            <img src="' . asset('img/no-pict.png') . '" width="100%" height="84px" class="rounded">
+                        </div>
+                        <div class="col-10">
+                            <dl>
+                                <dd style="margin-bottom: 0px">' . strtoupper($item->name) . '</dd>
+                                <input type="hidden" name="item_name[]" value="' . $item->name . '">
+                                <input type="hidden" name="index[]" value="' . $time . '">
+                                <input type="hidden" name="item_id[' . $time . '][0]" value="' . $item->id . '">
+                                <dd style="margin-bottom: 0px;color:#626E73">
+                                    <strong>x' . $request->qty . '</strong>
+                                </dd>
+                                <input type="hidden" name="item_qty[' . $time . '][0]" value="' . $request->qty . '">
+                                <input type="hidden" name="item_price[' . $time . '][0]" value="' . $sub . '">
+                                <input type="hidden" name="item_discount[' . $time . '][0]" value="' . $discount . '">
+                                <input type="hidden" name="discount[]" value="' . $discount . '">
+                                <input type="hidden" name="qty[]" id="qty_' . $time . '" value="' . $request->qty . '">
+
+                                <dd style="margin-bottom: 0px">
+                                    <div class="row">
+                                        <div class="col-5">
+                                            <textarea class="form-control" rows="1" name="notes[]" placeholder="Catatan" style="min-width: 100%"></textarea>
+                                        </div>
+                                        <div class="col-7">
+                                            <strong class="float-right" style="margin-right: 2rem">
+                                            Rp. ' . number_format($harga - $discount, '0', ',', '.') . '
+                                                <input type="hidden" name="price[]" id="price_' . $time . '" value="' . $harga - $discount . '">
+                                                <input type="hidden" name="old_total[]" id="old_total_' . $time . '" value="'. $harga - $discount .'">
+                                                <input type="hidden" name="cost[]" id="cost_' . $time . '"  value="' . $cost . '">
+                                                <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $sub . '">
+                                                <a type="button" class="btn btn-xs btn-warning"
+                                                    title="Edit Item" onClick="getData('.$time.','.$item->id.','.$transaction_detail_id.')">
+                                                     <i class="fas fa-pencil-alt"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ','.$transaction_detail_id.')">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                            </strong>
+                                        </div>
+                                    </div>
+                                </dd>
+                            </dl>
+                        </div>
+                   ';
+            $harga -=  $discount;
+        }
+
+        $item->qty = $request->qty;
+        $item->harga = $harga;
+        $item->cost = $cost;
+        // $item->old_total = $old_total;
+        $item->last_total = $last_total;
+        // $item->sub_total = $transaction_detail->transaction->total - $old_total + $item->harga;
+        
+
+        $data = [
+            'html' => $html,
+            'item' => $item,
+            
+        ];
+
+        $content = returnJson(true, $data);
+        $status = 200;
+
+        return (new Response($content, $status))
+            ->header('Content-Type', 'json');
+    }
+
+    public function updateOrder(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $id = base64_decode($request->id);
+            $model = Transaction::find($id);
+            $model->status_id = 1;
+            // $model->invoice_no = getNumber();
+            $model->date = date('y-m-d');
+            $model->total = str_replace('.', '', $request->total);
+            $model->grand_total = str_replace('.', '', $request->total);
+            $model->cost = str_replace('.', '', $request->total_cost);
+
+            // $sub = round(reverse_tax($model->total));
+
+            // $model->pajak = $model->total - $sub;
+            $model->sub_total = $model->total;
+            $model->created_by = Auth::user()->id;
+            $model->save();
+
+            
+
+            foreach($model->details as $key => $detail) {
+
+                $items_id = json_decode($detail->item_id);
+                $qtys_item = json_decode($detail->qty_item);
+                $items_price = json_decode($detail->item_price);
+                $items_dicount = json_decode($detail->item_discount);
+
+                foreach($items_id as $j => $item_detail) {
+                    $det_item = Item::find($item_detail);
+                    $det_item->qty = $det_item->qty + $qtys_item[$j];
+                    $det_item->save();
+                }
+
+                $detail_transaksi = TransactionDetail::find($detail->id);
+                $detail_transaksi->deleted_at = date('Y-m-d H:i:s');
+                $detail_transaksi->deleted_by = Auth::user()->id;
+                $detail_transaksi->save();
+            }
+            $index = $request->index;
+            foreach ($index as $key => $value) {
+                $dtl = new TransactionDetail();
+                $dtl->transaction_id = $model->id;
+                $dtl->item_id = json_encode($request->item_id[$value]);
+                $dtl->qty_item = json_encode($request->item_qty[$value]);
+                // $dtl->item_pajak = json_encode($request->item_pajak[$value]);
+                $dtl->item_price = json_encode($request->item_price[$value]);
+                $dtl->item_discount = json_encode($request->item_discount[$value]);
+                $dtl->qty = $request->qty[$key];
+                $dtl->item_name = strtoupper($request->item_name[$key]);
+                $dtl->total = $request->price[$key];
+                // $dtl->ppn = $request->pajak[$key];
+                $dtl->discount = $request->discount[$key];
+                $dtl->cost = $request->cost[$key];
+                $dtl->price = $request->sub_price[$key];
+                $dtl->notes = $request->notes[$key];
+
+                foreach ($request->item_id[$value] as $k => $val) {
+                    $item = Item::find($val);
+
+                    if ($item->qty < ($request->item_qty[$value][$k])) {
+                        $data = [
+                            'message' => 'Sisa stok ' . $item->name . ' adalah ' . $item->qty,
+                        ];
+
+                        $content = returnJson(false, $data);
+                        $status = 200;
+
+                        return (new Response($content, $status))
+                            ->header('Content-Type', 'json');
+                    }
+
+                    $item->qty = $item->qty - ($request->item_qty[$value][$k]);
+                    $item->save();
+                }
+
+                $dtl->save();
+            }
+
+            DB::commit();
+            $data = [
+                'url' => route('pos.show', ['id' => base64_encode($model->id)]),
+            ];
+
+            $content = returnJson(true, $data);
+            $status = 200;
+
+            return (new Response($content, $status))
+                ->header('Content-Type', 'json');
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            $data = [
+                'error' => json_encode($e),
+            ];
+            $content = returnJson(false, $data);
+            $status = 200;
+
+            Log::error($content);
+
+            return (new Response($content, $status))
+                ->header('Content-Type', 'json');
+        }
     }
 }

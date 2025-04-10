@@ -167,6 +167,9 @@
                                 Transaksi</button>
                         @elseif($model->status_id == 2)
                             <div class="float-right">
+                                <a href="{{ route('pos.edit', ['id' => base64_encode($model->id)]) }}" target="_blank"
+                                    type="button" class="btn btn-warning" title="Edit Item"><i class="fas fa-edit"></i>
+                                    Edit Transaksi</a>
                                 <a href="{{ route('pos.invoice', ['id' => base64_encode($model->id)]) }}" target="_blank"
                                     type="button" class="btn btn-info" title="Edit Item"><i class="fas fa-receipt"></i>
                                     Cetak Invoice</a>

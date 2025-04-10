@@ -47,7 +47,6 @@
 @push('scripts')
     <script>
         function plusItem(id) {
-
             var input = $(".input-number-" + id);
             var currentVal = parseInt(input.val());
 
@@ -55,7 +54,7 @@
                 if (currentVal < input.attr('max')) {
                     input.val(currentVal + 1).change();
                 }
-                if (parseInt(input.val()) == input.attr('max')) {
+                if (currentVal == input.attr('max')) {
                     $(this).attr('disabled', true);
                 }
             } else {
@@ -64,7 +63,6 @@
         }
 
         function minusItem(id) {
-
             var input = $(".input-number-" + id);
             var currentVal = parseInt(input.val());
 

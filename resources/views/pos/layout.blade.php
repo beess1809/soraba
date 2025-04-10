@@ -118,6 +118,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <!-- Main content -->
             <div class="content">
                 @yield('content')
+                
+                @include('layouts._modal')
             </div>
             <!-- /.content -->
         </div>
