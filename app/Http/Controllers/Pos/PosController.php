@@ -248,22 +248,22 @@ class PosController extends Controller
         } else {
             $items = Item::where('product_id', $product_id)->get();
         }
+        if (count($items) > 0) {
+            foreach ($items as $key => $value) {
+                $stock = ($value->qty == 0) ? '<small class="text-red">Out of Stock !</small>' : '<small>In Stock</small>';
+                $pajak = 0; //pajak($value->sale_price);
+                $harga = $value->sale_price + $pajak;
 
-        foreach ($items as $key => $value) {
-            $stock = ($value->qty == 0) ? '<small class="text-red">Out of Stock !</small>' : '<small>In Stock</small>';
-            $pajak = 0; //pajak($value->sale_price);
-            $harga = $value->sale_price + $pajak;
+                if (!is_null($value->discount)) {
+                    $total = '<dd style="color:grey"><strong><s>Rp. ' . number_format($harga, 0, ',', '.') . '</s></strong></dd>';
+                    $harga = $harga - $value->discount;
+                    $discount = '<span><strong>Rp. ' . number_format($harga, 0, ',', '.') . '</strong></span>';
+                } else {
+                    $total = '<dd style=""><strong>Rp. ' . number_format($harga, 0, ',', '.') . '</strong></dd>';
+                    $discount = '';
+                }
 
-            if (!is_null($value->discount)) {
-                $total = '<dd style="color:grey"><strong><s>Rp. ' . number_format($harga, 0, ',', '.') . '</s></strong></dd>';
-                $harga = $harga - $value->discount;
-                $discount = '<span><strong>Rp. ' . number_format($harga, 0, ',', '.') . '</strong></span>';
-            } else {
-                $total = '<dd style=""><strong>Rp. ' . number_format($harga, 0, ',', '.') . '</strong></dd>';
-                $discount = '';
-            }
-
-            $html = '<div class="col-4">
+                $html = '<div class="col-4">
                         <div class="card">
                             <div class="card-body" style="background-color: #F2F2F280">
                                 <div class="row">
@@ -311,10 +311,11 @@ class PosController extends Controller
                         </div>
                     </div>';
 
-            $htmls[$key] = $html;
+                $htmls[$key] = $html;
+            }
+        } else {
+            $htmls = '';
         }
-
-
         return $htmls;
     }
 
