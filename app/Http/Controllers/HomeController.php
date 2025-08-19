@@ -6,6 +6,7 @@ use App\Models\Transaction\Transaction;
 use App\Models\Master\Item;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 
 class HomeController extends Controller
@@ -27,13 +28,15 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $transaksi = Transaction::where('transactions.status_id', 2)->whereDate('date', Carbon::now()->toDateString());
-        
-        $query = Transaction::join('transaction_details as td', 'transactions.id','=','td.transaction_id')->where('transactions.status_id', 2)->whereDate('date', Carbon::now()->toDateString())->get();
+        $product_id = session('produk');
+
+        $transaksi = Transaction::where('transactions.status_id', 2)->where('product_id', $product_id)->whereDate('date', Carbon::now()->toDateString());
+
+        $query = Transaction::join('transaction_details as td', 'transactions.id', '=', 'td.transaction_id')->where('product_id', $product_id)->where('transactions.status_id', 2)->whereDate('date', Carbon::now()->toDateString())->get();
         $hpp_total = 0;
         $pendapatan_total = 0;
-        
-        foreach($query as $q => $value) {
+
+        foreach ($query as $q => $value) {
             $items = json_decode($value->item_id);
             $qty = json_decode($value->qty_item);
             $price = json_decode($value->item_price);
@@ -42,8 +45,8 @@ class HomeController extends Controller
                 $dtl = Item::find($item);
                 $hpp_subtotal = $dtl->hpp * $qty[$idx];
 
-                
-                
+
+
                 // $sub_total = $qty[$idx] * $price[$idx];
                 // $details[] = array(
                 //     'id' => $dtl->id,
@@ -58,11 +61,31 @@ class HomeController extends Controller
         $laba = $pendapatan_total - $hpp_total;
         $data['transaksi']  = $transaksi->count();
         $data['pendapatan'] = $transaksi->sum('grand_total');
-        $data['items'] = Item::orderBy('qty','asc')->limit(10);
+        $data['items'] = Item::where('product_id', $product_id)->orderBy('qty', 'asc')->limit(10);
         return view('home', $data);
     }
 
-    public function tes() {
+    function landing()
+    {
+        return view('landing-page');
+    }
+
+    function produckChoice(Request $request)
+    {
+        $request->session()->put('produk', $request->produk);
+        $data = [
+            'url' => route('home'),
+        ];
+
+        $content = returnJson(true, $data);
+        $status = 200;
+
+        return (new Response($content, $status))
+            ->header('Content-Type', 'json');
+    }
+
+    public function tes()
+    {
         echo Hash::make('HealthyFit1809');
     }
 }

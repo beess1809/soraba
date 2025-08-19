@@ -65,6 +65,7 @@ class ItemController extends Controller
         try {
             $model = new Item();
             $model->name = strtoupper($request->name);
+            $model->product_id = session('produk');
             $model->composition = $request->composition;
             $model->warehouse_id = $request->warehouse_id;
             $model->category_id = $request->category_id;
@@ -81,8 +82,7 @@ class ItemController extends Controller
             } else {
                 return redirect()->route('items.create')->with('alert.failed', 'Something Wrong');
             }
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             print($e);
         }
@@ -149,15 +149,14 @@ class ItemController extends Controller
             $model->flash_sale_price = isset($request->flash_sale_price) && $request->flash_sale_price <> 0 ? str_replace('.', '', $request->flash_sale_price) : null;
             $model->discount = isset($request->discount) && $request->discount <> 0 ? str_replace('.', '', $request->discount) : null;
             $model->expired_discount = $request->expired_date;
-    
+
             if ($model->save()) {
                 DB::commit();
                 return redirect()->route('items.index')->with('alert.success', 'Item Has Been Updated');
             } else {
                 return redirect()->route('items.create')->with('alert.failed', 'Something Wrong');
             }
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             print($e);
         }
@@ -195,7 +194,8 @@ class ItemController extends Controller
 
     public function datatable(Request $request)
     {
-        $query = Item::all();
+        $product_id = session('produk');
+        $query = Item::where('product_id', $product_id);
         return DataTables::of($query)
             ->addColumn('action', function ($model) {
                 $string = '<div class="btn-group">';
@@ -373,11 +373,10 @@ class ItemController extends Controller
                 $model->save();
             }
             DB::commit();
-    
+
             $res = ['res' => 'success'];
             return $res;
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             print($e);
             $res = ['res' => 'error', 'error' => json_encode($e),];
@@ -394,7 +393,7 @@ class ItemController extends Controller
         } else {
             $model = Item::all();
         }
-        
+
         if ($model->count() > 0) {
             foreach ($model as $key => $value) {
                 $stock = ($value->qty == 0) ? '<small class="text-red">Out of Stock !</small>' : '<small>In Stock</small>';
@@ -419,7 +418,7 @@ class ItemController extends Controller
                                         </div>
                                         <div class="col-lg-8 col-md-8 col-6">
                                             <dl>
-                                                <dd>'.$value->name.'</dd>
+                                                <dd>' . $value->name . '</dd>
                                                 ' . $total . '
                                                 <dd style="margin-bottom: 0px"><span>' . $value->qty . '</span></dd>
                                                 <dd style="margin-bottom: 0px">' . $stock . '</dd>
@@ -603,13 +602,11 @@ class ItemController extends Controller
             DB::commit();
             $res = ['res' => 'success'];
             return $res;
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             print($e);
             $res = ['res' => 'error', 'error' => json_encode($e),];
             return $res;
         }
-        
     }
 }

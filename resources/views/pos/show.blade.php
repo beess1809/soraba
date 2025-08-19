@@ -125,7 +125,7 @@
                                 <dd class="col-4" style="text-align: right"><label class="label-bordered"><strong>
                                             {{ number_format($model->total, 0, ',', '.') }}</strong></label></dd>
                             </dl>
-                            <dl class="row">
+                            {{-- <dl class="row">
                                 <dt class="col-8"><label class="label-bordered">Discount (%)</label></dt>
                                 <dd class="col-4" style="text-align: right">
                                     @if ($model->status_id != 1)
@@ -137,15 +137,23 @@
                                     @endif
 
                                 </dd>
-                            </dl>
+                            </dl> --}}
                             <dl class="row">
                                 <dt class="col-8"><label class="label-bordered">Discount (Rp)</label></dt>
                                 <dd class="col-4" style="text-align: right">
-                                    <label class="label-bordered" id="discLabel"><strong>
-                                            {{ number_format($model->discount, 0, ',', '.') }}</strong></label>
-                                    <input type="hidden" class="form-control number text-right" name="discount"
-                                        id="discount" value="{{ $model->discount ? $model->discount : 0 }}"
-                                        onkeyup="disc()">
+
+                                    @if ($model->status_id != 1)
+                                        <label class="label-bordered" id="discLabel"><strong>
+                                                {{ number_format($model->discount, 0, ',', '.') }}</strong></label>
+                                        <input type="hidden" class="form-control number text-right" name="discount"
+                                            id="discount" value="{{ $model->discount ? $model->discount : 0 }}"
+                                            onkeyup="rpdiscount()">
+                                    @else
+                                        <input type="text" class="form-control number text-right" name="discount"
+                                            id="discount" value="{{ $model->discount ? $model->discount : 0 }}"
+                                            onkeyup="rpdiscount()">
+                                    @endif
+
 
                                 </dd>
                             </dl>
@@ -328,6 +336,18 @@
 
             let total = parseFloat({{ $model->total }}) - persen_rp;
             $('#grandTotal').html(formatRupiah(total.toString()))
+        }
+
+        function rpdiscount() {
+
+            let disc = $("#rpdisc").val();
+            let persen_rp = parseFloat({{ $model->total }}) * parseFloat(disc) / 100;
+
+            let total = parseFloat({{ $model->total }}) - disc;
+
+            $("#discount").val(formatRupiah(disc.toString()));
+            $('#grandTotal').html(formatRupiah(total.toString()))
+
         }
     </script>
 @endpush

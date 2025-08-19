@@ -1,7 +1,10 @@
 <div class="row col-12" id="card-item2" style="overflow-y: scroll;height: 86.8vh">
-    @foreach ($bundlings as $item)
-        {!! $item !!}
-    @endforeach
+    @if ($bundlings)
+        @foreach ($bundlings as $item)
+            {!! $item !!}
+        @endforeach
+    @endif
+
 </div>
 
 @push('scripts')

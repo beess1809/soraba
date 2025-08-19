@@ -79,43 +79,158 @@
                     @csrf
                     <div class="p-3">
                         <h4>Pesanan</h4>
-                        <div id="detail" class="detail-pesanan" style="overflow-y: scroll;height: 250px">
+                        <div id="detail" class="detail-pesanan" style="overflow-y: scroll;height: 100vh">
+                            @if ($model->exists)
+                                @foreach ($model->details as $key => $detail_transaksi)
+                                    @php
+                                        $item = null;
 
+                                        $item_id = json_decode($detail_transaksi->item_id);
+                                        $qty_item = json_decode($detail_transaksi->qty_item);
+                                        $item_price = json_decode($detail_transaksi->item_price);
+                                        $item_discount = json_decode($detail_transaksi->item_discount);
+
+                                        if (count($item_id) <= 1) {
+                                            $item = \App\Models\Master\Item::find($item_id[0]);
+                                        } else {
+                                            $item = \App\Models\Master\Item::find($item_id[0]);
+                                        }
+
+                                    @endphp
+                                    <div class="row item-detail" id="detail-{{ $detail_transaksi->id }}">
+                                        <div class="col-2">
+                                            <img src="https://soraba.test/img/no-pict.png" width="100%" height="84px"
+                                                class="rounded">
+                                        </div>
+                                        <div class="col-10">
+                                            <dl>
+                                                <dd style="margin-bottom: 0px">
+                                                    {{ strtoupper($detail_transaksi->item_name) }}</dd>
+                                                <input type="hidden" name="item_name[]"
+                                                    value="{{ strtoupper($detail_transaksi->item_name) }}">
+                                                <input type="hidden" name="index[]" value="{{ $detail_transaksi->id }}">
+                                                <input type="hidden" name="item_id[{{ $detail_transaksi->id }}][0]"
+                                                    value="{{ $item->id }}">
+                                                <dd style="margin-bottom: 0px;color:#626E73"><strong>x1</strong></dd>
+                                                <input type="hidden" name="item_qty[{{ $detail_transaksi->id }}][0]"
+                                                    value="{{ $detail_transaksi->qty }}">
+                                                <input type="hidden" name="item_price[{{ $detail_transaksi->id }}][0]"
+                                                    value="{{ $detail_transaksi->price }}">
+                                                <input type="hidden" name="item_discount[{{ $detail_transaksi->id }}][0]"
+                                                    value="{{ $detail_transaksi->discount }}">
+                                                <input type="hidden" name="discount[]"
+                                                    value="{{ $detail_transaksi->discount }}">
+                                                <input type="hidden" name="qty[]" id="{{ $detail_transaksi->id }}"
+                                                    value="{{ $detail_transaksi->qty }}">
+                                                <dd style="margin-bottom: 0px">
+                                                    <div class="row">
+                                                        <div class="col-5">
+                                                            <textarea class="form-control" rows="1" name="notes[]" placeholder="Catatan" style="min-width: 100%"></textarea>
+
+                                                        </div>
+                                                        <div class="col-7">
+                                                            <strong class="float-right" style="margin-right: 2rem">
+                                                                Rp.
+                                                                {{ number_format($detail_transaksi->total, '0', ',', '.') }}
+                                                                <input type="hidden" name="price[]"
+                                                                    id="price_{{ $detail_transaksi->id }}"
+                                                                    value="{{ $detail_transaksi->total }}">
+                                                                <input type="hidden" name="cost[]"
+                                                                    id="cost_{{ $detail_transaksi->id }}"
+                                                                    value="{{ $detail_transaksi->cost }}">
+                                                                <input type="hidden" name="sub_price[]"
+                                                                    id="sub_price_{{ $detail_transaksi->id }}"
+                                                                    value="{{ $detail_transaksi->price }}">
+                                                                <button type="button" class="btn btn-xs btn-danger"
+                                                                    onclick="hapusOrder(this,{{ $detail_transaksi->id }})">
+                                                                    <i class="fas fa-minus"></i>
+                                                                </button>
+                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                </dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
                     </div>
 
-                    <div class="p3 footer-pesanan">
-                        <div class="row col-12">
-                            <div class="col-6">
-                                <h5>Subtotal</h5>
+                    @if ($model->exists)
+                        <div class="p3 footer-pesanan">
+                            <div class="row col-12">
+                                <div class="col-6">
+                                    <h5>Subtotal</h5>
+                                </div>
+                                <div class="col-6" style="text-align: right" id="subtotal">
+                                    <h5> Rp. <span
+                                            id="sub">{{ number_format($model->sub_total, '0', ',', '.') }}</span>
+                                    </h5>
+                                    <input type="hidden" name="_subtotal" id="_subtotal"
+                                        value="{{ $model->sub_total }}">
+                                </div>
                             </div>
-                            <div class="col-6" style="text-align: right" id="subtotal">
-                                <h5> Rp. <span id="sub">0</span></h5>
-                                <input type="hidden" name="_subtotal" id="_subtotal" value="0">
+                            <div class="row col-12">
+                                <div class="col-6">
+                                    <h5>Item</h5>
+                                </div>
+                                <div class="col-6" style="text-align: right" id="tot_qty">
+                                    <h5><span id="pcs">{{ count($model->details) }}</span> Pcs</h5>
+                                    <input type="hidden" name="_tot_qty" id="_tot_qty" value="0">
+                                </div>
                             </div>
+                            <hr>
+                            <div class="row col-12" style="margin-bottom: 3rem">
+                                <div class="col-6">
+                                    <h5>Total</h5>
+                                </div>
+                                <div class="col-6" style="text-align: right" id="total">
+                                    <h5>Rp. <span id="tot">{{ number_format($model->total, '0', ',', '.') }}</span>
+                                    </h5>
+                                    <input type="hidden" name="total" id="_total" value="{{ $model->total }}">
+                                    <input type="hidden" name="total_cost" id="_cost" value="{{ $model->cost }}">
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-inventory btn-block btn-lg" id="btn-lanjut">Lanjut
+                                Pembayaran</button>
                         </div>
-                        <div class="row col-12">
-                            <div class="col-6">
-                                <h5>Item</h5>
+                    @else
+                        <div class="p3 footer-pesanan">
+                            <div class="row col-12">
+                                <div class="col-6">
+                                    <h5>Subtotal</h5>
+                                </div>
+                                <div class="col-6" style="text-align: right" id="subtotal">
+                                    <h5> Rp. <span id="sub">0</span></h5>
+                                    <input type="hidden" name="_subtotal" id="_subtotal" value="0">
+                                </div>
                             </div>
-                            <div class="col-6" style="text-align: right" id="tot_qty">
-                                <h5><span id="pcs">0</span> Pcs</h5>
-                                <input type="hidden" name="_tot_qty" id="_tot_qty" value="0">
+                            <div class="row col-12">
+                                <div class="col-6">
+                                    <h5>Item</h5>
+                                </div>
+                                <div class="col-6" style="text-align: right" id="tot_qty">
+                                    <h5><span id="pcs">0</span> Pcs</h5>
+                                    <input type="hidden" name="_tot_qty" id="_tot_qty" value="0">
+                                </div>
                             </div>
+                            <hr>
+                            <div class="row col-12" style="margin-bottom: 3rem">
+                                <div class="col-6">
+                                    <h5>Total</h5>
+                                </div>
+                                <div class="col-6" style="text-align: right" id="total">
+                                    <h5>Rp. <span id="tot">0</span></h5>
+                                    <input type="hidden" name="total" id="_total" value="0">
+                                    <input type="hidden" name="total_cost" id="_cost" value="0">
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-inventory btn-block btn-lg" id="btn-lanjut">Lanjut
+                                Pembayaran</button>
                         </div>
-                        <hr>
-                        <div class="row col-12" style="margin-bottom: 3rem">
-                            <div class="col-6">
-                                <h5>Total</h5>
-                            </div>
-                            <div class="col-6" style="text-align: right" id="total">
-                                <h5>Rp. <span id="tot">0</span></h5>
-                                <input type="hidden" name="total" id="_total" value="0">
-                                <input type="hidden" name="total_cost" id="_cost" value="0">
-                            </div>
-                        </div>
-                        <button type="button" class="btn btn-inventory btn-block btn-lg" id="btn-lanjut">Lanjut Pembayaran</button>
-                    </div>
+                    @endif
+
                 </form>
 
             </div>

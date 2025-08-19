@@ -36,6 +36,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" href="{{ asset('css/inventory.css') }}">
     <!-- overlayScrollbars -->
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
+
+    <style>
+        {{ session('produk') == 2
+            ? ":root {
+                                            --primary: #00584C;
+                                            --hover: #2d8b7e;
+                                        }"
+            : ":root {
+                                            --primary: #7ca3d6;
+                                        }" }}
+    </style>
 </head>
 
 <body class="hold-transition layout-top-nav">
@@ -72,12 +83,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </ul>
                 <ul class="navbar-nav nav-center">
                     <li class="nav-item">
-                        <img src="{{ asset('img/logo-white.png') }}" alt="Logo">
+                        <img src="{{ session('produk') == 2 ? asset('img/logo-beib-white.svg') : asset('img/logo-white.png') }}"
+                            alt="Logo">
                     </li>
                 </ul>
 
                 <!-- Right navbar links -->
                 <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a href="{{ route('landing') }}" class="nav-link link-pos"><i
+                                class="fas fa-item"></i><span>Pilih Produk</span></a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle link-pos px-0" href="#"
                             role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
@@ -118,7 +134,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <!-- Main content -->
             <div class="content">
                 @yield('content')
-                
+
                 @include('layouts._modal')
             </div>
             <!-- /.content -->

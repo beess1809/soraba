@@ -46,6 +46,8 @@
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
     <!-- jQuery -->
     <script src="{{ asset('adminlte/plugins/jquery/jquery.min.js') }}"></script>
+
+
     <style>
         /* .text-sm .select2-search__field {
             line-height: 27px !important;
@@ -62,7 +64,15 @@
             height: 34px !important;
         } */
 
-        table.dataTable.dtr-inline.collapsed.table-sm>tbody>tr>td:first-child:before,
+        {{ session('produk') == 2
+            ? ":root {
+                    --primary: #00584C;
+                    --hover: #2d8b7e;
+        
+                }"
+            : ":root {
+                    --primary: #7ca3d6;
+                }" }} table.dataTable.dtr-inline.collapsed.table-sm>tbody>tr>td:first-child:before,
         table.dataTable.dtr-inline.collapsed.table-sm>tbody>tr>th:first-child:before {
             top: 2px;
             margin-top: .3rem;
@@ -115,7 +125,10 @@
 
             <!-- Right navbar links -->
             <ul class="navbar-nav ml-auto">
-
+                <li class="nav-item">
+                    <a class="btn nav-contact" style=" border-color: var(--primary)" href="{{ route('landing') }}">
+                        Pilih Produk</a>
+                </li>
                 <li class="nav-item dropdown user-menu">
                     <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
                         <img src="{{ asset('adminlte/dist/img/avatar5.png') }}"
@@ -164,7 +177,8 @@
         <aside class="main-sidebar sidebar-light-inventory elevation-4">
             <!-- Brand Logo -->
             <a href="#" class="brand-link">
-                <img src="{{ asset('img/logo.png') }}" alt="Logo" class="brand-image">
+                <img src="{{ session('produk') == 2 ? asset('img/logo-beib-1.svg') : asset('img/logo.png') }}"
+                    alt="Logo" class="brand-image">
             </a>
 
             <!-- Sidebar -->

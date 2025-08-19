@@ -145,7 +145,7 @@
     /* .main-header .navbar-nav .nav-link {
         padding: 3px;
     } */
-    /* 
+    /*
     .navbar-nav .nav-item .nav-link {
         display: flex;
     } */
@@ -192,7 +192,7 @@
 }
 
 .order {
-    background-color: #7ba4dd4d;
+    background-color: color-mix(in srgb, var(--primary), transparent 76%);
     padding: unset;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -209,12 +209,12 @@
 @media (min-width: 576px) and (max-width: 991.98px) {
     .order {
         margin-top: -400px;
-        background-color: #7ba4dd;
+        background-color: color-mix(in srgb, var(--primary), transparent 76%);
     }
 }
 
 .order-title {
-    background: #7ca3d680;
+    background: color-mix(in srgb, var(--primary), transparent 46%);
 }
 
 .order-title span {
@@ -273,7 +273,7 @@
 }
 
 .detail-transaction {
-    background-color: #7ba4dd4d;
+    background-color: color-mix(in srgb, var(--primary), transparent 76%);
     height: 86.8vh;
     padding: 1rem;
     overflow-y: scroll;

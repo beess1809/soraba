@@ -145,25 +145,54 @@ if (!function_exists('getNumber')) {
     {
         $month = date('m');
         $year = date('Y');
+        $product_id = session('produk');
 
-        $trx = Transaction::orderByDesc('id')->whereMonth('created_at', Carbon::now()->month)->first();
+        $trx = Transaction::orderByDesc('id')->where('product_id', $product_id)->whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year)->first();
 
         if ($trx) {
             $lastTrx = $trx->invoice_no;
             $no = explode("/", $lastTrx);
             $no = $no[1];
         } else {
-            $lastTrx =  "#INV/0000/" . $month . "/".$year."/NJM";
+            $lastTrx =  "#INV/0000/" . $month . "/" . $year . "/SORABA";
             $no = "0000";
         }
 
 
-        $lastNumber = "#INV/" . sprintf('%04d', $no + 1) . "/" . getRomawi($month) . "/".$year."/NJM" ;
+        $lastNumber = "#INV/" . sprintf('%04d', $no + 1) . "/" . getRomawi($month) . "/" . $year . "/SORABA";
 
         return $lastNumber;
 
         // INV/001/03/2024/NJM
         //001 no urut, 01 nama bulan, 2024 nama tahun, NJM nama copmany
+    }
+}
+
+if (!function_exists('invBeib')) {
+    function invBeib()
+    {
+        $month = date('m');
+        $year = date('Y');
+        $product_id = session('produk');
+
+        $trx = Transaction::orderByDesc('id')->where('product_id', $product_id)->whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year)->first();
+
+        if ($trx) {
+            $lastTrx = $trx->invoice_no;
+            $no = explode("/", $lastTrx);
+            $no = $no[1];
+        } else {
+            $lastTrx =  "#INV/0000/" . $month . "/" . $year . "/BEIB";
+            $no = "0000";
+        }
+
+
+        $lastNumber = "#INV/" . sprintf('%04d', $no + 1) . "/" . getRomawi($month) . "/" . $year . "/BEIB";
+
+        return $lastNumber;
+
+        // INV/001/03/2024/BEIB
+        //001 no urut, 01 nama bulan, 2024 nama tahun, BEIB nama copmany
     }
 }
 

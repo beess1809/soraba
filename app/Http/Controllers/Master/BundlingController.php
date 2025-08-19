@@ -30,9 +30,7 @@ class BundlingController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-    }
+    public function index() {}
 
     /**
      * Show the form for creating a new resource.
@@ -62,19 +60,20 @@ class BundlingController extends Controller
             'name.required' => 'Nama Paket Wajib Diisi',
             'price.required' => 'Harga Wajib Diisi'
         ]);
-        
+
         DB::beginTransaction();
         try {
             $model = new Bundling();
 
-            foreach($request->item as $key => $value) {
+            foreach ($request->item as $key => $value) {
                 $item[] = [
                     'item' => $request->item[$key],
                     'qty' => $request->qty[$key]
                 ];
             }
-    
+
             $model->name = $request->name;
+            $model->product_id = session('produk');
             $model->price = str_replace('.', '', $request->price);
             $model->item_id = json_encode($item);
             $model->created_by = Auth::user()->id;
@@ -84,8 +83,7 @@ class BundlingController extends Controller
             } else {
                 return redirect()->route('items.create')->with('alert.failed', 'Something Wrong');
             }
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             print($e);
         }
@@ -143,7 +141,7 @@ class BundlingController extends Controller
 
             $model = Bundling::find($id);
 
-            foreach($request->item as $key => $value) {
+            foreach ($request->item as $key => $value) {
                 $item[] = [
                     'item' => $request->item[$key],
                     'qty' => $request->qty[$key]
@@ -160,8 +158,7 @@ class BundlingController extends Controller
             } else {
                 return redirect()->route('items.create')->with('alert.failed', 'Something Wrong');
             }
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             print($e);
         }
@@ -200,7 +197,9 @@ class BundlingController extends Controller
 
     public function datatable(Request $request)
     {
-        $query = Bundling::all();
+        $product_id = session('produk');
+
+        $query = Bundling::where('product_id', $product_id);
         return DataTables::of($query)
             ->addColumn('action', function ($model) {
                 $string = '<div class="btn-group">';
@@ -217,16 +216,16 @@ class BundlingController extends Controller
                 $string = '';
                 $items = json_decode($model->item_id);
                 $string .= '<ul>';
-                foreach($items as $key => $i) {
+                foreach ($items as $key => $i) {
                     $item = Item::find($i->item);
-                    $string .= '<li><b>Item : </b>'.$item->name.' | <b>Qty : </b>'.$i->qty.'</li>';
+                    $string .= '<li><b>Item : </b>' . $item->name . ' | <b>Qty : </b>' . $i->qty . '</li>';
                 }
                 $string .= '</ul>';
                 return  $string;
             })
-            
+
             ->addIndexColumn()
-            ->rawColumns(['action','items'])
+            ->rawColumns(['action', 'items'])
             ->make(true);
     }
 
@@ -238,48 +237,47 @@ class BundlingController extends Controller
         $items = Item::all();
         $data['html'] = '';
 
-        foreach($items as $i) {
+        foreach ($items as $i) {
             $all_items[] = [
                 'id' => $i->id,
                 'text' => $i->name,
             ];
         }
 
-        if($model) {
+        if ($model) {
             $data['harga'] = format_rupiah($model->price);
             $item_c = json_decode($model->item_id);
-            
-            foreach($item_c as $i) {
+
+            foreach ($item_c as $i) {
                 $data['html'] .=  '<div class=""with-item>';
                 $data['html'] .=    '<div class="row ">';
                 $data['html'] .=    '   <div class="form-group col-lg-6 col-md-5 col-8">';
                 $data['html'] .=    '       <label for="item" class="col-sm-12 col-form-label">Item <span class="text-red">*</span></label>';
                 $data['html'] .=    '       <div class="col-sm-12">';
-                $data['html'] .=    '           <select class="form-control select-item" name="__item_id" id="__item_ids_'.$model->id.$i->item.'" disabled>';
+                $data['html'] .=    '           <select class="form-control select-item" name="__item_id" id="__item_ids_' . $model->id . $i->item . '" disabled>';
                 $data['html'] .=    '               <option value="">Pilih Item</option>';
-                foreach($items as $it) {
-                    $selected = $i->item==$it->id ? 'selected' : '';
-                    $data['html'] .=    '               <option value="'.$it->id.'" '.$selected.'>'.$it->name.'</option>';
+                foreach ($items as $it) {
+                    $selected = $i->item == $it->id ? 'selected' : '';
+                    $data['html'] .=    '               <option value="' . $it->id . '" ' . $selected . '>' . $it->name . '</option>';
                 }
                 $data['html'] .=    '           </select>';
-                $data['html'] .=    '           <input type="hidden" class="item-formula" value="'.$i->item.'">';
+                $data['html'] .=    '           <input type="hidden" class="item-formula" value="' . $i->item . '">';
                 $data['html'] .=    '       </div>';
                 $data['html'] .= '      </div>';
                 $data['html'] .= '      <div class="form-group col-lg-3 col-md-3 col-4">';
                 $data['html'] .= '          <label for="qty" class="col-sm-12 col-form-label">Item Quantity <span class="text-red">*</span></label>';
                 $data['html'] .= '          <div class="col-sm-12">';
-                $data['html'] .= '              <input type="number" class="form-control qty-formula" name="__qty_item" id="__qty_item_'.$model->id.$i->item.'" value="'.$i->qty.'" readonly>';
+                $data['html'] .= '              <input type="number" class="form-control qty-formula" name="__qty_item" id="__qty_item_' . $model->id . $i->item . '" value="' . $i->qty . '" readonly>';
                 $data['html'] .= '          </div>';
                 $data['html'] .= '      </div>';
-    
+
                 $data['html'] .= '  </div>';
                 $data['html'] .= '</div>';
-            //     $item['items'][] = [
-            //         'selected_value' => $i->item,
-            //         'options' => $all_items
-            //     ];
+                //     $item['items'][] = [
+                //         'selected_value' => $i->item,
+                //         'options' => $all_items
+                //     ];
             }
-
         }
         return res::json($data);
     }
@@ -292,5 +290,4 @@ class BundlingController extends Controller
         $item = Item::all();
         return view('item.bundling', ['model' => $model, 'item' => $item, 'indexBundling' => $indexBundling]);
     }
-
 }

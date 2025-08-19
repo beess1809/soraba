@@ -5,6 +5,64 @@
             @page {
                 size: A5;
             }
+
+            div.divFooter {
+                position: absolute;
+                right: 25%;
+                bottom: -20pc;
+            }
+
+            html,
+            body {
+                height: 100%
+            }
+
+            .hr1 {
+                background-color: var(--primary);
+                height: 5px;
+                margin-top: 2rem;
+            }
+
+            .hr2 {
+                background-color: var(--primary);
+                height: 2px;
+                margin-bottom: 2rem;
+                margin-top: 2px;
+            }
+        }
+
+        .divFooter {
+            position: absolute;
+
+            bottom: -25pc;
+        }
+
+
+        .table tr td {
+            border-bottom: 1px solid #000;
+            /* Change the color you want to set */
+        }
+
+        .table>thead>tr>th {
+            border-bottom: 1px solid #000;
+            /* Change the color you want to set */
+        }
+
+        .hr1 {
+            background-color: var(--primary);
+            height: 5px;
+            margin-top: 2rem;
+        }
+
+        .hr2 {
+            background-color: var(--primary);
+            height: 2px;
+            margin-bottom: 2rem;
+            margin-top: 2px;
+        }
+
+        hr {
+            border-top: 1px solid #000 !important;
         }
 
         @page {
@@ -44,21 +102,22 @@
 
                     <div class="row col-12">
                         <div class="col-6">
-                            <img src="{{ asset('img/logo.png') }}" width="250px" alt="">
+                            <img src="{{ $transaction->product_id == 2 ? asset('img/logo-beib-1.svg') : asset('img/logo.png') }}"
+                                width="250px" alt="">
                         </div>
                         <div class="col-6 ">
                             <table class="">
-                                <tr>
+                                {{-- <tr>
                                     <th valign="top">
-                                        Apotek
+                                        Lokasi
                                     </th>
                                     <td valign="top">:</td>
                                     <td width="" style="text-align:justify">
                                         Office 88 Kasablanka Tower A, 18th floor Jl. Casablanca Raya Kav 88 Jakarta 12870,
                                         Indonesia
                                     </td>
-                                </tr>
-                                <tr>
+                                </tr> --}}
+                                {{-- <tr>
                                     <th valign="top">
                                         Phone
                                     </th>
@@ -66,7 +125,7 @@
                                     <td class="justy">
                                         +62 859-1065-30391
                                     </td>
-                                </tr>
+                                </tr> --}}
                             </table>
                         </div>
                     </div>
@@ -124,6 +183,7 @@
                             @endforeach
                         </tbody>
                     </table>
+                    <br>
                     <div class="row col-12" style="padding-right: unset;">
                         <div class="col-6">
                             {{-- <div class="form-group" style="position: absolute; bottom: 0px;width:90%">
@@ -132,20 +192,22 @@
                                     value="" {{ $model->status_id != 1 ? 'readonly' : '' }}>
                             </div> --}}
                         </div>
-                        <div class="col-6" style="background: white;padding-inline:1rem;padding-top:1.5rem">
-                            <dl class="row">
+                        <div class="col-6 p-0" style="background: white;padding-inline:1rem;">
+                            <dl class="row mb-0">
                                 <dt class="col-8"><label class="">Subtotal</label></dt>
                                 <dd class="col-4" style="text-align: right"><label class=""><strong>
                                             {{ number_format($transaction->total, 0, ',', '.') }}</strong></label></dd>
                             </dl>
-                            <dl class="row">
+                            <hr style="">
+                            <dl class="row mb-0">
                                 <dt class="col-8"><label class="">Diskon</label></dt>
                                 <dd class="col-4" style="text-align: right">
                                     <label class=""><strong>
                                             {{ number_format($transaction->discount, 0, ',', '.') }}</strong></label>
                                 </dd>
                             </dl>
-                            <dl class="row">
+                            <hr>
+                            <dl class="row mb-0">
                                 <dt class="col-8"><label class="">Total</label></dt>
                                 <dd class="col-4" style="text-align: right">
                                     <label class="" id="grandTotal"><strong>
@@ -155,14 +217,21 @@
 
                         </div>
                     </div>
-                    <small>
+                    <div>
+                        No. Rek:<br>
+                        BCA WISMA MILLENIA<br>
+                        A/C : 005.088.1997 <br>
+                        A/N : Michele Gonatha<br>
+                        <span style="font-style: italic">Notes : Pengiriman dilakukan setelah pembayaran</span>
+                    </div>
 
-                        <ul>
-                            <li>Transaksi sudah termasuk pajak</li>
-                            <li>Barang yang sudah dibeli tidak dapat ditukar atau dikembalikan</li>
-                        </ul>
-
-                    </small>
+                    <div class="row" style="margin-top: 4rem">
+                        <div class="col-sm-4">
+                            <p style="margin-bottom: 10rem">{{ $transaction->product_id == 2 ? 'Beib' : 'Soraba' }}
+                                Official</p>
+                            <p>Michele Gonatha</p>
+                        </div>
+                    </div>
                     <div class="float-right no-print">
                         {{-- <a href="{{ route('invoice.download', ['id' => base64_encode($transaction->id)]) }}"
                             class="btn btn-success"><i class="fas fa-download"></i> Download</a> --}}
@@ -170,6 +239,17 @@
                             Cetak
                             Invoice</a>
                     </div>
+
+                    <div class="divFooter">
+                        <div class="text-center">
+                            @if ($transaction->product_id == 2)
+                                <h5>Find your Beauty In Balance!</h5>
+                            @else
+                                <img src="{{ asset('img/soraba-tag.png') }}" width="500px" alt="">
+                            @endif
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

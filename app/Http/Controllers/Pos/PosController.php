@@ -56,11 +56,14 @@ class PosController extends Controller
      */
     public function store(Request $request)
     {
+        $product_id = session('produk');
+
         DB::beginTransaction();
         try {
             $model = new Transaction();
             $model->status_id = 1;
-            $model->invoice_no = getNumber();
+            $model->invoice_no = $product_id == 1 ? getNumber() : invBeib();
+            $model->product_id = $product_id;
             $model->date = date('y-m-d');
             $model->total = str_replace('.', '', $request->total);
             $model->grand_total = str_replace('.', '', $request->total);
@@ -238,11 +241,12 @@ class PosController extends Controller
     function cardItem($transaction, $param)
     {
         $model = $transaction;
-        
+        $product_id = session('produk');
+
         if (!is_null($param)) {
-            $items = Item::where('name', 'like', '%' . $param . '%')->get();
+            $items = Item::where('product_id', $product_id)->where('name', 'like', '%' . $param . '%')->get();
         } else {
-            $items = Item::all();
+            $items = Item::where('product_id', $product_id)->get();
         }
 
         foreach ($items as $key => $value) {
@@ -316,29 +320,31 @@ class PosController extends Controller
 
     function cardBundling($param)
     {
+        $product_id = session('produk');
+
         if (!is_null($param)) {
-            $bundlings = Bundling::where('name', 'like', '%' . $param . '%')->get();
+            $bundlings = Bundling::where('product_id', $product_id)->where('name', 'like', '%' . $param . '%')->get();
         } else {
-            $bundlings = Bundling::all();
+            $bundlings = Bundling::where('product_id', $product_id)->get();
         }
+        if (count($bundlings) > 0) {
+            foreach ($bundlings as $key => $value) {
+                $harga = $value->price;
+                $total = '<dd><strong>Rp. ' . number_format($harga, 0, ',', '.') . '</strong></dd>';
 
-        foreach ($bundlings as $key => $value) {
-            $harga = $value->price;
-            $total = '<dd><strong>Rp. ' . number_format($harga, 0, ',', '.') . '</strong></dd>';
+                $items = json_decode($value->item_id);
 
-            $items = json_decode($value->item_id);
+                $li = '<ul style="margin-bottom: 0; padding-left: 10px;">';
+                foreach ($items as $item) {
+                    $item_name = Item::find($item->item);
+                    $li .= '<li>';
+                    $li .= '<input type="hidden" class="item-formula" value="' . $item_name->id . '">' . $item_name->name . ' ';
+                    $li .= '<input type="hidden" class="form-control qty-formula" name="__qty_item" id="__qty_item_' . $value->id . $item->item . '" value="' . $item->qty . '" readonly> | ' . $item->qty . ' ' . $item_name->uom->name;
+                    $li .= '</li>';
+                }
+                $li .= '</ul>';
 
-            $li = '<ul style="margin-bottom: 0; padding-left: 10px;">';
-            foreach ($items as $item) {
-                $item_name = Item::find($item->item);
-                $li .= '<li>';
-                $li .= '<input type="hidden" class="item-formula" value="' . $item_name->id . '">' . $item_name->name . ' ';
-                $li .= '<input type="hidden" class="form-control qty-formula" name="__qty_item" id="__qty_item_' . $value->id . $item->item . '" value="' . $item->qty . '" readonly> | ' . $item->qty . ' ' . $item_name->uom->name;
-                $li .= '</li>';
-            }
-            $li .= '</ul>';
-
-            $html = '   <div class="col-12 col-md-6 col-lg-4 item">
+                $html = '   <div class="col-12 col-md-6 col-lg-4 item">
                             <div class="card">
                                 <div class="card-body item-body" style="background-color: #F2F2F280">
                                     <div class="row">
@@ -376,7 +382,10 @@ class PosController extends Controller
                             </div>
                         </div>';
 
-            $htmls[$key] = $html;
+                $htmls[$key] = $html;
+            }
+        } else {
+            $htmls = '';
         }
         return $htmls;
     }
@@ -827,7 +836,8 @@ class PosController extends Controller
 
     public function datatable(Request $request)
     {
-        $query = Transaction::orderBy('created_at', 'desc');
+        $product_id = session('produk');
+        $query = Transaction::where('product_id', $product_id)->orderBy('created_at', 'desc');
         return DataTables::of($query)
             ->addColumn('action', function ($model) {
                 $string = '<div class="btn-group">';
@@ -944,7 +954,7 @@ class PosController extends Controller
         $new_qty = $request->qty;
         $old_total = $request->old_total;
         $model = TransactionDetail::find($id);
-        
+
         $qty_item = json_decode($model->qty_item);
         $item_id = json_decode($model->item_id);
         $item_price = json_decode($model->item_price);
@@ -952,14 +962,13 @@ class PosController extends Controller
 
         $data['item_id'] = $item_id;
         $data['model'] = $model;
-        if(count($item_id) <= 1) {
+        if (count($item_id) <= 1) {
             $data['tipe'] = 1;
             $data['item'] = Item::find($item_id[0]);
             $data['qty_item'] = isset($new_qty) ? $new_qty : $qty_item[0];
             $data['item_price'] = $item_price[0];
             $data['item_discount'] = $item_discount[0];
-        }
-        else {
+        } else {
             $data['tipe'] = 2;
             // $data['item'] = Item::find($item_id[0]);
             $data['bundling'] = Bundling::where('name', $model->item_name)->first();
@@ -984,7 +993,7 @@ class PosController extends Controller
         $item_price = json_decode($transaction_detail->item_price);
         $item_discount = json_decode($transaction_detail->item_discount);
 
-        if(count($item_id) <= 1) {
+        if (count($item_id) <= 1) {
             $data['item'] = Item::find($item_id[0]);
             $data['item_id'] = $item_id[0];
             $data['qty_item'] = $qty_item[0];
@@ -1211,10 +1220,10 @@ class PosController extends Controller
                                                     <input type="hidden" name="cost[]" id="cost_' . $time . '" value="' . str_replace('.', '', $cost) . '">
                                                     <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $sub . '">
                                                 <a type="button" class="btn btn-xs btn-warning"
-                                                    title="Edit Item" onClick="getData('.$time.','.$bundling->id.','.$transaction_detail_id.')">
+                                                    title="Edit Item" onClick="getData(' . $time . ',' . $bundling->id . ',' . $transaction_detail_id . ')">
                                                      <i class="fas fa-pencil-alt"></i>
                                                 </a>
-                                                <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ','.$transaction_detail_id.')">
+                                                <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ',' . $transaction_detail_id . ')">
                                                     <i class="fas fa-minus"></i>
                                                 </button>
                                             </strong>
@@ -1263,14 +1272,14 @@ class PosController extends Controller
                                             <strong class="float-right" style="margin-right: 2rem">
                                             Rp. ' . number_format($harga - $discount, '0', ',', '.') . '
                                                 <input type="hidden" name="price[]" id="price_' . $time . '" value="' . $harga - $discount . '">
-                                                <input type="hidden" name="old_total[]" id="old_total_' . $time . '" value="'. $harga - $discount .'">
+                                                <input type="hidden" name="old_total[]" id="old_total_' . $time . '" value="' . $harga - $discount . '">
                                                 <input type="hidden" name="cost[]" id="cost_' . $time . '"  value="' . $cost . '">
                                                 <input type="hidden" name="sub_price[]" id="sub_price_' . $time . '" value="' . $sub . '">
                                                 <a type="button" class="btn btn-xs btn-warning"
-                                                    title="Edit Item" onClick="getData('.$time.','.$item->id.','.$transaction_detail_id.')">
+                                                    title="Edit Item" onClick="getData(' . $time . ',' . $item->id . ',' . $transaction_detail_id . ')">
                                                      <i class="fas fa-pencil-alt"></i>
                                                 </a>
-                                                <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ','.$transaction_detail_id.')">
+                                                <button type="button" class="btn btn-xs btn-danger" onclick="hapusOrder(this,' . $time . ',' . $transaction_detail_id . ')">
                                                     <i class="fas fa-minus"></i>
                                                 </button>
                                             </strong>
@@ -1289,12 +1298,12 @@ class PosController extends Controller
         // $item->old_total = $old_total;
         $item->last_total = $last_total;
         // $item->sub_total = $transaction_detail->transaction->total - $old_total + $item->harga;
-        
+
 
         $data = [
             'html' => $html,
             'item' => $item,
-            
+
         ];
 
         $content = returnJson(true, $data);
@@ -1324,16 +1333,14 @@ class PosController extends Controller
             $model->created_by = Auth::user()->id;
             $model->save();
 
-            
-
-            foreach($model->details as $key => $detail) {
+            foreach ($model->details as $key => $detail) {
 
                 $items_id = json_decode($detail->item_id);
                 $qtys_item = json_decode($detail->qty_item);
                 $items_price = json_decode($detail->item_price);
                 $items_dicount = json_decode($detail->item_discount);
 
-                foreach($items_id as $j => $item_detail) {
+                foreach ($items_id as $j => $item_detail) {
                     $det_item = Item::find($item_detail);
                     $det_item->qty = $det_item->qty + $qtys_item[$j];
                     $det_item->save();
@@ -1350,7 +1357,7 @@ class PosController extends Controller
                 $dtl->transaction_id = $model->id;
                 $dtl->item_id = json_encode($request->item_id[$value]);
                 $dtl->qty_item = json_encode($request->item_qty[$value]);
-                // $dtl->item_pajak = json_encode($request->item_pajak[$value]);
+
                 $dtl->item_price = json_encode($request->item_price[$value]);
                 $dtl->item_discount = json_encode($request->item_discount[$value]);
                 $dtl->qty = $request->qty[$key];

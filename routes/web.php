@@ -55,6 +55,8 @@ Route::name('pesanan-online.')->prefix('pesanan-online')->group(function () {
 
 Route::middleware('auth:employee')->group(function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/landing', [App\Http\Controllers\HomeController::class, 'landing'])->name('landing');
+    Route::post('/produckChoice', [App\Http\Controllers\HomeController::class, 'produckChoice'])->name('produckChoice');
 
     Route::name('auth.')->prefix('auth')->group(function () {
         Route::name('user.')->prefix('user')->group(function () {
@@ -175,7 +177,7 @@ Route::middleware('auth:employee')->group(function () {
         Route::post('/update-cart', [PosController::class, 'updateCart'])->name('update-cart');
         Route::post('/edit-order', [PosController::class, 'editOrder',])->name('editOrder');
         Route::post('/cari', [PosController::class, 'cari'])->name('cari');
-        
+
         Route::post('/update-order', [PosController::class, 'updateOrder'])->name('updateOrder');
         Route::resource('', PosController::class, ['parameters' => ['' => 'id']]);
     });
