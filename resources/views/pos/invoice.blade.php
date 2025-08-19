@@ -12,6 +12,12 @@
                 bottom: -20pc;
             }
 
+            div.divFooterBeib {
+                position: absolute;
+                right: 35%;
+                bottom: -23pc;
+            }
+
             html,
             body {
                 height: 100%
@@ -240,15 +246,21 @@
                             Invoice</a>
                     </div>
 
-                    <div class="divFooter">
-                        <div class="text-center">
-                            @if ($transaction->product_id == 2)
-                                <h5>Find your Beauty In Balance!</h5>
-                            @else
-                                <img src="{{ asset('img/soraba-tag.png') }}" width="500px" alt="">
-                            @endif
+                    @if ($transaction->product_id == 2)
+                        <div class="divFooterBeib">
+                            <div class="text-center">
+                                <h4 style="align-self: center;color:var(--primary);font-weight: 700">FIND YOUR BEAUTY IN
+                                    BALANCE!</h4>
+                            </div>
                         </div>
-                    </div>
+                    @else
+                        <div class="divFooter">
+                            <div class="text-center">
+                                <img src="{{ asset('img/soraba-tag.png') }}" width="500px" alt="">
+                            </div>
+                        </div>
+                    @endif
+
 
                 </div>
             </div>
