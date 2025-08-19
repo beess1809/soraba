@@ -39,9 +39,11 @@
 </div>
 
 <div class="row col-12" id="card-item" style="overflow-y: scroll;height: 86.8vh">
-    @foreach ($cards as $item)
-        {!! $item !!}
-    @endforeach
+    @if ($cards)
+        @foreach ($cards as $item)
+            {!! $item !!}
+        @endforeach
+    @endif
 </div>
 
 @push('scripts')
