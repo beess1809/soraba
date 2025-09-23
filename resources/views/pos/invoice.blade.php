@@ -226,7 +226,7 @@
                     <div>
                         No. Rek:<br>
                         BCA WISMA MILLENIA<br>
-                        A/C : 005.088.1997 <br>
+                        {{ $transaction->product_id == 2 ? 'A/C : 005.988.2025' : 'A/C : 005.088.1997' }} <br>
                         A/N : Michele Gonatha<br>
                         <span style="font-style: italic">Notes : Pengiriman dilakukan setelah pembayaran</span>
                     </div>
